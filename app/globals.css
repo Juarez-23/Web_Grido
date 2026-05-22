@@ -6,8 +6,8 @@
 
 /* ─── ROOT VARIABLES ─────────────────────────────── */
 :root {
-  --grido-primary: #e63329;
-  --grido-secondary: #1a1a2e;
+  --grido-primary: #134385;
+  --grido-secondary: #0d2d5e;
   --grido-accent: #f7b731;
   --grido-cream: #fff8f0;
 }
@@ -117,7 +117,7 @@ body {
 
 /* Gradiente rojo Grido */
 .bg-grido-gradient {
-  background: linear-gradient(135deg, #e63329 0%, #c0392b 100%);
+  background: linear-gradient(135deg, #134385 0%, #0d2d5e 100%);
 }
 
 /* Botón primario estilo app delivery */
@@ -135,7 +135,7 @@ body {
 /* Card de producto */
 .product-card {
   @apply bg-white rounded-2xl overflow-hidden shadow-card
-         active:scale-98 transition-all duration-200 cursor-pointer;
+         active:scale-95 transition-all duration-200 cursor-pointer;
 }
 
 /* Badge de cantidad en carrito */
@@ -155,7 +155,7 @@ body {
 }
 
 .flavor-chip-selected {
-  @apply border-grido-primary bg-red-50 text-grido-primary;
+  @apply border-grido-primary bg-blue-50 text-grido-primary;
 }
 
 .flavor-chip-unavailable {

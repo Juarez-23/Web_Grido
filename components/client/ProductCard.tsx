@@ -17,7 +17,7 @@ export function ProductCard({ product, variant = "grid", onSelect }: Props) {
         onClick={onSelect}
         className="product-card w-full text-left"
       >
-        <div className="relative h-28 bg-gradient-to-br from-red-50 to-orange-50">
+        <div className="relative h-28 bg-gradient-to-br from-blue-50 to-indigo-50">
           {product.image ? (
             <Image
               src={product.image}
@@ -53,7 +53,7 @@ export function ProductCard({ product, variant = "grid", onSelect }: Props) {
       className="product-card w-full text-left group"
     >
       {/* Image */}
-      <div className="relative h-36 bg-gradient-to-br from-red-50 to-orange-50 overflow-hidden">
+      <div className="relative h-36 bg-gradient-to-br from-blue-50 to-indigo-50 overflow-hidden">
         {product.image ? (
           <Image
             src={product.image}

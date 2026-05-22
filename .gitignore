@@ -36,3 +36,12 @@ next-env.d.ts
 
 # prisma
 prisma/migrations/*.sql
+
+# SQLite local database
+prisma/dev.db
+prisma/dev.db-journal
+
+# Cowork / Claude internal
+.agents/
+.claude/
+skills-lock.json

@@ -11,8 +11,8 @@ const config: Config = {
       colors: {
         // Grido Brand Colors
         grido: {
-          primary: "#E63329",   // Rojo Grido
-          secondary: "#1A1A2E", // Azul oscuro
+          primary: "#134385",   // Azul Grido
+          secondary: "#0d2d5e", // Azul oscuro
           accent: "#F7B731",    // Amarillo dorado
           cream: "#FFF8F0",     // Crema helado
           dark: "#0F0F1A",      // Fondo oscuro

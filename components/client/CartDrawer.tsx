@@ -1,38 +1,91 @@
 "use client";
 
+import { useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useCartStore } from "@/store/cartStore";
 import { formatPrice } from "@/lib/whatsapp";
+import { gsap } from "@/lib/gsap";
+import { useDrawerAnimation } from "@/hooks/useModalAnimation";
 
 export function CartDrawer() {
-  const { items, isOpen, closeCart, removeItem, updateQuantity, clearCart, getSubtotal, getItemCount } =
-    useCartStore();
+  const {
+    items,
+    isOpen,
+    closeCart,
+    removeItem,
+    updateQuantity,
+    clearCart,
+    getSubtotal,
+    getItemCount,
+  } = useCartStore();
+
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
+  // Track if drawer has ever been opened — prevents close() on first render
+  const hasOpenedRef = useRef(false);
+
+  const { open, close } = useDrawerAnimation(
+    drawerRef as React.RefObject<HTMLElement>,
+    backdropRef as React.RefObject<HTMLElement>
+  );
+
+  // ─── React to isOpen changes ────────────────────────────────────────────────
+  useEffect(() => {
+    if (isOpen) {
+      hasOpenedRef.current = true;
+      open();
+
+      // Stagger items in after drawer starts sliding in
+      if (items.length > 0) {
+        gsap.from(".cart-item", {
+          x: 20,
+          autoAlpha: 0,
+          duration: 0.28,
+          stagger: 0.07,
+          ease: "power2.out",
+          delay: 0.2,
+          overwrite: true,
+        });
+      }
+    } else if (hasOpenedRef.current) {
+      close();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   const subtotal = getSubtotal();
   const count = getItemCount();
 
-  if (!isOpen) return null;
-
   return (
     <>
-      {/* Backdrop */}
-      <div className="backdrop animate-fade-in" onClick={closeCart} />
+      {/* Backdrop — starts hidden, GSAP controls visibility */}
+      <div
+        ref={backdropRef}
+        className="backdrop"
+        style={{ display: "none" }}
+        onClick={closeCart}
+      />
 
-      {/* Drawer from right */}
-      <div className="fixed right-0 top-0 bottom-0 w-full max-w-sm z-50 animate-slide-in-right flex flex-col bg-white shadow-modal">
-
+      {/* Drawer — always in DOM, GSAP slides in/out from right */}
+      <div
+        ref={drawerRef}
+        className="fixed right-0 top-0 bottom-0 w-full max-w-sm z-50 flex flex-col bg-white shadow-modal"
+        style={{ display: "none" }}
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <div>
             <h2 className="font-black text-gray-900 text-lg">Tu carrito</h2>
-            <p className="text-xs text-gray-500">{count} producto{count !== 1 ? "s" : ""}</p>
+            <p className="text-xs text-gray-500">
+              {count} producto{count !== 1 ? "s" : ""}
+            </p>
           </div>
           <div className="flex items-center gap-2">
             {items.length > 0 && (
               <button
                 onClick={clearCart}
-                className="text-xs text-gray-400 underline active:text-red-500"
+                className="text-xs text-gray-400 underline active:text-blue-500"
               >
                 Vaciar
               </button>
@@ -41,7 +94,15 @@ export function CartDrawer() {
               onClick={closeCart}
               className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 active:scale-90 transition-transform"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              >
                 <path d="M18 6L6 18M6 6l12 12" />
               </svg>
             </button>
@@ -55,10 +116,7 @@ export function CartDrawer() {
               <span className="text-6xl mb-4">🛒</span>
               <p className="font-bold text-gray-700 text-lg">Tu carrito está vacío</p>
               <p className="text-gray-400 text-sm mt-1">Agregá productos del menú</p>
-              <button
-                onClick={closeCart}
-                className="mt-5 btn-primary px-8"
-              >
+              <button onClick={closeCart} className="mt-5 btn-primary px-8">
                 Ver menú
               </button>
             </div>
@@ -67,10 +125,10 @@ export function CartDrawer() {
               {items.map((item) => (
                 <div
                   key={item.cartId}
-                  className="flex gap-3 bg-gray-50 rounded-2xl p-3"
+                  className="cart-item flex gap-3 bg-gray-50 rounded-2xl p-3"
                 >
-                  {/* Image */}
-                  <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-red-50 to-orange-50 flex-shrink-0">
+                  {/* Product image */}
+                  <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50 flex-shrink-0">
                     {item.product.image ? (
                       <Image
                         src={item.product.image}
@@ -103,17 +161,22 @@ export function CartDrawer() {
 
                   {/* Quantity & Delete */}
                   <div className="flex flex-col items-end justify-between gap-1">
-                    {/* Delete */}
                     <button
                       onClick={() => removeItem(item.cartId)}
-                      className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 active:bg-red-100 transition-colors"
+                      className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 active:bg-blue-100 transition-colors"
                     >
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2.5" strokeLinecap="round">
+                      <svg
+                        width="10"
+                        height="10"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#6b7280"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                      >
                         <path d="M18 6L6 18M6 6l12 12" />
                       </svg>
                     </button>
-
-                    {/* Quantity */}
                     <div className="flex items-center gap-1.5">
                       <button
                         onClick={() => updateQuantity(item.cartId, item.quantity - 1)}

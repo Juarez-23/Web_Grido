@@ -74,9 +74,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Generar número de orden secuencial
+    const lastOrder = await prisma.order.findFirst({ orderBy: { orderNumber: "desc" } });
+    const orderNumber = (lastOrder?.orderNumber ?? 0) + 1;
+
     // Crear pedido con items
     const order = await prisma.order.create({
       data: {
+        orderNumber,
         customerName,
         customerPhone,
         address,

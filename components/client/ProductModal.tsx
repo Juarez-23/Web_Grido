@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { useCartStore } from "@/store/cartStore";
 import { formatPrice } from "@/lib/whatsapp";
+import { gsap } from "@/lib/gsap";
 import toast from "react-hot-toast";
 import type { Product, Flavor, CartFlavor } from "@/types";
 
@@ -19,10 +20,40 @@ export function ProductModal({ product, onClose }: Props) {
   const [loadingFlavors, setLoadingFlavors] = useState(true);
   const [quantity, setQuantity] = useState(1);
 
+  // Refs para GSAP
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
   const needsFlavors = product.maxFlavors > 0;
 
+  // ─── Open animation on mount + body scroll lock ─────────────────────────────
   useEffect(() => {
     document.body.style.overflow = "hidden";
+
+    const panel = panelRef.current;
+    const backdrop = backdropRef.current;
+    if (!panel || !backdrop) return;
+
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+    tl.fromTo(backdrop, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.25 })
+      .fromTo(panel, { y: "100%" }, { y: "0%", duration: 0.42 }, "<0.05");
+
+    // Emoji pop cuando no hay imagen
+    if (!product.image) {
+      const emojiEl = panel.querySelector(".modal-emoji");
+      if (emojiEl) {
+        tl.from(emojiEl, { scale: 0, duration: 0.4, ease: "back.out(2.2)" }, "-=0.12");
+      }
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ─── Flavors fetching ────────────────────────────────────────────────────────
+  useEffect(() => {
     if (needsFlavors) {
       fetch("/api/flavors")
         .then((r) => r.json())
@@ -31,43 +62,74 @@ export function ProductModal({ product, onClose }: Props) {
     } else {
       setLoadingFlavors(false);
     }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, []);
+  }, [needsFlavors]);
 
-  const toggleFlavor = (flavor: Flavor) => {
+  // ─── Close animation → then unmount via onClose ─────────────────────────────
+  const handleClose = useCallback(() => {
+    const panel = panelRef.current;
+    const backdrop = backdropRef.current;
+    if (!panel || !backdrop) {
+      onClose();
+      return;
+    }
+    const tl = gsap.timeline({ defaults: { ease: "power2.in" } });
+    tl.to(panel, { y: "100%", duration: 0.28 })
+      .to(backdrop, { autoAlpha: 0, duration: 0.22 }, "<0.04")
+      .call(() => onClose());
+  }, [onClose]);
+
+  // ─── Flavor chip toggle with GSAP feedback ──────────────────────────────────
+  const toggleFlavor = (flavor: Flavor, e: React.MouseEvent<HTMLButtonElement>) => {
     if (!flavor.available) return;
 
     const isSelected = selectedFlavors.some((f) => f.id === flavor.id);
+    const isFull = !isSelected && selectedFlavors.length >= product.maxFlavors;
 
     if (isSelected) {
+      // Deselect: subtle shrink
       setSelectedFlavors((prev) => prev.filter((f) => f.id !== flavor.id));
+      gsap.fromTo(e.currentTarget, { scale: 1 }, { scale: 0.92, duration: 0.08, yoyo: true, repeat: 1 });
+    } else if (isFull) {
+      // Full: shake to signal error
+      toast.error(`Máximo ${product.maxFlavors} sabores para este producto`);
+      gsap.timeline()
+        .to(e.currentTarget, { x: -5, duration: 0.07 })
+        .to(e.currentTarget, { x: 5, duration: 0.07 })
+        .to(e.currentTarget, { x: -3, duration: 0.06 })
+        .to(e.currentTarget, { x: 0, duration: 0.06 });
     } else {
-      if (selectedFlavors.length >= product.maxFlavors) {
-        toast.error(`Máximo ${product.maxFlavors} sabores para este producto`);
-        return;
-      }
+      // Select: satisfying pop with back.out
       setSelectedFlavors((prev) => [...prev, { id: flavor.id, name: flavor.name }]);
+      gsap.fromTo(
+        e.currentTarget,
+        { scale: 0.86 },
+        { scale: 1, duration: 0.35, ease: "back.out(2.5)" }
+      );
     }
   };
 
   const handleAddToCart = () => {
     addItem(product, selectedFlavors);
     toast.success(`${product.name} agregado al carrito`);
-    onClose();
+    handleClose();
   };
 
   return (
     <>
       {/* Backdrop */}
       <div
-        className="backdrop animate-fade-in"
-        onClick={onClose}
+        ref={backdropRef}
+        className="backdrop"
+        style={{ opacity: 0 }}
+        onClick={handleClose}
       />
 
-      {/* Modal - slide up desde abajo en mobile */}
-      <div className="fixed inset-x-0 bottom-0 z-50 animate-slide-up max-h-[92vh] overflow-hidden">
+      {/* Modal panel — starts below screen, GSAP slides it up */}
+      <div
+        ref={panelRef}
+        className="fixed inset-x-0 bottom-0 z-50 max-h-[92vh] overflow-hidden"
+        style={{ transform: "translateY(100%)" }}
+      >
         <div className="bg-white rounded-t-3xl shadow-modal flex flex-col max-h-[92vh]">
 
           {/* Handle bar */}
@@ -78,7 +140,7 @@ export function ProductModal({ product, onClose }: Props) {
           {/* Scrollable content */}
           <div className="overflow-y-auto flex-1">
             {/* Product Image */}
-            <div className="relative h-52 bg-gradient-to-br from-red-50 to-orange-100 mx-4 rounded-2xl overflow-hidden">
+            <div className="relative h-52 bg-gradient-to-br from-blue-50 to-indigo-100 mx-4 rounded-2xl overflow-hidden">
               {product.image ? (
                 <Image
                   src={product.image}
@@ -90,7 +152,7 @@ export function ProductModal({ product, onClose }: Props) {
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-7xl">🍦</span>
+                  <span className="modal-emoji text-7xl">🍦</span>
                 </div>
               )}
             </div>
@@ -99,7 +161,7 @@ export function ProductModal({ product, onClose }: Props) {
             <div className="px-5 pt-4">
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div>
-                  <span className="text-xs font-semibold text-grido-primary bg-red-50 px-2 py-0.5 rounded-full">
+                  <span className="text-xs font-semibold text-grido-primary bg-blue-50 px-2 py-0.5 rounded-full">
                     {product.category?.name}
                   </span>
                   <h2 className="text-xl font-black text-gray-900 mt-2 leading-tight">
@@ -120,22 +182,18 @@ export function ProductModal({ product, onClose }: Props) {
               <div className="px-5 pb-4">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h3 className="font-bold text-gray-900 text-base">
-                      Elegí los sabores
-                    </h3>
+                    <h3 className="font-bold text-gray-900 text-base">Elegí los sabores</h3>
                     <p className="text-xs text-gray-500 mt-0.5">
                       Hasta {product.maxFlavors} sabore{product.maxFlavors !== 1 ? "s" : ""}
                     </p>
                   </div>
-                  {/* Counter */}
+                  {/* Dot counter */}
                   <div className="flex items-center gap-1">
                     {Array.from({ length: product.maxFlavors }).map((_, i) => (
                       <div
                         key={i}
                         className={`w-2.5 h-2.5 rounded-full transition-colors duration-200 ${
-                          i < selectedFlavors.length
-                            ? "bg-grido-primary"
-                            : "bg-gray-200"
+                          i < selectedFlavors.length ? "bg-grido-primary" : "bg-gray-200"
                         }`}
                       />
                     ))}
@@ -145,13 +203,13 @@ export function ProductModal({ product, onClose }: Props) {
                   </div>
                 </div>
 
-                {/* Selected flavors display */}
+                {/* Selected flavors tags */}
                 {selectedFlavors.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-3">
                     {selectedFlavors.map((f, i) => (
                       <span
                         key={f.id}
-                        className="inline-flex items-center gap-1 bg-red-50 text-grido-primary text-xs font-semibold px-2.5 py-1 rounded-full border border-red-100"
+                        className="inline-flex items-center gap-1 bg-blue-50 text-grido-primary text-xs font-semibold px-2.5 py-1 rounded-full border border-blue-100"
                       >
                         <span className="w-4 h-4 bg-grido-primary text-white rounded-full flex items-center justify-center text-xs font-bold">
                           {i + 1}
@@ -159,11 +217,9 @@ export function ProductModal({ product, onClose }: Props) {
                         {f.name}
                         <button
                           onClick={() =>
-                            setSelectedFlavors((prev) =>
-                              prev.filter((sf) => sf.id !== f.id)
-                            )
+                            setSelectedFlavors((prev) => prev.filter((sf) => sf.id !== f.id))
                           }
-                          className="ml-0.5 text-red-400 hover:text-red-600"
+                          className="ml-0.5 text-blue-400 hover:text-blue-600"
                         >
                           ×
                         </button>
@@ -183,19 +239,18 @@ export function ProductModal({ product, onClose }: Props) {
                   <div className="grid grid-cols-2 gap-2">
                     {flavors.map((flavor) => {
                       const isSelected = selectedFlavors.some((f) => f.id === flavor.id);
-                      const isFull =
-                        !isSelected && selectedFlavors.length >= product.maxFlavors;
+                      const isFull = !isSelected && selectedFlavors.length >= product.maxFlavors;
 
                       return (
                         <button
                           key={flavor.id}
-                          onClick={() => toggleFlavor(flavor)}
-                          disabled={!flavor.available || isFull}
-                          className={`flavor-chip text-left transition-all duration-150 ${
+                          onClick={(e) => toggleFlavor(flavor, e)}
+                          disabled={!flavor.available}
+                          className={`flavor-chip text-left ${
                             !flavor.available
                               ? "flavor-chip-unavailable"
                               : isSelected
-                              ? "flavor-chip-selected scale-[1.02]"
+                              ? "flavor-chip-selected"
                               : isFull
                               ? "flavor-chip-unavailable opacity-40"
                               : "flavor-chip-available"
@@ -205,7 +260,13 @@ export function ProductModal({ product, onClose }: Props) {
                             {isSelected && (
                               <div className="w-4 h-4 bg-grido-primary rounded-full flex items-center justify-center flex-shrink-0">
                                 <svg width="8" height="8" viewBox="0 0 24 24" fill="white">
-                                  <path d="M20 6L9 17l-5-5" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                                  <path
+                                    d="M20 6L9 17l-5-5"
+                                    stroke="white"
+                                    strokeWidth="3"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
                                 </svg>
                               </div>
                             )}
@@ -222,7 +283,6 @@ export function ProductModal({ product, onClose }: Props) {
               </div>
             )}
 
-            {/* Spacer */}
             <div className="h-4" />
           </div>
 
@@ -237,9 +297,7 @@ export function ProductModal({ product, onClose }: Props) {
                 >
                   −
                 </button>
-                <span className="w-6 text-center font-bold text-gray-900">
-                  {quantity}
-                </span>
+                <span className="w-6 text-center font-bold text-gray-900">{quantity}</span>
                 <button
                   onClick={() => setQuantity((q) => q + 1)}
                   className="w-9 h-9 flex items-center justify-center rounded-xl bg-white shadow-sm active:scale-90 transition-transform font-bold text-gray-700"
@@ -248,12 +306,21 @@ export function ProductModal({ product, onClose }: Props) {
                 </button>
               </div>
 
-              {/* Add to cart button */}
+              {/* Add to cart */}
               <button
                 onClick={handleAddToCart}
                 className="flex-1 btn-primary h-12 flex items-center justify-center gap-2"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <circle cx="9" cy="21" r="1" fill="white" />
                   <circle cx="20" cy="21" r="1" fill="white" />
                   <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
