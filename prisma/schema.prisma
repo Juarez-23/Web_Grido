@@ -1,0 +1,176 @@
+// ============================================
+// GRIDO SAN RAFAEL - Prisma Schema
+// ============================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── USUARIOS ───────────────────────────────
+enum Role {
+  ADMIN
+  EMPLEADO
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(EMPLEADO)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+// ─── CATEGORÍAS ─────────────────────────────
+model Category {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  slug     String    @unique
+  icon     String?   // emoji o nombre de ícono
+  order    Int       @default(0)
+  active   Boolean   @default(true)
+  products Product[]
+
+  @@map("categories")
+}
+
+// ─── PRODUCTOS ──────────────────────────────
+model Product {
+  id           String     @id @default(cuid())
+  name         String
+  description  String?
+  price        Float
+  image        String?
+  maxFlavors   Int        @default(4)  // máximo de sabores elegibles
+  active       Boolean    @default(true)
+  featured     Boolean    @default(false)
+  categoryId   String
+  category     Category   @relation(fields: [categoryId], references: [id])
+  orderItems   OrderItem[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("products")
+}
+
+// ─── SABORES ────────────────────────────────
+model Flavor {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  available   Boolean     @default(true)  // toggle rápido para agotados
+  order       Int         @default(0)
+  orderItems  OrderItemFlavor[]
+
+  @@map("flavors")
+}
+
+// ─── PEDIDOS ────────────────────────────────
+enum OrderStatus {
+  CREADO
+  ESPERANDO_PAGO
+  PAGADO
+  PREPARANDO
+  LISTO
+  ENTREGADO
+  CANCELADO
+}
+
+enum DeliveryType {
+  DELIVERY
+  RETIRO
+}
+
+enum PaymentMethod {
+  MERCADO_PAGO
+  TRANSFERENCIA
+  EFECTIVO
+}
+
+model Order {
+  id             String        @id @default(cuid())
+  orderNumber    Int           @unique @default(autoincrement())
+  customerName   String
+  customerPhone  String
+  address        String?       // solo si es delivery
+  deliveryType   DeliveryType
+  paymentMethod  PaymentMethod
+  status         OrderStatus   @default(CREADO)
+  subtotal       Float
+  deliveryCost   Float         @default(0)
+  total          Float
+  notes          String?
+  items          OrderItem[]
+  payment        Payment?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@map("orders")
+}
+
+// ─── ÍTEMS DE PEDIDO ────────────────────────
+model OrderItem {
+  id        String           @id @default(cuid())
+  orderId   String
+  order     Order            @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product          @relation(fields: [productId], references: [id])
+  quantity  Int              @default(1)
+  unitPrice Float
+  subtotal  Float
+  flavors   OrderItemFlavor[]
+
+  @@map("order_items")
+}
+
+// ─── SABORES POR ÍTEM ───────────────────────
+model OrderItemFlavor {
+  id          String    @id @default(cuid())
+  orderItemId String
+  orderItem   OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  flavorId    String
+  flavor      Flavor    @relation(fields: [flavorId], references: [id])
+
+  @@map("order_item_flavors")
+}
+
+// ─── PAGOS ──────────────────────────────────
+enum PaymentStatus {
+  PENDIENTE
+  APROBADO
+  RECHAZADO
+  CANCELADO
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  orderId           String        @unique
+  order             Order         @relation(fields: [orderId], references: [id])
+  method            PaymentMethod
+  status            PaymentStatus @default(PENDIENTE)
+  mpPreferenceId    String?       // ID de preferencia de Mercado Pago
+  mpPaymentId       String?       // ID del pago confirmado por MP
+  amount            Float
+  transferAlias     String?       // alias para transferencia
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@map("payments")
+}
+
+// ─── CONFIGURACIÓN ──────────────────────────
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+
+  @@map("settings")
+}

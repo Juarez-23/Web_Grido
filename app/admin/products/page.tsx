@@ -1,0 +1,299 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import toast from "react-hot-toast";
+import type { Product, Category } from "@/types";
+import { formatPrice } from "@/lib/whatsapp";
+
+interface ProductFormState {
+  name: string;
+  description: string;
+  price: string;
+  image: string;
+  maxFlavors: string;
+  active: boolean;
+  featured: boolean;
+  categoryId: string;
+}
+
+const EMPTY_FORM: ProductFormState = {
+  name: "",
+  description: "",
+  price: "",
+  image: "",
+  maxFlavors: "4",
+  active: true,
+  featured: false,
+  categoryId: "",
+};
+
+export default function AdminProductsPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [form, setForm] = useState<ProductFormState>(EMPTY_FORM);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/products").then((r) => r.json()),
+      fetch("/api/categories").then((r) => r.json()),
+    ]).then(([p, c]) => {
+      setProducts(p.data || []);
+      setCategories(c.data || []);
+      setLoading(false);
+    });
+  }, []);
+
+  const openCreate = () => {
+    setEditingProduct(null);
+    setForm({ ...EMPTY_FORM, categoryId: categories[0]?.id || "" });
+    setShowForm(true);
+  };
+
+  const openEdit = (product: Product) => {
+    setEditingProduct(product);
+    setForm({
+      name: product.name,
+      description: product.description || "",
+      price: String(product.price),
+      image: product.image || "",
+      maxFlavors: String(product.maxFlavors),
+      active: product.active,
+      featured: product.featured,
+      categoryId: product.categoryId,
+    });
+    setShowForm(true);
+  };
+
+  const handleSave = async () => {
+    if (!form.name || !form.price || !form.categoryId) {
+      toast.error("Completá nombre, precio y categoría");
+      return;
+    }
+    setSaving(true);
+
+    try {
+      const url = editingProduct
+        ? `/api/products/${editingProduct.id}`
+        : "/api/products";
+      const method = editingProduct ? "PATCH" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          price: parseFloat(form.price),
+          maxFlavors: parseInt(form.maxFlavors),
+        }),
+      });
+
+      if (!res.ok) throw new Error();
+
+      const data = await res.json();
+      if (editingProduct) {
+        setProducts((prev) =>
+          prev.map((p) => (p.id === editingProduct.id ? data.data : p))
+        );
+        toast.success("Producto actualizado");
+      } else {
+        setProducts((prev) => [data.data, ...prev]);
+        toast.success("Producto creado");
+      }
+      setShowForm(false);
+    } catch {
+      toast.error("Error al guardar producto");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const toggleActive = async (product: Product) => {
+    try {
+      await fetch(`/api/products/${product.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ active: !product.active }),
+      });
+      setProducts((prev) =>
+        prev.map((p) => (p.id === product.id ? { ...p, active: !p.active } : p))
+      );
+    } catch {
+      toast.error("Error");
+    }
+  };
+
+  const deleteProduct = async (id: string) => {
+    if (!confirm("¿Eliminar este producto?")) return;
+    try {
+      await fetch(`/api/products/${id}`, { method: "DELETE" });
+      setProducts((prev) => prev.filter((p) => p.id !== id));
+      toast.success("Producto eliminado");
+    } catch {
+      toast.error("Error al eliminar");
+    }
+  };
+
+  return (
+    <div className="p-6 max-w-6xl mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-black text-gray-900">Productos</h1>
+          <p className="text-gray-500 text-sm">{products.length} productos</p>
+        </div>
+        <button
+          onClick={openCreate}
+          className="btn-primary flex items-center gap-2"
+        >
+          <span>+</span> Nuevo producto
+        </button>
+      </div>
+
+      {/* Products list */}
+      {loading ? (
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="skeleton h-20 rounded-2xl" />
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white rounded-2xl shadow-card divide-y divide-gray-50">
+          {products.map((product) => (
+            <div key={product.id} className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50/50 transition-colors">
+              {/* Image */}
+              <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-gradient-to-br from-red-50 to-orange-50 flex-shrink-0">
+                {product.image ? (
+                  <Image src={product.image} alt={product.name} fill className="object-cover" sizes="56px" />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-2xl">🍦</div>
+                )}
+              </div>
+
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="font-bold text-gray-900 truncate">{product.name}</p>
+                  {product.featured && (
+                    <span className="text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded-full font-semibold">⭐ Top</span>
+                  )}
+                </div>
+                <p className="text-sm text-gray-500 truncate">
+                  {product.category?.name} · {product.maxFlavors} sabores · {formatPrice(product.price)}
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {/* Active toggle */}
+                <button
+                  onClick={() => toggleActive(product)}
+                  className={`w-10 h-6 rounded-full transition-colors relative ${
+                    product.active ? "bg-green-500" : "bg-gray-200"
+                  }`}
+                  title={product.active ? "Activo - clic para desactivar" : "Inactivo - clic para activar"}
+                >
+                  <span
+                    className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                      product.active ? "translate-x-4.5" : "translate-x-0.5"
+                    }`}
+                  />
+                </button>
+
+                <button
+                  onClick={() => openEdit(product)}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors text-sm"
+                >
+                  ✏️
+                </button>
+                <button
+                  onClick={() => deleteProduct(product.id)}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors text-sm"
+                >
+                  🗑️
+                </button>
+              </div>
+            </div>
+          ))}
+          {products.length === 0 && (
+            <div className="py-12 text-center text-gray-400">
+              <p className="text-4xl mb-2">🍦</p>
+              <p>No hay productos. ¡Creá el primero!</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Modal Form */}
+      {showForm && (
+        <>
+          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setShowForm(false)} />
+          <div className="fixed inset-y-0 right-0 w-full max-w-md z-50 bg-white shadow-modal flex flex-col">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <h2 className="font-bold text-gray-900 text-lg">
+                {editingProduct ? "Editar producto" : "Nuevo producto"}
+              </h2>
+              <button onClick={() => setShowForm(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100">
+                ✕
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Nombre *</label>
+                <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="1/2 Kg" className="input-field" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Descripción</label>
+                <input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Descripción corta..." className="input-field" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">Precio *</label>
+                  <input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="12000" className="input-field" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">Máx. sabores</label>
+                  <input type="number" min="0" max="10" value={form.maxFlavors} onChange={(e) => setForm({ ...form, maxFlavors: e.target.value })} className="input-field" />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Categoría *</label>
+                <select value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })} className="input-field">
+                  <option value="">Seleccionar...</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">URL de imagen</label>
+                <input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} placeholder="https://..." className="input-field" />
+              </div>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} className="w-4 h-4 accent-grido-primary" />
+                  <span className="text-sm font-medium text-gray-700">Activo</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} className="w-4 h-4 accent-yellow-500" />
+                  <span className="text-sm font-medium text-gray-700">⭐ Destacado</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="px-6 py-4 border-t border-gray-100">
+              <button onClick={handleSave} disabled={saving} className="w-full btn-primary h-12">
+                {saving ? "Guardando..." : editingProduct ? "Guardar cambios" : "Crear producto"}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}

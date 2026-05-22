@@ -1,0 +1,194 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
+
+/* ─── ROOT VARIABLES ─────────────────────────────── */
+:root {
+  --grido-primary: #e63329;
+  --grido-secondary: #1a1a2e;
+  --grido-accent: #f7b731;
+  --grido-cream: #fff8f0;
+}
+
+/* ─── BASE ───────────────────────────────────────── */
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background-color: #f8f7f5;
+  min-height: 100dvh;
+  overscroll-behavior: none;
+}
+
+/* ─── SCROLLBAR ───────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 999px;
+}
+
+/* ─── ANIMACIONES ────────────────────────────────── */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* ─── UTILITY CLASSES ────────────────────────────── */
+.animate-slide-up {
+  animation: slideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Skeleton loader */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+/* Gradiente rojo Grido */
+.bg-grido-gradient {
+  background: linear-gradient(135deg, #e63329 0%, #c0392b 100%);
+}
+
+/* Botón primario estilo app delivery */
+.btn-primary {
+  @apply bg-grido-primary text-white font-semibold rounded-2xl px-6 py-3
+         active:scale-95 transition-all duration-150
+         disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-secondary {
+  @apply bg-white text-gray-800 font-semibold rounded-2xl px-6 py-3
+         border border-gray-200 active:scale-95 transition-all duration-150;
+}
+
+/* Card de producto */
+.product-card {
+  @apply bg-white rounded-2xl overflow-hidden shadow-card
+         active:scale-98 transition-all duration-200 cursor-pointer;
+}
+
+/* Badge de cantidad en carrito */
+.cart-badge {
+  @apply absolute -top-2 -right-2 bg-grido-primary text-white text-xs
+         font-bold w-5 h-5 rounded-full flex items-center justify-center;
+}
+
+/* Estilo de sabor seleccionado */
+.flavor-chip {
+  @apply px-3 py-1.5 rounded-xl text-sm font-medium border-2
+         transition-all duration-150 cursor-pointer select-none;
+}
+
+.flavor-chip-available {
+  @apply border-gray-200 text-gray-700 bg-white active:scale-95;
+}
+
+.flavor-chip-selected {
+  @apply border-grido-primary bg-red-50 text-grido-primary;
+}
+
+.flavor-chip-unavailable {
+  @apply border-gray-100 text-gray-300 bg-gray-50 cursor-not-allowed line-through;
+}
+
+/* Input estilo delivery app */
+.input-field {
+  @apply w-full rounded-xl border border-gray-200 px-4 py-3 text-gray-800
+         focus:outline-none focus:ring-2 focus:ring-grido-primary/30 focus:border-grido-primary
+         transition-all duration-150 bg-white text-base;
+}
+
+/* Overlay / Backdrop */
+.backdrop {
+  @apply fixed inset-0 bg-black/50 z-40 backdrop-blur-sm;
+}
+
+/* Fix para iOS: evitar el zoom en inputs */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  input[type="text"],
+  input[type="tel"],
+  input[type="email"],
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Safe area para iPhones con notch */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
