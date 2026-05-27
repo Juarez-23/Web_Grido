@@ -158,11 +158,15 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
               <CategoryIcon slug={cat.slug} />
             </div>
 
-            {/* Nombre */}
+            {/* Nombre — altura fija para que todos queden alineados */}
             <span
               className="text-[11px] font-semibold text-center leading-tight"
               style={{
                 maxWidth: 82,
+                minHeight: "2.2rem",
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "center",
                 color: isSelected ? "#1a0d8c" : "#9ca3af",
                 transition: "color 0.2s ease",
               }}

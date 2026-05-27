@@ -87,27 +87,26 @@ export default function HomePage() {
       });
 
       tl.from(".hero-badge", { y: 18, autoAlpha: 0, scale: 0.82, duration: 0.45 })
-        .from(".hero-title", { y: 32, autoAlpha: 0, duration: 0.5 }, "-=0.18")
+        .from(".hero-title", { y: 36, autoAlpha: 0, duration: 0.55 }, "-=0.18")
         .from(
           [".hero-sub", ".hero-sub2"],
           { y: 20, autoAlpha: 0, duration: 0.42, stagger: 0.12 },
           "-=0.22"
-        )
-        .from(
-          ".hero-chip",
-          {
-            y: 26,
-            autoAlpha: 0,
-            scale: 0.82,
-            duration: 0.5,
-            stagger: 0.09,
-            ease: "back.out(2)",
-          },
-          "-=0.18"
         );
     },
     { scope: heroRef }
   );
+
+  // ─── Stats card entrance ────────────────────────────────────────────────────
+  useGSAP(() => {
+    gsap.from(".stats-card", {
+      y: 28,
+      autoAlpha: 0,
+      duration: 0.55,
+      ease: "back.out(1.6)",
+      delay: 0.48,
+    });
+  }, []);
 
   // ─── Featured cards entrance ────────────────────────────────────────────────
   useGSAP(() => {
@@ -215,70 +214,81 @@ export default function HomePage() {
       {/* ── Hero ── */}
       <section
         ref={heroRef}
-        className="bg-grido-gradient pt-16 pb-10 px-4 relative overflow-hidden rounded-b-[2rem]"
+        className="bg-grido-gradient pt-16 pb-16 px-4 relative overflow-hidden rounded-b-[2.5rem]"
       >
-        {/* Blobs decorativos flotantes */}
-        <div className="hero-blob-1 absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32 pointer-events-none" />
-        <div className="hero-blob-2 absolute bottom-0 left-0 w-48 h-48 bg-white/8 rounded-full translate-y-24 -translate-x-16 pointer-events-none" />
+        {/* Blobs decorativos */}
+        <div className="hero-blob-1 absolute top-0 right-0 w-80 h-80 bg-white/[0.06] rounded-full -translate-y-40 translate-x-40 pointer-events-none" />
+        <div className="hero-blob-2 absolute bottom-0 left-0 w-56 h-56 bg-white/[0.04] rounded-full translate-y-32 -translate-x-24 pointer-events-none" />
 
         <div className="hero-content relative max-w-lg mx-auto">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="hero-badge inline-flex items-center gap-1.5 bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+          {/* Badge */}
+          <div className="flex items-center gap-2 mb-5">
+            <span className="hero-badge inline-flex items-center gap-1.5 bg-white/[0.14] text-white/90 text-[11px] font-semibold px-3 py-1.5 rounded-full border border-white/[0.16]">
+              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
               Abierto ahora
             </span>
           </div>
 
-          <h1 className="hero-title text-white text-3xl font-black leading-tight mb-1">
-            Helados Grido
+          {/* Title */}
+          <h1
+            className="hero-title text-white font-black leading-[0.92] tracking-tight mb-4"
+            style={{ fontSize: "clamp(2.5rem, 11vw, 3.5rem)" }}
+          >
+            Helados<br />Grido
           </h1>
-          <p className="hero-sub text-white/80 text-base mb-1 font-medium">
-            Av. Libertador, San Rafael, Mendoza
+
+          {/* Address */}
+          <p className="hero-sub text-white/55 text-sm font-medium tracking-wide">
+            Av. Libertador · San Rafael, Mendoza
           </p>
-          <p className="hero-sub2 text-white/60 text-sm mb-5">
+          <p className="hero-sub2 text-white/30 text-xs mt-1">
             Delivery y retiro en sucursal
           </p>
-
-          {/* Stats bar — sin emojis, estilo profesional */}
-          <div className="hero-chip grid grid-cols-3 bg-white/[0.11] backdrop-blur-sm rounded-2xl border border-white/[0.15] overflow-hidden">
-            {/* Delivery */}
-            <div className="flex flex-col items-center py-4 px-2 gap-1 border-r border-white/[0.12]">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="1" y="3" width="15" height="13" rx="2" />
-                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-                <circle cx="5.5" cy="18.5" r="2.5" fill="white" stroke="none" />
-                <circle cx="18.5" cy="18.5" r="2.5" fill="white" stroke="none" />
-              </svg>
-              <p className="text-white font-black text-[15px] leading-none tracking-tight">30–45</p>
-              <p className="text-white/45 text-[9px] font-bold tracking-widest uppercase">delivery</p>
-            </div>
-            {/* Retiro */}
-            <div className="flex flex-col items-center py-4 px-2 gap-1 border-r border-white/[0.12]">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                <polyline points="9 22 9 12 15 12 15 22" />
-              </svg>
-              <p className="text-white font-black text-[15px] leading-none tracking-tight">15–20</p>
-              <p className="text-white/45 text-[9px] font-bold tracking-widest uppercase">retiro</p>
-            </div>
-            {/* Rating */}
-            <div className="flex flex-col items-center py-4 px-2 gap-1">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="white" stroke="none">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-              </svg>
-              <p className="text-white font-black text-[15px] leading-none tracking-tight">4.8</p>
-              <p className="text-white/45 text-[9px] font-bold tracking-widest uppercase">calificación</p>
-            </div>
-          </div>
         </div>
       </section>
+
+      {/* ── Stats card — flota sobre el borde del hero ── */}
+      <div className="max-w-2xl mx-auto px-4 -mt-7 relative z-10">
+        <div className="stats-card bg-white rounded-2xl overflow-hidden grid grid-cols-3 divide-x divide-gray-100"
+          style={{ boxShadow: "0 4px 32px rgba(26,13,140,0.14), 0 1px 6px rgba(26,13,140,0.07)" }}
+        >
+          {/* Delivery */}
+          <div className="flex flex-col items-center py-4 gap-1">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#1a0d8c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="1" y="3" width="15" height="13" rx="2" />
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+              <circle cx="5.5" cy="18.5" r="2.5" fill="#1a0d8c" stroke="none" />
+              <circle cx="18.5" cy="18.5" r="2.5" fill="#1a0d8c" stroke="none" />
+            </svg>
+            <p className="text-[#1a0d8c] font-black text-[13px] leading-none mt-0.5">30–45</p>
+            <p className="text-gray-400 text-[9px] font-bold tracking-widest uppercase mt-0.5">min delivery</p>
+          </div>
+          {/* Retiro */}
+          <div className="flex flex-col items-center py-4 gap-1">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#1a0d8c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            <p className="text-[#1a0d8c] font-black text-[13px] leading-none mt-0.5">15–20</p>
+            <p className="text-gray-400 text-[9px] font-bold tracking-widest uppercase mt-0.5">min retiro</p>
+          </div>
+          {/* Rating */}
+          <div className="flex flex-col items-center py-4 gap-1">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="#f59e0b" stroke="none">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg>
+            <p className="text-[#1a0d8c] font-black text-[13px] leading-none mt-0.5">4.8</p>
+            <p className="text-gray-400 text-[9px] font-bold tracking-widest uppercase mt-0.5">calificación</p>
+          </div>
+        </div>
+      </div>
 
       {/* ── Content ── */}
       <main className="max-w-2xl mx-auto px-4 pb-32">
         {/* Featured */}
         {!loading && featuredProducts.length > 0 && (
           <section className="mt-6">
-            <h2 className="text-base font-bold text-[#0d2050] mb-3 tracking-tight">⭐ Más pedidos</h2>
+            <h2 className="text-base font-bold text-[#0d2050] mb-3 tracking-tight">Más pedidos</h2>
             <div className="featured-scroll flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x">
               {featuredProducts.map((product) => (
                 <div key={product.id} className="featured-card snap-start flex-shrink-0 w-48">

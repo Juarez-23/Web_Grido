@@ -235,6 +235,11 @@ export function ProductModal({ product, onClose }: Props) {
                       <div key={i} className="skeleton h-12 rounded-xl" />
                     ))}
                   </div>
+                ) : flavors.length === 0 ? (
+                  <div className="py-5 text-center rounded-2xl bg-gray-50 border border-dashed border-gray-200">
+                    <p className="text-sm font-semibold text-gray-500">No hay sabores cargados</p>
+                    <p className="text-xs text-gray-400 mt-1">Agregá sabores desde el panel admin → Sabores</p>
+                  </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-2.5">
                     {flavors.map((flavor) => {
