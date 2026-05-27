@@ -12,6 +12,7 @@ export async function createMercadoPagoPreference(
   orderNumber: number,
   orderId: string,
   items: Array<{
+    id: string;
     title: string;
     quantity: number;
     unit_price: number;
@@ -29,6 +30,7 @@ export async function createMercadoPagoPreference(
         ...(deliveryCost > 0
           ? [
               {
+                id: "delivery",
                 title: "Costo de envío",
                 quantity: 1,
                 unit_price: deliveryCost,
