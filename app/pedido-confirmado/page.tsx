@@ -28,7 +28,7 @@ function PedidoConfirmadoContent() {
   const isMPFailure = status === "failure";
 
   return (
-    <div className="min-h-screen bg-[#f8f7f5] flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4">
       <div className="max-w-sm w-full animate-scale-in">
         {/* Ícono principal */}
         <div className="flex justify-center mb-6">

@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import { useRef } from "react";
+import { gsap } from "@/lib/gsap";
 import type { Product } from "@/types";
 import { formatPrice } from "@/lib/whatsapp";
 
@@ -11,10 +13,25 @@ interface Props {
 }
 
 export function ProductCard({ product, variant = "grid", onSelect }: Props) {
+  const btnRef = useRef<HTMLButtonElement>(null);
+
+  const handleMouseEnter = () => {
+    if (!window.matchMedia("(hover: hover)").matches) return;
+    gsap.to(btnRef.current, { y: -5, duration: 0.22, ease: "power2.out", overwrite: true });
+  };
+
+  const handleMouseLeave = () => {
+    if (!window.matchMedia("(hover: hover)").matches) return;
+    gsap.to(btnRef.current, { y: 0, duration: 0.3, ease: "power2.out", overwrite: true });
+  };
+
   if (variant === "featured") {
     return (
       <button
+        ref={btnRef}
         onClick={onSelect}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         className="product-card w-full text-left"
       >
         <div className="relative h-28 bg-gradient-to-br from-blue-50 to-indigo-50">
@@ -49,7 +66,10 @@ export function ProductCard({ product, variant = "grid", onSelect }: Props) {
 
   return (
     <button
+      ref={btnRef}
       onClick={onSelect}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       className="product-card w-full text-left group"
     >
       {/* Image */}

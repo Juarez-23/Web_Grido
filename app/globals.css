@@ -24,7 +24,7 @@ html {
 }
 
 body {
-  background-color: #1a0d8c;
+  background-color: #ffffff;
   min-height: 100dvh;
   overscroll-behavior: none;
 }
@@ -115,9 +115,9 @@ body {
   border-radius: 8px;
 }
 
-/* Gradiente rojo Grido */
+/* Gradiente azul oscuro Grido */
 .bg-grido-gradient {
-  background: linear-gradient(135deg, #134385 0%, #0d2d5e 100%);
+  background: linear-gradient(155deg, #2115b0 0%, #1a0d8c 55%, #14096e 100%);
 }
 
 /* Botón primario estilo app delivery */
@@ -134,8 +134,16 @@ body {
 
 /* Card de producto */
 .product-card {
-  @apply bg-white rounded-2xl overflow-hidden shadow-card
-         active:scale-95 transition-all duration-200 cursor-pointer;
+  @apply bg-[#f0f5ff] rounded-2xl overflow-hidden shadow-card
+         active:scale-95 cursor-pointer;
+  transition: box-shadow 0.22s ease-out, transform 0.1s ease;
+  will-change: transform;
+}
+
+@media (hover: hover) {
+  .product-card:hover {
+    box-shadow: 0 10px 32px rgba(26, 13, 140, 0.18), 0 4px 12px rgba(26, 13, 140, 0.1);
+  }
 }
 
 /* Badge de cantidad en carrito */

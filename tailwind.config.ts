@@ -51,8 +51,8 @@ const config: Config = {
         },
       },
       boxShadow: {
-        "card": "0 4px 20px rgba(0,0,0,0.08)",
-        "card-hover": "0 8px 30px rgba(0,0,0,0.15)",
+        "card": "0 2px 14px rgba(26, 13, 140, 0.09), 0 1px 4px rgba(26, 13, 140, 0.05)",
+        "card-hover": "0 10px 32px rgba(26, 13, 140, 0.18), 0 4px 12px rgba(26, 13, 140, 0.1)",
         "modal": "0 25px 60px rgba(0,0,0,0.3)",
       },
     },
