@@ -159,7 +159,7 @@ body {
 }
 
 .flavor-chip-available {
-  @apply border-gray-200 text-gray-700 bg-white active:scale-95;
+  @apply border-gray-200 text-gray-700 bg-white active:scale-95 hover:border-gray-300;
 }
 
 .flavor-chip-selected {

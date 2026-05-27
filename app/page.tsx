@@ -239,23 +239,36 @@ export default function HomePage() {
             Delivery y retiro en sucursal
           </p>
 
-          <div className="flex gap-3">
-            {[
-              { icon: "🛵", label: "Delivery", sub: "30-45 min" },
-              { icon: "🏪", label: "Retiro", sub: "15-20 min" },
-              { icon: "⭐", label: "4.8", sub: "Calidad" },
-            ].map((chip) => (
-              <div
-                key={chip.label}
-                className="hero-chip bg-white/15 backdrop-blur-sm rounded-2xl px-4 py-3 flex items-center gap-2"
-              >
-                <span className="text-xl">{chip.icon}</span>
-                <div>
-                  <p className="text-white text-xs font-semibold">{chip.label}</p>
-                  <p className="text-white/70 text-xs">{chip.sub}</p>
-                </div>
-              </div>
-            ))}
+          {/* Stats bar — sin emojis, estilo profesional */}
+          <div className="hero-chip grid grid-cols-3 bg-white/[0.11] backdrop-blur-sm rounded-2xl border border-white/[0.15] overflow-hidden">
+            {/* Delivery */}
+            <div className="flex flex-col items-center py-4 px-2 gap-1 border-r border-white/[0.12]">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="1" y="3" width="15" height="13" rx="2" />
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                <circle cx="5.5" cy="18.5" r="2.5" fill="white" stroke="none" />
+                <circle cx="18.5" cy="18.5" r="2.5" fill="white" stroke="none" />
+              </svg>
+              <p className="text-white font-black text-[15px] leading-none tracking-tight">30–45</p>
+              <p className="text-white/45 text-[9px] font-bold tracking-widest uppercase">delivery</p>
+            </div>
+            {/* Retiro */}
+            <div className="flex flex-col items-center py-4 px-2 gap-1 border-r border-white/[0.12]">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
+              </svg>
+              <p className="text-white font-black text-[15px] leading-none tracking-tight">15–20</p>
+              <p className="text-white/45 text-[9px] font-bold tracking-widest uppercase">retiro</p>
+            </div>
+            {/* Rating */}
+            <div className="flex flex-col items-center py-4 px-2 gap-1">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="white" stroke="none">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+              <p className="text-white font-black text-[15px] leading-none tracking-tight">4.8</p>
+              <p className="text-white/45 text-[9px] font-bold tracking-widest uppercase">calificación</p>
+            </div>
           </div>
         </div>
       </section>
