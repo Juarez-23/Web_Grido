@@ -24,7 +24,7 @@ html {
 }
 
 body {
-  background-color: #f8f7f5;
+  background-color: #1a0d8c;
   min-height: 100dvh;
   overscroll-behavior: none;
 }
@@ -146,7 +146,7 @@ body {
 
 /* Estilo de sabor seleccionado */
 .flavor-chip {
-  @apply px-3 py-1.5 rounded-xl text-sm font-medium border-2
+  @apply px-3 py-2 rounded-xl text-sm font-medium border-2
          transition-all duration-150 cursor-pointer select-none;
 }
 
@@ -155,7 +155,7 @@ body {
 }
 
 .flavor-chip-selected {
-  @apply border-grido-primary bg-blue-50 text-grido-primary;
+  @apply border-grido-primary bg-grido-primary text-white shadow-md;
 }
 
 .flavor-chip-unavailable {

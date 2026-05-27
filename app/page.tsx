@@ -191,7 +191,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f7f5]">
+    <div className="min-h-screen bg-[#1a0d8c]">
       <Header />
       <CartDrawer />
 

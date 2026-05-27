@@ -127,7 +127,7 @@ export default function CheckoutPage() {
   if (items.length === 0) return null;
 
   return (
-    <div className="min-h-screen bg-[#f8f7f5]">
+    <div className="min-h-screen bg-[#1a0d8c]">
       {/* Header */}
       <header className="sticky top-0 z-30 bg-white border-b border-gray-100 px-4 h-14 flex items-center gap-3">
         <button
@@ -213,7 +213,7 @@ export default function CheckoutPage() {
                 key={opt.value}
                 className={`cursor-pointer rounded-xl border-2 p-3 transition-all ${
                   form.deliveryType === opt.value
-                    ? "border-grido-primary bg-red-50"
+                    ? "border-grido-primary bg-blue-50"
                     : "border-gray-200 bg-white"
                 }`}
               >
@@ -276,7 +276,7 @@ export default function CheckoutPage() {
                 key={opt.value}
                 className={`flex items-center gap-3 cursor-pointer rounded-xl border-2 p-3 transition-all ${
                   form.paymentMethod === opt.value
-                    ? "border-grido-primary bg-red-50"
+                    ? "border-grido-primary bg-blue-50"
                     : "border-gray-200 bg-white"
                 }`}
               >
@@ -293,8 +293,8 @@ export default function CheckoutPage() {
                   <p className="text-xs text-gray-500 mt-0.5">{opt.sub}</p>
                 </div>
                 {form.paymentMethod === opt.value && (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#e63329">
-                    <path d="M20 6L9 17l-5-5" stroke="#e63329" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M20 6L9 17l-5-5" stroke="#134385" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 )}
               </label>

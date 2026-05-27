@@ -258,12 +258,12 @@ export function ProductModal({ product, onClose }: Props) {
                         >
                           <div className="flex items-center gap-2">
                             {isSelected && (
-                              <div className="w-4 h-4 bg-grido-primary rounded-full flex items-center justify-center flex-shrink-0">
-                                <svg width="8" height="8" viewBox="0 0 24 24" fill="white">
+                              <div className="w-4 h-4 bg-white rounded-full flex items-center justify-center flex-shrink-0">
+                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none">
                                   <path
                                     d="M20 6L9 17l-5-5"
-                                    stroke="white"
-                                    strokeWidth="3"
+                                    stroke="#134385"
+                                    strokeWidth="3.5"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
                                   />
@@ -273,7 +273,7 @@ export function ProductModal({ product, onClose }: Props) {
                             <span className="font-medium text-sm truncate">{flavor.name}</span>
                           </div>
                           {!flavor.available && (
-                            <span className="text-xs text-gray-400 block mt-0.5">Agotado</span>
+                            <span className="text-xs text-white/60 block mt-0.5">Agotado</span>
                           )}
                         </button>
                       );
