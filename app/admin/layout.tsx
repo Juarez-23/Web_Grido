@@ -1,6 +1,5 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { Toaster } from "react-hot-toast";
 import "@/app/globals.css";
@@ -18,8 +17,16 @@ export default async function AdminLayout({
 }) {
   const session = await getServerSession(authOptions);
 
+  // Sin sesión: mostrar solo el children (login page) sin sidebar ni redirect
   if (!session) {
-    redirect("/admin/login");
+    return (
+      <html lang="es-AR">
+        <body className="bg-gray-950 min-h-screen">
+          {children}
+          <Toaster position="top-right" />
+        </body>
+      </html>
+    );
   }
 
   return (
