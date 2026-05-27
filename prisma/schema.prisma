@@ -1,7 +1,5 @@
 // ============================================
-// GRIDO SAN RAFAEL - Prisma Schema (SQLite local)
-// Para producción con PostgreSQL: cambiar provider a "postgresql"
-// y restaurar los enum types.
+// GRIDO SAN RAFAEL - Prisma Schema (PostgreSQL)
 // ============================================
 
 generator client {
@@ -9,7 +7,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
