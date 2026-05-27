@@ -1,6 +1,12 @@
-export { default } from "next-auth/middleware";
+import { withAuth } from "next-auth/middleware";
+
+export default withAuth({
+  pages: {
+    signIn: "/admin/login",
+  },
+});
 
 export const config = {
   // Proteger todas las rutas /admin excepto /admin/login
-  matcher: ["/admin/((?!login).*)"],
+  matcher: ["/admin/((?!login$).*)"],
 };
