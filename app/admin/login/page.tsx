@@ -2,11 +2,10 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { GridoLogo } from "@/components/ui/GridoLogo";
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -25,8 +24,8 @@ export default function AdminLoginPage() {
       if (result?.error) {
         toast.error("Credenciales incorrectas");
       } else {
-        router.push("/admin");
-        router.refresh();
+        // Hard redirect para que el server component del layout lea la sesión nueva
+        window.location.href = "/admin";
       }
     } catch (err) {
       toast.error("Error al iniciar sesión");
@@ -40,11 +39,18 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-sm animate-scale-in">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex w-16 h-16 bg-grido-primary rounded-2xl items-center justify-center mb-4">
-            <span className="text-white font-black text-2xl">G</span>
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <GridoLogo size={52} />
+            <div className="text-left">
+              <p className="font-black text-white text-2xl leading-none" style={{ letterSpacing: "-0.5px" }}>
+                grido
+              </p>
+              <p className="text-gray-500 text-[10px] leading-none tracking-widest uppercase font-semibold mt-1">
+                San Rafael
+              </p>
+            </div>
           </div>
-          <h1 className="text-2xl font-black text-white">Panel Grido</h1>
-          <p className="text-gray-400 text-sm mt-1">San Rafael, Mendoza</p>
+          <h1 className="text-lg font-bold text-gray-300">Panel de administración</h1>
         </div>
 
         {/* Form */}
