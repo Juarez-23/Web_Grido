@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -17,7 +17,7 @@ export default function AdminLoginPage() {
 
     try {
       const result = await signIn("credentials", {
-        email,
+        username,
         password,
         redirect: false,
       });
@@ -54,14 +54,15 @@ export default function AdminLoginPage() {
         >
           <div>
             <label className="text-sm font-medium text-gray-300 mb-1.5 block">
-              Email
+              Usuario
             </label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@grido.com"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="admin"
               required
+              autoComplete="username"
               className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-grido-primary focus:ring-1 focus:ring-grido-primary/50 transition-all placeholder:text-gray-500"
             />
           </div>

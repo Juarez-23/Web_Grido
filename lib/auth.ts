@@ -1,7 +1,18 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
+
+// Credenciales hardcodeadas del panel admin
+// Hash de "grido2026" generado con bcrypt (saltRounds=10)
+const ADMIN_USERS = [
+  {
+    id: "admin-1",
+    username: "admin",
+    passwordHash: "$2a$10$A5x1sf87Bo2BxyaoPTsPgObB2PreWQTSDufSy3K78B.zmB4JbFmE6",
+    name: "Administrador",
+    role: "ADMIN",
+  },
+];
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -15,25 +26,25 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: "credentials",
       credentials: {
-        email: { label: "Email", type: "email" },
+        username: { label: "Usuario", type: "text" },
         password: { label: "Contraseña", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+        if (!credentials?.username || !credentials?.password) {
           throw new Error("Credenciales inválidas");
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
+        const user = ADMIN_USERS.find(
+          (u) => u.username === credentials.username.toLowerCase().trim()
+        );
 
-        if (!user || !user.active) {
-          throw new Error("Usuario no encontrado o inactivo");
+        if (!user) {
+          throw new Error("Usuario no encontrado");
         }
 
         const isPasswordValid = await bcrypt.compare(
           credentials.password,
-          user.password
+          user.passwordHash
         );
 
         if (!isPasswordValid) {
@@ -42,8 +53,8 @@ export const authOptions: NextAuthOptions = {
 
         return {
           id: user.id,
-          email: user.email,
           name: user.name,
+          email: user.username,
           role: user.role,
         };
       },
