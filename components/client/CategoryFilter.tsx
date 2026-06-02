@@ -80,8 +80,8 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
             ].join(" ")}
             style={{
               height: 48,
-              paddingLeft: 24,
-              paddingRight: 24,
+              paddingLeft: 32,
+              paddingRight: 32,
               fontFamily: "'Nunito', system-ui, sans-serif",
               fontSize: 15,
               fontWeight: active ? 800 : 600,
