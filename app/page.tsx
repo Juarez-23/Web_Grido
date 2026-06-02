@@ -232,17 +232,17 @@ export default function HomePage() {
 
           {/* Title */}
           <h1
-            className="hero-title text-white font-black leading-[0.92] tracking-tight mb-4"
-            style={{ fontSize: "clamp(2.5rem, 11vw, 3.5rem)" }}
+            className="hero-title text-white leading-[0.9] mb-4"
+            style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 800, fontSize: "clamp(2.6rem, 11vw, 3.6rem)", letterSpacing: "-0.03em" }}
           >
             Helados<br />Grido
           </h1>
 
           {/* Address */}
-          <p className="hero-sub text-white/55 text-sm font-medium tracking-wide">
+          <p className="hero-sub text-white/60 text-sm tracking-wide" style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 500 }}>
             Av. Libertador · San Rafael, Mendoza
           </p>
-          <p className="hero-sub2 text-white/30 text-xs mt-1">
+          <p className="hero-sub2 text-white/35 text-xs mt-1" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400 }}>
             Delivery y retiro en sucursal
           </p>
         </div>
@@ -261,25 +261,25 @@ export default function HomePage() {
               <circle cx="5.5" cy="18.5" r="2.5" fill="#1a0d8c" stroke="none" />
               <circle cx="18.5" cy="18.5" r="2.5" fill="#1a0d8c" stroke="none" />
             </svg>
-            <p className="text-[#1a0d8c] font-black text-[13px] leading-none mt-0.5">30–45</p>
-            <p className="text-gray-400 text-[9px] font-bold tracking-widest uppercase mt-0.5">min delivery</p>
+            <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 13, color: "#0d2050", lineHeight: 1, marginTop: 2 }}>30–45</p>
+            <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: 9, color: "#9ca3af", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 2 }}>min delivery</p>
           </div>
           {/* Retiro */}
           <div className="flex flex-col items-center py-4 gap-1">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#1a0d8c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0d2050" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
               <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
-            <p className="text-[#1a0d8c] font-black text-[13px] leading-none mt-0.5">15–20</p>
-            <p className="text-gray-400 text-[9px] font-bold tracking-widest uppercase mt-0.5">min retiro</p>
+            <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 13, color: "#0d2050", lineHeight: 1, marginTop: 2 }}>15–20</p>
+            <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: 9, color: "#9ca3af", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 2 }}>min retiro</p>
           </div>
           {/* Rating */}
           <div className="flex flex-col items-center py-4 gap-1">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="#f59e0b" stroke="none">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
             </svg>
-            <p className="text-[#1a0d8c] font-black text-[13px] leading-none mt-0.5">4.8</p>
-            <p className="text-gray-400 text-[9px] font-bold tracking-widest uppercase mt-0.5">calificación</p>
+            <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 13, color: "#0d2050", lineHeight: 1, marginTop: 2 }}>4.8</p>
+            <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: 9, color: "#9ca3af", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 2 }}>calificación</p>
           </div>
         </div>
       </div>
@@ -289,7 +289,7 @@ export default function HomePage() {
         {/* Featured */}
         {!loading && featuredProducts.length > 0 && (
           <section className="mt-6">
-            <h2 className="text-base font-bold text-[#0d2050] mb-3 tracking-tight">Más pedidos</h2>
+            <h2 style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 15, color: "#0d2050", letterSpacing: "-0.02em", marginBottom: 12 }}>Más pedidos</h2>
             <div className="featured-scroll flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x">
               {featuredProducts.map((product) => (
                 <div key={product.id} className="featured-card snap-start flex-shrink-0 w-48">

@@ -102,11 +102,12 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
             onClick={() => handleSelect(cat.slug, i)}
             className="category-pill flex-shrink-0 rounded-full select-none whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-grido-primary"
             style={{
-              height: 42,
-              padding: "0 20px",
-              fontSize: 14,
+              height: 44,
+              padding: "0 22px",
+              fontFamily: "'Poppins', system-ui, sans-serif",
+              fontSize: 13.5,
               fontWeight: 600,
-              letterSpacing: "-0.01em",
+              letterSpacing: "0.01em",
               background: active ? "#0d2050" : "#eef1f8",
               color: active ? "#ffffff" : "#4b5563",
               boxShadow: active

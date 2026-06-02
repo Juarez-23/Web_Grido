@@ -51,8 +51,8 @@ export function ProductCard({ product, variant = "grid", onSelect }: Props) {
           )}
         </div>
         <div className="p-3">
-          <p className="font-bold text-gray-900 text-sm truncate">{product.name}</p>
-          <p className="text-grido-primary font-black text-sm mt-1">
+          <p className="text-gray-900 text-sm truncate" style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>{product.name}</p>
+          <p className="text-grido-primary text-sm mt-1" style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700 }}>
             {formatPrice(product.price)}
           </p>
         </div>
@@ -95,7 +95,7 @@ export function ProductCard({ product, variant = "grid", onSelect }: Props) {
 
       {/* Info */}
       <div className="p-3">
-        <p className="font-bold text-gray-900 text-sm leading-tight line-clamp-2 mb-1">
+        <p className="text-gray-900 text-sm leading-tight line-clamp-2 mb-1" style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>
           {product.name}
         </p>
         {product.description && (
@@ -104,7 +104,7 @@ export function ProductCard({ product, variant = "grid", onSelect }: Props) {
           </p>
         )}
         <div className="flex items-center justify-between mt-1">
-          <p className="font-black text-grido-primary text-sm">
+          <p className="text-grido-primary text-sm" style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700 }}>
             {formatPrice(product.price)}
           </p>
           {/* Botón + con press feedback */}

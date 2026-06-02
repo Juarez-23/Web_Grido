@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@500;600;700;800&display=swap");
 
 /* ─── ROOT VARIABLES ─────────────────────────────── */
 :root {
@@ -10,6 +10,10 @@
   --grido-secondary: #0d2d5e;
   --grido-accent: #f7b731;
   --grido-cream: #fff8f0;
+
+  /* Typography */
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  --font-ui:   "Poppins", system-ui, -apple-system, sans-serif;
 
   /* Easing curves — Emil Kowalski philosophy */
   --ease-out-expo:  cubic-bezier(0.16, 1, 0.3, 1);
@@ -129,15 +133,23 @@ body {
 
 /* Botón primario */
 .btn-primary {
-  @apply bg-grido-primary text-white font-semibold rounded-2xl px-6 py-3
+  @apply bg-grido-primary text-white rounded-2xl px-6 py-3
          disabled:opacity-50 disabled:cursor-not-allowed;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.01em;
   transition: transform 130ms var(--ease-out-quart),
               opacity 130ms var(--ease-out-quart);
 }
 .btn-primary:active:not(:disabled) { transform: scale(0.97); }
 
 .btn-secondary {
-  @apply bg-white text-gray-800 font-semibold rounded-2xl px-6 py-3 border border-gray-200;
+  @apply bg-white text-gray-800 rounded-2xl px-6 py-3 border border-gray-200;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.01em;
   transition: transform 130ms var(--ease-out-quart);
 }
 .btn-secondary:active { transform: scale(0.97); }
