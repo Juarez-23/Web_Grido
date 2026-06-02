@@ -305,7 +305,10 @@ export default function HomePage() {
         )}
 
         {/* Categories */}
-        <section className="mt-6">
+        <section className="mt-8">
+          <h2 className="text-[13px] font-semibold text-gray-400 uppercase tracking-wider mb-3">
+            Categorías
+          </h2>
           <div className="category-bar">
             <CategoryFilter
               categories={categories}

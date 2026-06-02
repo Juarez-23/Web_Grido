@@ -5,27 +5,27 @@ interface IconProps {
 }
 
 /**
- * Icon per category slug — clean geometric SVG, no emoji.
- * Stroke-based, consistent 1.8px weight at 22px.
+ * SVG icons per category — clean, geometric, readable at 26px.
+ * Stroke-only, 1.8px weight, no decoration.
  */
-export function CategoryIcon({ slug, size = 22, color = "currentColor" }: IconProps) {
-  const shared = {
+export function CategoryIcon({ slug, size = 26, color = "currentColor" }: IconProps) {
+  const p = {
     width: size,
     height: size,
     viewBox: "0 0 24 24",
     fill: "none",
     stroke: color,
-    strokeWidth: 1.8,
+    strokeWidth: 1.85,
     strokeLinecap: "round" as const,
     strokeLinejoin: "round" as const,
     "aria-hidden": true,
   };
 
   switch (slug) {
-    /* ── Todos: grid 2×2 ── */
+    // Todos — grid 2×2
     case "todos":
       return (
-        <svg {...shared}>
+        <svg {...p}>
           <rect x="3" y="3" width="7" height="7" rx="1.5" />
           <rect x="14" y="3" width="7" height="7" rx="1.5" />
           <rect x="3" y="14" width="7" height="7" rx="1.5" />
@@ -33,90 +33,90 @@ export function CategoryIcon({ slug, size = 22, color = "currentColor" }: IconPr
         </svg>
       );
 
-    /* ── Para cucharear: scoop + cone ── */
+    // Para cucharear — cono de helado
     case "para-cucharear":
       return (
-        <svg {...shared}>
-          <circle cx="12" cy="8.5" r="5" />
-          <path d="M9 13l3 8 3-8" />
+        <svg {...p}>
+          <circle cx="12" cy="8" r="5" />
+          <path d="M8.5 12.5L12 21l3.5-8.5" />
         </svg>
       );
 
-    /* ── Potes: jar con tapa ── */
+    // Potes — frasco con tapa
     case "potes":
       return (
-        <svg {...shared}>
-          <rect x="5" y="8" width="14" height="13" rx="2" />
-          <rect x="7" y="5" width="10" height="3" rx="1" />
-          <line x1="5" y1="13" x2="19" y2="13" />
+        <svg {...p}>
+          <path d="M8 5h8l1.5 3H6.5L8 5z" />
+          <rect x="5" y="8" width="14" height="12" rx="2" />
+          <path d="M5 13h14" />
         </svg>
       );
 
-    /* ── Postres: copa de helado ── */
+    // Postres — copa de postre
     case "postres":
       return (
-        <svg {...shared}>
-          <path d="M6 3h12l-2 9H8L6 3z" />
-          <path d="M8 12c0 3 1.5 5 4 6 2.5-1 4-3 4-6" />
+        <svg {...p}>
+          <path d="M5 3h14l-3 9H8L5 3z" />
+          <path d="M8 12c0 3.5 1.8 5.5 4 6.5 2.2-1 4-3 4-6.5" />
           <line x1="9" y1="21" x2="15" y2="21" />
-          <line x1="12" y1="18" x2="12" y2="21" />
+          <line x1="12" y1="19" x2="12" y2="21" />
         </svg>
       );
 
-    /* ── Tortas: pastel con vela ── */
+    // Tortas — pastel
     case "tortas":
       return (
-        <svg {...shared}>
-          <rect x="3" y="12" width="18" height="9" rx="2" />
-          <path d="M3 12c0-4 2.5-7 9-7s9 3 9 7" />
-          <line x1="12" y1="5" x2="12" y2="2" />
-          <circle cx="12" cy="2" r="0.8" fill={color} stroke="none" />
+        <svg {...p}>
+          <rect x="3" y="11" width="18" height="10" rx="2" />
+          <path d="M3 11c0-4.5 3-8 9-8s9 3.5 9 8" />
+          <path d="M12 3V1" />
+          <path d="M9 11h6" />
         </svg>
       );
 
-    /* ── Palitos: paleta rectangular ── */
+    // Palitos — paleta/popsicle
     case "palitos":
       return (
-        <svg {...shared}>
-          <rect x="8" y="2" width="8" height="13" rx="4" />
-          <line x1="12" y1="15" x2="12" y2="22" />
+        <svg {...p}>
+          <rect x="8" y="2" width="8" height="12" rx="4" />
+          <line x1="12" y1="14" x2="12" y2="22" />
         </svg>
       );
 
-    /* ── Bombones: caja de bombones ── */
+    // Bombones — caja de chocolates
     case "bombones":
       return (
-        <svg {...shared}>
+        <svg {...p}>
           <rect x="3" y="3" width="18" height="18" rx="3" />
-          <circle cx="9" cy="9" r="2.5" />
-          <circle cx="15" cy="9" r="2.5" />
-          <circle cx="9" cy="15" r="2.5" />
-          <circle cx="15" cy="15" r="2.5" />
+          <circle cx="8.5" cy="8.5" r="2" />
+          <circle cx="15.5" cy="8.5" r="2" />
+          <circle cx="8.5" cy="15.5" r="2" />
+          <circle cx="15.5" cy="15.5" r="2" />
         </svg>
       );
 
-    /* ── Frizzio: copo de nieve ── */
+    // Frizzio — copo de nieve simple (3 líneas)
     case "frizzio":
       return (
-        <svg {...shared}>
+        <svg {...p}>
           <line x1="12" y1="2" x2="12" y2="22" />
           <line x1="2" y1="12" x2="22" y2="12" />
-          <path d="M7 7l10 10M17 7L7 17" />
-          <path d="M12 5l-2-2M12 5l2-2M12 19l-2 2M12 19l2 2M5 12l-2-2M5 12l-2 2M19 12l2-2M19 12l2 2" />
+          <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+          <line x1="19.07" y1="4.93" x2="4.93" y2="19.07" />
         </svg>
       );
 
-    /* ── Especiales: estrella de 5 puntas ── */
+    // Especiales — estrella de 5 puntas filled
     case "especiales":
       return (
-        <svg {...shared} fill={color} stroke="none">
-          <path d="M12 2l2.7 8.3H23l-7 5 2.7 8.3L12 18.9l-6.7 4.7L8 15.3l-7-5h8.3L12 2z" />
+        <svg {...p} stroke="none" fill={color}>
+          <path d="M12 2l2.9 8.9H23l-7.5 5.4 2.9 8.9L12 19.8l-6.4 5.4 2.9-8.9L1 9l8.1-.1L12 2z" />
         </svg>
       );
 
     default:
       return (
-        <svg {...shared}>
+        <svg {...p}>
           <circle cx="12" cy="12" r="9" />
         </svg>
       );
