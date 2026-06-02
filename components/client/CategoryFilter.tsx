@@ -76,7 +76,7 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grido-primary focus-visible:ring-offset-2",
               active
                 ? "bg-[#0d2050] text-white border-2 border-[#0d2050]"
-                : "bg-white text-gray-600 border-2 border-gray-200",
+                : "bg-white text-gray-600 border-2 border-transparent",
             ].join(" ")}
             style={{
               height: 48,
