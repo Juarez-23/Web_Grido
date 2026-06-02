@@ -33,19 +33,17 @@ export function PromoSection() {
     if (!promos.length || !containerRef.current) return;
     const cards = containerRef.current.querySelectorAll(".promo-card");
     if (!cards.length) return;
-    gsap.fromTo(
-      Array.from(cards),
-      { x: 32, autoAlpha: 0, scale: 0.96 },
-      {
-        x: 0,
-        autoAlpha: 1,
-        scale: 1,
-        duration: 0.44,
-        stagger: 0.08,
-        ease: "power4.out",
-        clearProps: "all",
-      }
-    );
+
+    // Set visible first, then animate from offset
+    gsap.set(Array.from(cards), { opacity: 0, x: 24 });
+    gsap.to(Array.from(cards), {
+      opacity: 1,
+      x: 0,
+      duration: 0.42,
+      stagger: 0.07,
+      ease: "power4.out",
+      delay: 0.1,
+    });
   }, [promos]);
 
   if (!promos.length) return null;
