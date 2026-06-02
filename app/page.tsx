@@ -325,9 +325,12 @@ export default function HomePage() {
               ))}
             </div>
           ) : filteredProducts.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-4xl mb-3">🍦</p>
-              <p className="text-gray-500 font-medium">No hay productos en esta categoría</p>
+            <div className="flex flex-col items-center justify-center py-16 gap-4">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="8.5" r="5" />
+                <path d="M9 13l3 8 3-8" />
+              </svg>
+              <p className="text-gray-400 font-medium text-sm">No hay productos en esta categoría</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3 mt-4">

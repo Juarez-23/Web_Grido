@@ -152,7 +152,10 @@ export function ProductModal({ product, onClose }: Props) {
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="modal-emoji text-7xl">🍦</span>
+                  <svg className="modal-emoji" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#d4a574" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="8.5" r="5" />
+                    <path d="M9 13l3 8 3-8" />
+                  </svg>
                 </div>
               )}
             </div>

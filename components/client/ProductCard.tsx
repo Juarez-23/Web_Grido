@@ -38,7 +38,10 @@ export function ProductCard({ product, variant = "grid", onSelect }: Props) {
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-4xl" role="img" aria-label="helado">🍦</span>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d4a574" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="8.5" r="5" />
+                <path d="M9 13l3 8 3-8" />
+              </svg>
             </div>
           )}
           {product.featured && (
@@ -76,14 +79,10 @@ export function ProductCard({ product, variant = "grid", onSelect }: Props) {
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <span
-              className="text-5xl"
-              style={{ transition: "transform 300ms cubic-bezier(0.25, 1, 0.5, 1)" }}
-              role="img"
-              aria-label="helado"
-            >
-              🍦
-            </span>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d4a574" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="8.5" r="5" />
+              <path d="M9 13l3 8 3-8" />
+            </svg>
           </div>
         )}
 

@@ -109,11 +109,17 @@ export function CartDrawer() {
         {/* Items */}
         <div className="flex-1 overflow-y-auto px-5 py-3">
           {items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <span className="text-6xl mb-4">🛒</span>
-              <p className="font-bold text-gray-700 text-lg">Tu carrito está vacío</p>
-              <p className="text-gray-400 text-sm mt-1">Agregá productos del menú</p>
-              <button onClick={closeCart} className="mt-5 btn-primary px-8">
+            <div className="flex flex-col items-center justify-center h-full text-center gap-3">
+              <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <path d="M16 10a4 4 0 0 1-8 0" />
+              </svg>
+              <div>
+                <p className="font-bold text-gray-700 text-base">Tu carrito está vacío</p>
+                <p className="text-gray-400 text-sm mt-1">Elegí productos del menú</p>
+              </div>
+              <button onClick={closeCart} className="mt-2 btn-primary px-8 py-3">
                 Ver menú
               </button>
             </div>
@@ -135,8 +141,11 @@ export function CartDrawer() {
                         sizes="64px"
                       />
                     ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-2xl">
-                        🍦
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d4a574" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <circle cx="12" cy="8.5" r="5" />
+                          <path d="M9 13l3 8 3-8" />
+                        </svg>
                       </div>
                     )}
                   </div>
