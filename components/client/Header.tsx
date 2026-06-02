@@ -46,10 +46,10 @@ export function Header() {
       <div className="flex items-center gap-2.5">
         <GridoLogo size={38} />
         <div>
-          <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 800, fontSize: "1.2rem", letterSpacing: "-0.03em", color: "#0d2050", lineHeight: 1 }}>
+          <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "1.2rem", letterSpacing: "-0.03em", color: "#0d2050", lineHeight: 1 }}>
             grido
           </p>
-          <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 500, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#9ca3af", marginTop: 2, lineHeight: 1 }}>
+          <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#9ca3af", marginTop: 2, lineHeight: 1 }}>
             San Rafael
           </p>
         </div>

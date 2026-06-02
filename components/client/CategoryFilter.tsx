@@ -58,7 +58,7 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
   }
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide" role="tablist" aria-label="Categorías">
+    <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide" role="tablist" aria-label="Categorías">
       {options.map((cat, i) => {
         const active = selected === cat.slug;
         return (
@@ -76,17 +76,19 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grido-primary focus-visible:ring-offset-2",
               active
                 ? "bg-[#0d2050] text-white border-2 border-[#0d2050]"
-                : "bg-white text-gray-700 border-2 border-gray-200 hover:border-gray-300",
+                : "bg-white text-gray-600 border-2 border-gray-200",
             ].join(" ")}
             style={{
-              height: 44,
-              paddingLeft: 18,
-              paddingRight: 18,
-              fontFamily: "'Poppins', system-ui, sans-serif",
-              fontSize: 14,
-              fontWeight: active ? 700 : 500,
-              letterSpacing: "-0.01em",
-              boxShadow: active ? "0 4px 14px rgba(13,32,80,0.22)" : "0 1px 3px rgba(0,0,0,0.06)",
+              height: 48,
+              paddingLeft: 24,
+              paddingRight: 24,
+              fontFamily: "'Nunito', system-ui, sans-serif",
+              fontSize: 15,
+              fontWeight: active ? 800 : 600,
+              letterSpacing: "0.01em",
+              boxShadow: active
+                ? "0 4px 16px rgba(13,32,80,0.28)"
+                : "0 1px 4px rgba(0,0,0,0.07)",
               transition: "background 160ms cubic-bezier(0.25,1,0.5,1), color 160ms, box-shadow 200ms cubic-bezier(0.25,1,0.5,1), border-color 160ms, transform 120ms cubic-bezier(0.25,1,0.5,1)",
             }}
           >

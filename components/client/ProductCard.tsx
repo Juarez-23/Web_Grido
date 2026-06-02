@@ -57,10 +57,10 @@ export function ProductCard({ product, variant = "grid", onSelect }: Props) {
           )}
         </div>
         <div className="p-3">
-          <p className="text-gray-900 text-sm truncate" style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>
+          <p className="text-gray-900 text-sm truncate" style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 600 }}>
             {product.name}
           </p>
-          <p className="mt-1" style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 13, color: "#0d2050" }}>
+          <p className="mt-1" style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 13, color: "#0d2050" }}>
             {formatPrice(product.price)}
           </p>
         </div>
@@ -97,14 +97,14 @@ export function ProductCard({ product, variant = "grid", onSelect }: Props) {
 
       {/* Info */}
       <div className="p-3">
-        <p className="text-gray-900 text-sm leading-tight line-clamp-2 mb-1" style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 600 }}>
+        <p className="text-gray-900 text-sm leading-tight line-clamp-2 mb-1" style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 600 }}>
           {product.name}
         </p>
         {product.description && (
           <p className="text-xs text-gray-400 line-clamp-1 mb-2">{product.description}</p>
         )}
         <div className="flex items-center justify-between mt-1">
-          <p style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 13, color: "#0d2050" }}>
+          <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 13, color: "#0d2050" }}>
             {formatPrice(product.price)}
           </p>
           <span
