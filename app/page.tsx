@@ -7,6 +7,7 @@ import { CartDrawer } from "@/components/client/CartDrawer";
 import { ProductCard } from "@/components/client/ProductCard";
 import { ProductModal } from "@/components/client/ProductModal";
 import { CategoryFilter } from "@/components/client/CategoryFilter";
+import { PromoStrip } from "@/components/client/PromoStrip";
 import type { Product, Category } from "@/types";
 
 export default function HomePage() {
@@ -245,6 +246,11 @@ export default function HomePage() {
           <p className="hero-sub2 text-white/35 text-xs mt-1" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400 }}>
             Delivery y retiro en sucursal
           </p>
+
+          {/* Promos */}
+          <div className="mt-6">
+            <PromoStrip />
+          </div>
         </div>
       </section>
 
