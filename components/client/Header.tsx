@@ -30,7 +30,10 @@ export function Header() {
 
   useEffect(() => {
     if (count > 0 && badgeRef.current) {
-      gsap.fromTo(badgeRef.current, { scale: 1.7 }, { scale: 1, duration: 0.45, ease: "elastic.out(1, 0.4)" });
+      gsap.fromTo(badgeRef.current,
+        { scale: 1.45 },
+        { scale: 1, duration: 0.32, ease: "power4.out" }
+      );
     }
   }, [count]);
 

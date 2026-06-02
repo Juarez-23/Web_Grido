@@ -80,18 +80,19 @@ export default function HomePage() {
         },
       });
 
-      // Timeline de entrada del hero — más dramático
+      // Timeline de entrada del hero
+      const easeExpo = "power4.out";
       const tl = gsap.timeline({
-        defaults: { ease: "power4.out" },
-        delay: 0.04,
+        defaults: { ease: easeExpo },
+        delay: 0.05,
       });
 
-      tl.from(".hero-badge", { y: 18, autoAlpha: 0, scale: 0.82, duration: 0.45 })
-        .from(".hero-title", { y: 36, autoAlpha: 0, duration: 0.55 }, "-=0.18")
+      tl.from(".hero-badge", { y: 14, autoAlpha: 0, scale: 0.95, duration: 0.38 })
+        .from(".hero-title", { y: 28, autoAlpha: 0, duration: 0.46 }, "-=0.16")
         .from(
           [".hero-sub", ".hero-sub2"],
-          { y: 20, autoAlpha: 0, duration: 0.42, stagger: 0.12 },
-          "-=0.22"
+          { y: 16, autoAlpha: 0, duration: 0.36, stagger: 0.08 },
+          "-=0.20"
         );
     },
     { scope: heroRef }
@@ -100,11 +101,11 @@ export default function HomePage() {
   // ─── Stats card entrance ────────────────────────────────────────────────────
   useGSAP(() => {
     gsap.from(".stats-card", {
-      y: 28,
+      y: 20,
       autoAlpha: 0,
-      duration: 0.55,
-      ease: "back.out(1.6)",
-      delay: 0.48,
+      duration: 0.44,
+      ease: "power4.out",
+      delay: 0.42,
     });
   }, []);
 
@@ -112,12 +113,12 @@ export default function HomePage() {
   useGSAP(() => {
     if (loading) return;
     gsap.from(".featured-card", {
-      x: 40,
+      x: 24,
       autoAlpha: 0,
-      scale: 0.93,
-      duration: 0.52,
-      stagger: 0.08,
-      ease: "back.out(1.6)",
+      scale: 0.96,
+      duration: 0.42,
+      stagger: 0.06,
+      ease: "power4.out",
       scrollTrigger: {
         trigger: ".featured-scroll",
         start: "top 92%",
@@ -130,12 +131,12 @@ export default function HomePage() {
   useGSAP(() => {
     if (loading) return;
     gsap.from(".category-pill", {
-      y: 16,
+      y: 12,
       autoAlpha: 0,
-      scale: 0.88,
-      duration: 0.4,
-      stagger: 0.05,
-      ease: "back.out(2)",
+      scale: 0.95,
+      duration: 0.32,
+      stagger: 0.04,
+      ease: "power4.out",
       scrollTrigger: {
         trigger: ".category-bar",
         start: "top 94%",
@@ -153,18 +154,18 @@ export default function HomePage() {
       gsap.set(".product-card", { autoAlpha: 0, y: 30, scale: 0.95 });
 
       ScrollTrigger.batch(".product-card", {
-        start: "top 92%",
+        start: "top 94%",
         once: true,
-        interval: 0.08,
+        interval: 0.06,
         batchMax: 4,
         onEnter: (batch) => {
           gsap.to(batch, {
             autoAlpha: 1,
             y: 0,
             scale: 1,
-            duration: 0.55,
-            stagger: 0.07,
-            ease: "back.out(1.5)",
+            duration: 0.44,
+            stagger: 0.05,
+            ease: "power4.out",
             overwrite: true,
           });
         },

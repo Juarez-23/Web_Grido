@@ -34,9 +34,9 @@ export function ProductModal({ product, onClose }: Props) {
     const backdrop = backdropRef.current;
     if (!panel || !backdrop) return;
 
-    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-    tl.fromTo(backdrop, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.25 })
-      .fromTo(panel, { y: "100%" }, { y: "0%", duration: 0.42 }, "<0.05");
+    const tl = gsap.timeline();
+    tl.fromTo(backdrop, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.20, ease: "power2.out" })
+      .fromTo(panel, { y: "100%" }, { y: "0%", duration: 0.38, ease: "power4.out" }, "<0.04");
 
     // Emoji pop cuando no hay imagen
     if (!product.image) {
@@ -72,9 +72,9 @@ export function ProductModal({ product, onClose }: Props) {
       onClose();
       return;
     }
-    const tl = gsap.timeline({ defaults: { ease: "power2.in" } });
-    tl.to(panel, { y: "100%", duration: 0.28 })
-      .to(backdrop, { autoAlpha: 0, duration: 0.22 }, "<0.04")
+    const tl = gsap.timeline();
+    tl.to(panel, { y: "100%", duration: 0.24, ease: "power3.in" })
+      .to(backdrop, { autoAlpha: 0, duration: 0.18, ease: "power2.in" }, "<0.04")
       .call(() => onClose());
   }, [onClose]);
 
@@ -88,7 +88,7 @@ export function ProductModal({ product, onClose }: Props) {
     if (isSelected) {
       // Deselect: subtle shrink
       setSelectedFlavors((prev) => prev.filter((f) => f.id !== flavor.id));
-      gsap.fromTo(e.currentTarget, { scale: 1 }, { scale: 0.92, duration: 0.08, yoyo: true, repeat: 1 });
+      gsap.fromTo(e.currentTarget, { scale: 1 }, { scale: 0.95, duration: 0.10, yoyo: true, repeat: 1, ease: "power2.inOut" });
     } else if (isFull) {
       // Full: shake to signal error
       toast.error(`Máximo ${product.maxFlavors} sabores para este producto`);
@@ -102,8 +102,8 @@ export function ProductModal({ product, onClose }: Props) {
       setSelectedFlavors((prev) => [...prev, { id: flavor.id, name: flavor.name }]);
       gsap.fromTo(
         e.currentTarget,
-        { scale: 0.86 },
-        { scale: 1, duration: 0.35, ease: "back.out(2.5)" }
+        { scale: 0.92 },
+        { scale: 1, duration: 0.28, ease: "power4.out" }
       );
     }
   };

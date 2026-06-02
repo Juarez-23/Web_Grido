@@ -92,18 +92,15 @@ export function CartDrawer() {
             )}
             <button
               onClick={closeCart}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 active:scale-90 transition-transform"
+              aria-label="Cerrar carrito"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100"
+              style={{ transition: "transform 120ms cubic-bezier(0.25,1,0.5,1)" }}
+              onPointerDown={(e) => { e.currentTarget.style.transform = "scale(0.93)"; }}
+              onPointerUp={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
+              onPointerLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
             >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              >
-                <path d="M18 6L6 18M6 6l12 12" />
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+                <path d="M1 1l11 11M12 1L1 12" stroke="#374151" strokeWidth="2" strokeLinecap="round" />
               </svg>
             </button>
           </div>
@@ -163,24 +160,26 @@ export function CartDrawer() {
                   <div className="flex flex-col items-end justify-between gap-1">
                     <button
                       onClick={() => removeItem(item.cartId)}
-                      className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 active:bg-blue-100 transition-colors"
+                      aria-label={`Eliminar ${item.product.name}`}
+                      className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100"
+                      style={{ transition: "transform 110ms cubic-bezier(0.25,1,0.5,1)" }}
+                      onPointerDown={(e) => { e.currentTarget.style.transform = "scale(0.88)"; }}
+                      onPointerUp={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
+                      onPointerLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
                     >
-                      <svg
-                        width="10"
-                        height="10"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#6b7280"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                      >
-                        <path d="M18 6L6 18M6 6l12 12" />
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                        <path d="M1 1l8 8M9 1L1 9" stroke="#9ca3af" strokeWidth="1.8" strokeLinecap="round" />
                       </svg>
                     </button>
                     <div className="flex items-center gap-1.5">
                       <button
                         onClick={() => updateQuantity(item.cartId, item.quantity - 1)}
-                        className="w-6 h-6 flex items-center justify-center rounded-lg bg-gray-200 active:scale-90 transition-transform font-bold text-sm text-gray-700"
+                        aria-label="Reducir cantidad"
+                        className="w-7 h-7 flex items-center justify-center rounded-lg bg-gray-100 font-bold text-sm text-gray-700"
+                        style={{ transition: "transform 110ms cubic-bezier(0.25,1,0.5,1)" }}
+                        onPointerDown={(e) => { e.currentTarget.style.transform = "scale(0.90)"; }}
+                        onPointerUp={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
+                        onPointerLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
                       >
                         −
                       </button>
@@ -189,7 +188,12 @@ export function CartDrawer() {
                       </span>
                       <button
                         onClick={() => updateQuantity(item.cartId, item.quantity + 1)}
-                        className="w-6 h-6 flex items-center justify-center rounded-lg bg-grido-primary active:scale-90 transition-transform font-bold text-sm text-white"
+                        aria-label="Aumentar cantidad"
+                        className="w-7 h-7 flex items-center justify-center rounded-lg bg-grido-primary font-bold text-sm text-white"
+                        style={{ transition: "transform 110ms cubic-bezier(0.25,1,0.5,1)" }}
+                        onPointerDown={(e) => { e.currentTarget.style.transform = "scale(0.90)"; }}
+                        onPointerUp={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
+                        onPointerLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
                       >
                         +
                       </button>

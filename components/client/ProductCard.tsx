@@ -1,8 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { useRef } from "react";
-import { gsap } from "@/lib/gsap";
 import type { Product } from "@/types";
 import { formatPrice } from "@/lib/whatsapp";
 
@@ -12,29 +10,24 @@ interface Props {
   onSelect: () => void;
 }
 
+// Icono "+" consistente como SVG inline
+function PlusIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <path d="M7 1v12M1 7h12" stroke="white" strokeWidth="2.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function ProductCard({ product, variant = "grid", onSelect }: Props) {
-  const btnRef = useRef<HTMLButtonElement>(null);
-
-  const handleMouseEnter = () => {
-    if (!window.matchMedia("(hover: hover)").matches) return;
-    gsap.to(btnRef.current, { y: -5, duration: 0.22, ease: "power2.out", overwrite: true });
-  };
-
-  const handleMouseLeave = () => {
-    if (!window.matchMedia("(hover: hover)").matches) return;
-    gsap.to(btnRef.current, { y: 0, duration: 0.3, ease: "power2.out", overwrite: true });
-  };
-
   if (variant === "featured") {
     return (
       <button
-        ref={btnRef}
         onClick={onSelect}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
         className="product-card w-full text-left"
+        aria-label={`Ver ${product.name} — ${formatPrice(product.price)}`}
       >
-        <div className="relative h-28 bg-gradient-to-br from-blue-50 to-indigo-50">
+        <div className="relative h-28 bg-gradient-to-br from-amber-50 to-orange-50 overflow-hidden">
           {product.image ? (
             <Image
               src={product.image}
@@ -45,11 +38,11 @@ export function ProductCard({ product, variant = "grid", onSelect }: Props) {
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-4xl">🍦</span>
+              <span className="text-4xl" role="img" aria-label="helado">🍦</span>
             </div>
           )}
           {product.featured && (
-            <span className="absolute top-2 left-2 bg-grido-accent text-gray-900 text-xs font-bold px-2 py-0.5 rounded-full">
+            <span className="absolute top-2 left-2 bg-grido-accent text-gray-900 text-[11px] font-bold px-2 py-0.5 rounded-full">
               ⭐ Top
             </span>
           )}
@@ -66,38 +59,39 @@ export function ProductCard({ product, variant = "grid", onSelect }: Props) {
 
   return (
     <button
-      ref={btnRef}
       onClick={onSelect}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
       className="product-card w-full text-left group"
+      aria-label={`Ver ${product.name} — ${formatPrice(product.price)}`}
     >
       {/* Image */}
-      <div className="relative h-36 bg-gradient-to-br from-blue-50 to-indigo-50 overflow-hidden">
+      <div className="relative h-36 bg-gradient-to-br from-amber-50 to-orange-50 overflow-hidden">
         {product.image ? (
           <Image
             src={product.image}
             alt={product.name}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            className="object-cover"
+            style={{ transition: "transform 300ms cubic-bezier(0.25, 1, 0.5, 1)" }}
             sizes="(max-width: 768px) 50vw, 33vw"
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-5xl group-hover:scale-110 transition-transform duration-300">
+            <span
+              className="text-5xl"
+              style={{ transition: "transform 300ms cubic-bezier(0.25, 1, 0.5, 1)" }}
+              role="img"
+              aria-label="helado"
+            >
               🍦
             </span>
           </div>
         )}
 
-        {/* Badges */}
-        <div className="absolute top-2 left-2 flex flex-col gap-1">
-          {product.featured && (
-            <span className="bg-grido-accent text-gray-900 text-xs font-bold px-1.5 py-0.5 rounded-full">
-              ⭐
-            </span>
-          )}
-        </div>
+        {product.featured && (
+          <span className="absolute top-2 left-2 bg-grido-accent text-gray-900 text-[11px] font-bold px-1.5 py-0.5 rounded-full leading-none">
+            ⭐
+          </span>
+        )}
       </div>
 
       {/* Info */}
@@ -106,19 +100,22 @@ export function ProductCard({ product, variant = "grid", onSelect }: Props) {
           {product.name}
         </p>
         {product.description && (
-          <p className="text-xs text-gray-500 line-clamp-1 mb-2">
+          <p className="text-xs text-gray-400 line-clamp-1 mb-2">
             {product.description}
           </p>
         )}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mt-1">
           <p className="font-black text-grido-primary text-sm">
             {formatPrice(product.price)}
           </p>
-          <div className="w-7 h-7 bg-grido-primary rounded-full flex items-center justify-center">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
-              <path d="M12 5v14M5 12h14" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
-            </svg>
-          </div>
+          {/* Botón + con press feedback */}
+          <span
+            className="w-7 h-7 bg-grido-primary rounded-full flex items-center justify-center"
+            style={{ transition: "transform 120ms cubic-bezier(0.25, 1, 0.5, 1)" }}
+            aria-hidden="true"
+          >
+            <PlusIcon />
+          </span>
         </div>
       </div>
     </button>

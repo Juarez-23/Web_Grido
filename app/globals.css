@@ -10,6 +10,13 @@
   --grido-secondary: #0d2d5e;
   --grido-accent: #f7b731;
   --grido-cream: #fff8f0;
+
+  /* Easing curves — Emil Kowalski philosophy */
+  --ease-out-expo:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-expo:   cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-drawer:    cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-in-out:    cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 /* ─── BASE ───────────────────────────────────────── */
@@ -120,29 +127,34 @@ body {
   background: linear-gradient(155deg, #2115b0 0%, #1a0d8c 55%, #14096e 100%);
 }
 
-/* Botón primario estilo app delivery */
+/* Botón primario */
 .btn-primary {
   @apply bg-grido-primary text-white font-semibold rounded-2xl px-6 py-3
-         active:scale-95 transition-all duration-150
          disabled:opacity-50 disabled:cursor-not-allowed;
+  transition: transform 130ms var(--ease-out-quart),
+              opacity 130ms var(--ease-out-quart);
 }
+.btn-primary:active:not(:disabled) { transform: scale(0.97); }
 
 .btn-secondary {
-  @apply bg-white text-gray-800 font-semibold rounded-2xl px-6 py-3
-         border border-gray-200 active:scale-95 transition-all duration-150;
+  @apply bg-white text-gray-800 font-semibold rounded-2xl px-6 py-3 border border-gray-200;
+  transition: transform 130ms var(--ease-out-quart);
 }
+.btn-secondary:active { transform: scale(0.97); }
 
 /* Card de producto */
 .product-card {
-  @apply bg-[#f0f5ff] rounded-2xl overflow-hidden shadow-card
-         active:scale-95 cursor-pointer;
-  transition: box-shadow 0.22s ease-out, transform 0.1s ease;
-  will-change: transform;
+  @apply bg-white rounded-2xl overflow-hidden cursor-pointer;
+  box-shadow: 0 2px 12px rgba(13, 32, 80, 0.08);
+  transition: transform 140ms var(--ease-out-quart),
+              box-shadow 200ms var(--ease-out-quart);
 }
+.product-card:active { transform: scale(0.97); }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .product-card:hover {
-    box-shadow: 0 10px 32px rgba(26, 13, 140, 0.18), 0 4px 12px rgba(26, 13, 140, 0.1);
+    box-shadow: 0 8px 28px rgba(13, 32, 80, 0.16);
+    transform: translateY(-1px);
   }
 }
 
@@ -152,22 +164,37 @@ body {
          font-bold w-5 h-5 rounded-full flex items-center justify-center;
 }
 
-/* Estilo de sabor seleccionado */
+/* Flavor chips */
 .flavor-chip {
-  @apply px-3 py-2 rounded-xl text-sm font-medium border-2
-         transition-all duration-150 cursor-pointer select-none;
+  @apply px-3 py-2 rounded-xl text-sm font-medium border-2 cursor-pointer select-none;
+  transition: transform 120ms var(--ease-out-quart),
+              border-color 120ms var(--ease-out-quart),
+              background-color 120ms var(--ease-out-quart);
 }
+.flavor-chip:active:not(:disabled) { transform: scale(0.97); }
 
 .flavor-chip-available {
-  @apply border-gray-200 text-gray-700 bg-white active:scale-95 hover:border-gray-300;
+  @apply border-gray-200 text-gray-700 bg-white;
+}
+@media (hover: hover) and (pointer: fine) {
+  .flavor-chip-available:hover { @apply border-gray-300 bg-gray-50; }
 }
 
 .flavor-chip-selected {
-  @apply border-grido-primary bg-grido-primary text-white shadow-md;
+  @apply border-grido-primary bg-grido-primary text-white;
 }
 
 .flavor-chip-unavailable {
   @apply border-gray-100 text-gray-300 bg-gray-50 cursor-not-allowed line-through;
+}
+
+/* ─── REDUCED MOTION ─────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Input estilo delivery app */
