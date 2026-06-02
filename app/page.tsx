@@ -7,7 +7,7 @@ import { CartDrawer } from "@/components/client/CartDrawer";
 import { ProductCard } from "@/components/client/ProductCard";
 import { ProductModal } from "@/components/client/ProductModal";
 import { CategoryFilter } from "@/components/client/CategoryFilter";
-import { PromoStrip } from "@/components/client/PromoStrip";
+import { PromoSection } from "@/components/client/PromoSection";
 import type { Product, Category } from "@/types";
 
 export default function HomePage() {
@@ -247,10 +247,6 @@ export default function HomePage() {
             Delivery y retiro en sucursal
           </p>
 
-          {/* Promos */}
-          <div className="mt-6">
-            <PromoStrip />
-          </div>
         </div>
       </section>
 
@@ -289,6 +285,9 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* ── Promos dinámicas ── */}
+      <PromoSection />
 
       {/* ── Content ── */}
       <main className="max-w-2xl mx-auto px-4 pb-32">

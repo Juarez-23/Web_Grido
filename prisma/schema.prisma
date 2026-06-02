@@ -146,3 +146,18 @@ model Setting {
 
   @@map("settings")
 }
+
+// ─── PROMOCIONES ─────────────────────────────
+model Promotion {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  image       String?
+  badge       String?
+  active      Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("promotions")
+}
