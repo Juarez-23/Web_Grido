@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import type { Product, Category } from "@/types";
@@ -36,6 +36,8 @@ export default function AdminProductsPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [form, setForm] = useState<ProductFormState>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     Promise.all([
@@ -67,6 +69,23 @@ export default function AdminProductsPage() {
       categoryId: product.categoryId,
     });
     setShowForm(true);
+  };
+
+  const handleImageUpload = async (file: File) => {
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error al subir");
+      setForm((prev) => ({ ...prev, image: data.url }));
+      toast.success("Imagen subida");
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Error al subir la imagen");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSave = async () => {
@@ -270,9 +289,59 @@ export default function AdminProductsPage() {
                   ))}
                 </select>
               </div>
+              {/* Image upload */}
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">URL de imagen</label>
-                <input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} placeholder="https://..." className="input-field" />
+                <label className="text-sm font-medium text-gray-700 mb-2 block">Imagen del producto</label>
+
+                {/* Preview */}
+                {form.image && (
+                  <div className="relative w-full h-40 rounded-xl overflow-hidden bg-gray-50 mb-3">
+                    <Image src={form.image} alt="Preview" fill className="object-cover" sizes="400px" />
+                    <button
+                      type="button"
+                      onClick={() => setForm((prev) => ({ ...prev, image: "" }))}
+                      className="absolute top-2 right-2 w-7 h-7 bg-black/50 text-white rounded-full flex items-center justify-center text-sm hover:bg-black/70 transition-colors"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+
+                {/* Upload area */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImageUpload(file);
+                    e.target.value = "";
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="w-full h-24 border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center gap-2 hover:border-grido-primary hover:bg-blue-50/50 transition-colors disabled:opacity-50"
+                >
+                  {uploading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-grido-primary border-t-transparent rounded-full animate-spin" />
+                      <span className="text-sm text-gray-500">Subiendo...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                      </svg>
+                      <span className="text-sm text-gray-500">{form.image ? "Cambiar imagen" : "Subir imagen"}</span>
+                      <span className="text-xs text-gray-400">JPG, PNG, WebP — máx. 5MB</span>
+                    </>
+                  )}
+                </button>
               </div>
               <div className="flex gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
