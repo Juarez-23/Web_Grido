@@ -10,6 +10,7 @@ interface Promotion {
   description: string | null;
   image: string | null;
   badge: string | null;
+  price: number;
   active: boolean;
   order: number;
 }
@@ -19,6 +20,7 @@ const EMPTY: Omit<Promotion, "id"> = {
   description: "",
   image: "",
   badge: "",
+  price: 0,
   active: true,
   order: 0,
 };
@@ -42,7 +44,7 @@ export default function AdminPromotionsPage() {
   const openCreate = () => { setEditing(null); setForm(EMPTY); setShowForm(true); };
   const openEdit = (p: Promotion) => {
     setEditing(p);
-    setForm({ title: p.title, description: p.description || "", image: p.image || "", badge: p.badge || "", active: p.active, order: p.order });
+    setForm({ title: p.title, description: p.description || "", image: p.image || "", badge: p.badge || "", price: p.price, active: p.active, order: p.order });
     setShowForm(true);
   };
 
@@ -182,6 +184,10 @@ export default function AdminPromotionsPage() {
               <div>
                 <label className="text-sm font-medium text-gray-700 mb-1 block">Descripción</label>
                 <input value={form.description || ""} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="2 potes + vasito gratis" className="input-field" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 block">Precio</label>
+                <input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} placeholder="15000" className="input-field" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>

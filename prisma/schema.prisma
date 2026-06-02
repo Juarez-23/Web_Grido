@@ -154,6 +154,7 @@ model Promotion {
   description String?
   image       String?
   badge       String?
+  price       Float    @default(0)
   active      Boolean  @default(true)
   order       Int      @default(0)
   createdAt   DateTime @default(now())

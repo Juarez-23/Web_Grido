@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import { gsap } from "@/lib/gsap";
+import { PromoModal } from "@/components/client/PromoModal";
 
 interface Promotion {
   id: string;
@@ -10,6 +11,7 @@ interface Promotion {
   description: string | null;
   image: string | null;
   badge: string | null;
+  price: number;
 }
 
 // Gradientes de fallback cuando no hay imagen
@@ -21,6 +23,7 @@ const FALLBACK_GRADIENTS = [
 
 export function PromoSection() {
   const [promos, setPromos] = useState<Promotion[]>([]);
+  const [selected, setSelected] = useState<Promotion | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -68,9 +71,15 @@ export function PromoSection() {
         className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x scrollbar-hide"
       >
         {promos.map((promo, i) => (
-          <div
+          <button
             key={promo.id}
-            className="promo-card flex-shrink-0 snap-start relative rounded-2xl overflow-hidden"
+            onClick={() => setSelected(promo)}
+            className="promo-card flex-shrink-0 snap-start relative rounded-2xl overflow-hidden text-left"
+            style={{ transition: "transform 140ms cubic-bezier(0.25,1,0.5,1)" }}
+            onPointerDown={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(0.97)"; }}
+            onPointerUp={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
+            onPointerLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
+            aria-label={`Ver promoción: ${promo.title}`}
             style={{
               width: 280,
               height: 148,
@@ -156,9 +165,13 @@ export function PromoSection() {
                 )}
               </div>
             </div>
-          </div>
+          </button>
         ))}
       </div>
+
+      {selected && (
+        <PromoModal promo={selected} onClose={() => setSelected(null)} />
+      )}
     </section>
   );
 }
