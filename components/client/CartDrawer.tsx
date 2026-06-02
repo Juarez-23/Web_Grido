@@ -137,7 +137,7 @@ export function CartDrawer() {
                         src={item.product.image}
                         alt={item.product.name}
                         fill
-                        className="object-cover"
+                        className="object-contain p-1"
                         sizes="64px"
                       />
                     ) : (

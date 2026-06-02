@@ -146,7 +146,7 @@ export function ProductModal({ product, onClose }: Props) {
                   src={product.image}
                   alt={product.name}
                   fill
-                  className="object-cover"
+                  className="object-contain p-4"
                   sizes="100vw"
                   priority
                 />

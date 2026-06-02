@@ -46,7 +46,7 @@ export function ProductCard({ product, variant = "grid", onSelect }: Props) {
       >
         <div className="relative h-28 overflow-hidden">
           {product.image ? (
-            <Image src={product.image} alt={product.name} fill className="object-cover" sizes="192px" />
+            <Image src={product.image} alt={product.name} fill className="object-contain p-2" sizes="192px" />
           ) : (
             <ImagePlaceholder />
           )}
@@ -81,7 +81,7 @@ export function ProductCard({ product, variant = "grid", onSelect }: Props) {
             src={product.image}
             alt={product.name}
             fill
-            className="object-cover"
+            className="object-contain p-3"
             style={{ transition: "transform 320ms cubic-bezier(0.25,1,0.5,1)" }}
             sizes="(max-width: 768px) 50vw, 33vw"
           />
