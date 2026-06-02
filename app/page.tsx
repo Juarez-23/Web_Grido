@@ -286,9 +286,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ── Promos dinámicas ── */}
-      <PromoSection />
-
       {/* ── Content ── */}
       <main className="max-w-2xl mx-auto px-4 pb-32">
         {/* Featured */}
@@ -308,6 +305,9 @@ export default function HomePage() {
             </div>
           </section>
         )}
+
+        {/* Promociones */}
+        <PromoSection />
 
         {/* Categories */}
         <section className="mt-7">
