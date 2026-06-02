@@ -25,24 +25,15 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
   const pillRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const didMount = useRef(false);
 
-  // Stagger entrance — one shot after data loads
   useEffect(() => {
     if (loading || didMount.current) return;
     didMount.current = true;
     const pills = pillRefs.current.filter(Boolean);
     if (!pills.length) return;
-
     gsap.fromTo(
       pills,
       { y: 10, autoAlpha: 0 },
-      {
-        y: 0,
-        autoAlpha: 1,
-        duration: 0.38,
-        stagger: 0.05,
-        ease: "power4.out",
-        clearProps: "all",
-      }
+      { y: 0, autoAlpha: 1, duration: 0.38, stagger: 0.05, ease: "power4.out", clearProps: "all" }
     );
   }, [loading]);
 
@@ -50,9 +41,7 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
     (slug: string, idx: number) => {
       if (slug === selected) return;
       const el = pillRefs.current[idx];
-      if (el) {
-        gsap.fromTo(el, { scale: 0.92 }, { scale: 1, duration: 0.3, ease: "power4.out" });
-      }
+      if (el) gsap.fromTo(el, { scale: 0.92 }, { scale: 1, duration: 0.3, ease: "power4.out" });
       onSelect(slug);
     },
     [selected, onSelect]
@@ -61,7 +50,7 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
   if (loading) {
     return (
       <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide">
-        {[80, 110, 90, 100, 120, 95].map((w, i) => (
+        {[72, 110, 80, 95, 110, 85].map((w, i) => (
           <div key={i} className="skeleton flex-shrink-0 rounded-2xl" style={{ width: w, height: 44 }} />
         ))}
       </div>
@@ -69,11 +58,7 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
   }
 
   return (
-    <div
-      className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide"
-      role="tablist"
-      aria-label="Categorías"
-    >
+    <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide" role="tablist" aria-label="Categorías">
       {options.map((cat, i) => {
         const active = selected === cat.slug;
         return (
@@ -83,33 +68,26 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
             role="tab"
             aria-selected={active}
             onClick={() => handleSelect(cat.slug, i)}
-            className="category-pill flex-shrink-0 whitespace-nowrap rounded-2xl select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grido-primary focus-visible:ring-offset-2"
+            onPointerDown={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(0.95)"; }}
+            onPointerUp={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
+            onPointerLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
+            className={[
+              "category-pill flex-shrink-0 whitespace-nowrap rounded-2xl select-none",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grido-primary focus-visible:ring-offset-2",
+              active
+                ? "bg-[#0d2050] text-white border-2 border-[#0d2050]"
+                : "bg-white text-gray-700 border-2 border-gray-200 hover:border-gray-300",
+            ].join(" ")}
             style={{
               height: 44,
-              padding: "0 18px",
+              paddingLeft: 18,
+              paddingRight: 18,
               fontFamily: "'Poppins', system-ui, sans-serif",
               fontSize: 14,
               fontWeight: active ? 700 : 500,
               letterSpacing: "-0.01em",
-              background: active ? "#0d2050" : "#ffffff",
-              color: active ? "#ffffff" : "#374151",
-              border: active ? "none" : "1.5px solid #e5e7eb",
-              boxShadow: active
-                ? "0 4px 14px rgba(13,32,80,0.25)"
-                : "0 1px 3px rgba(0,0,0,0.05)",
-              transition:
-                "background 160ms cubic-bezier(0.25,1,0.5,1), color 160ms cubic-bezier(0.25,1,0.5,1), box-shadow 200ms cubic-bezier(0.25,1,0.5,1), font-weight 0ms",
-            }}
-            onPointerDown={(e) => {
-              (e.currentTarget as HTMLElement).style.transform = "scale(0.95)";
-              (e.currentTarget as HTMLElement).style.transition = "transform 80ms cubic-bezier(0.25,1,0.5,1)";
-            }}
-            onPointerUp={(e) => {
-              (e.currentTarget as HTMLElement).style.transform = "scale(1)";
-              (e.currentTarget as HTMLElement).style.transition = "transform 200ms cubic-bezier(0.25,1,0.5,1)";
-            }}
-            onPointerLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.transform = "scale(1)";
+              boxShadow: active ? "0 4px 14px rgba(13,32,80,0.22)" : "0 1px 3px rgba(0,0,0,0.06)",
+              transition: "background 160ms cubic-bezier(0.25,1,0.5,1), color 160ms, box-shadow 200ms cubic-bezier(0.25,1,0.5,1), border-color 160ms, transform 120ms cubic-bezier(0.25,1,0.5,1)",
             }}
           >
             {cat.name}
