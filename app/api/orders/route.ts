@@ -41,6 +41,12 @@ export async function GET(req: NextRequest) {
 // POST /api/orders (público — lo hace el cliente)
 export async function POST(req: NextRequest) {
   try {
+    // Verificar que la tienda esté abierta
+    const storeSetting = await prisma.setting.findUnique({ where: { key: "storeOpen" } });
+    if (storeSetting?.value === "false") {
+      return NextResponse.json({ error: "La tienda está cerrada" }, { status: 503 });
+    }
+
     const body = await req.json();
     const {
       customerName,

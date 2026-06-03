@@ -29,7 +29,7 @@ export default function CheckoutPage() {
     }
     fetch("/api/settings")
       .then((r) => r.json())
-      .then((d) => setSettings(d.data));
+      .then((d) => setSettings(d.data ?? null));
   }, []);
 
   const subtotal = getSubtotal();
@@ -52,6 +52,11 @@ export default function CheckoutPage() {
     }
     if (form.deliveryType === "DELIVERY" && !form.address?.trim()) {
       toast.error("Ingresá la dirección de entrega");
+      return;
+    }
+
+    if (settings && settings.storeOpen === false) {
+      toast.error("La tienda está cerrada en este momento");
       return;
     }
 
@@ -142,6 +147,20 @@ export default function CheckoutPage() {
         </button>
         <h1 className="font-bold text-gray-900 text-base">Confirmar pedido</h1>
       </header>
+
+      {settings && !settings.storeOpen && (
+        <div className="max-w-lg mx-auto px-4 pt-4">
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex gap-3 items-start">
+            <span className="text-xl">🔴</span>
+            <div>
+              <p className="font-bold text-red-800 text-sm">Tienda cerrada</p>
+              <p className="text-red-600 text-sm mt-0.5">
+                {settings.storeClosedMessage || "Estamos cerrados por el momento."}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="max-w-lg mx-auto px-4 pb-40 pt-4 space-y-4">
 
@@ -348,8 +367,8 @@ export default function CheckoutPage() {
             type="submit"
             form="checkout-form"
             onClick={handleSubmit}
-            disabled={loading}
-            className="w-full btn-primary h-13 text-base flex items-center justify-center gap-2"
+            disabled={loading || (settings !== null && !settings?.storeOpen)}
+            className="w-full btn-primary h-13 text-base flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>
