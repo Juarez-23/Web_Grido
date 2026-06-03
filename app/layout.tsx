@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
   title: "Grido San Rafael | Helados a domicilio",
@@ -24,7 +25,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#E63329",
+  themeColor: "#0d2050",
 };
 
 export default function RootLayout({
@@ -35,6 +36,7 @@ export default function RootLayout({
   return (
     <html lang="es-AR">
       <body>
+        <Providers>
         {children}
         <Toaster
           position="top-center"
@@ -61,6 +63,7 @@ export default function RootLayout({
             },
           }}
         />
+        </Providers>
       </body>
     </html>
   );

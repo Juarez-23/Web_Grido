@@ -65,7 +65,10 @@ export function AdminSidebar({ user }: Props) {
           <p className="text-gray-500 text-xs truncate">{user.role}</p>
         </div>
         <button
-          onClick={() => signOut({ callbackUrl: "/admin/login" })}
+          onClick={async () => {
+            await signOut({ redirect: false });
+            window.location.replace("/admin/login");
+          }}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-gray-800 hover:text-white transition-all"
         >
           <span>🚪</span>

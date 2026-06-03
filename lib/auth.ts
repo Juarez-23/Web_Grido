@@ -1,6 +1,16 @@
-import { NextAuthOptions } from "next-auth";
+import { NextAuthOptions, User } from "next-auth";
+import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+
+// Extender tipos de NextAuth
+declare module "next-auth" {
+  interface User { role: string }
+  interface Session { user: { name?: string | null; email?: string | null; role: string; id: string } }
+}
+declare module "next-auth/jwt" {
+  interface JWT { role: string; id: string }
+}
 
 // Credenciales hardcodeadas del panel admin
 // Hash de "grido2026" generado con bcrypt (saltRounds=10)
@@ -63,15 +73,15 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = (user as any).role;
-        token.id = user.id;
+        token.role = user.role;
+        token.id = user.id ?? "";
       }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
-        (session.user as any).role = token.role;
-        (session.user as any).id = token.id;
+        session.user.role = token.role;
+        session.user.id = token.id;
       }
       return session;
     },
