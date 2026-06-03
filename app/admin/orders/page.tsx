@@ -32,25 +32,24 @@ export default function AdminOrdersPage() {
 
   const fetchOrders = useCallback(async () => {
     try {
-      const statusParam =
-        filter === "active"
-          ? ""
-          : filter === "CANCELADO"
-          ? "?status=CANCELADO"
-          : filter === "ENTREGADO"
-          ? "?status=ENTREGADO"
-          : "";
+      // Construir URL correctamente
+      const params = new URLSearchParams({ limit: "100" });
+      if (filter === "CANCELADO") params.set("status", "CANCELADO");
+      if (filter === "ENTREGADO") params.set("status", "ENTREGADO");
 
-      const res = await fetch(`/api/orders${statusParam}&limit=100`);
+      const res = await fetch(`/api/orders?${params.toString()}`);
+      if (!res.ok) throw new Error(`Error ${res.status}`);
+
       const data = await res.json();
-      let orders: Order[] = data.data || [];
+      let fetchedOrders: Order[] = data.data || [];
 
+      // Filtrar activos en el cliente
       if (filter === "active") {
         const activeStatuses = ["CREADO", "ESPERANDO_PAGO", "PAGADO", "PREPARANDO", "LISTO"];
-        orders = orders.filter((o) => activeStatuses.includes(o.status));
+        fetchedOrders = fetchedOrders.filter((o) => activeStatuses.includes(o.status));
       }
 
-      setOrders(orders);
+      setOrders(fetchedOrders);
     } catch (err) {
       toast.error("Error al cargar pedidos");
     } finally {

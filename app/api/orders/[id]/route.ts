@@ -3,9 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-// GET /api/orders/[id]
-export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
+// GET /api/orders/[id] — solo admin
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+
     const order = await prisma.order.findUnique({
       where: { id: params.id },
       include: {
@@ -30,7 +33,9 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    if (!session || !["ADMIN", "EMPLEADO"].includes(session.user?.role ?? "")) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
 
     const { status } = await req.json();
 

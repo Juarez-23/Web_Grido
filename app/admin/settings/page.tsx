@@ -16,6 +16,7 @@ export default function AdminSettingsPage() {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [togglingStore, setTogglingStore] = useState(false);
 
   useEffect(() => {
     fetch("/api/settings")
@@ -26,12 +27,31 @@ export default function AdminSettingsPage() {
       });
   }, []);
 
+  // Auto-guarda solo el estado de tienda abierta/cerrada
+  const toggleStore = async () => {
+    const newValue = !settings.storeOpen;
+    setSettings((s) => ({ ...s, storeOpen: newValue }));
+    setTogglingStore(true);
+    try {
+      const res = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...settings, storeOpen: newValue }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success(newValue ? "Tienda abierta ✓" : "Tienda cerrada ✓");
+    } catch {
+      // Revertir si falla
+      setSettings((s) => ({ ...s, storeOpen: !newValue }));
+      toast.error("Error al cambiar estado");
+    } finally {
+      setTogglingStore(false);
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
-    setSettings((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
-    }));
+    const { name, value } = e.target;
+    setSettings((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSave = async () => {
@@ -54,7 +74,7 @@ export default function AdminSettingsPage() {
   if (loading) {
     return (
       <div className="p-6 max-w-2xl mx-auto space-y-4">
-        {Array.from({ length: 5 }).map((_, i) => (
+        {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="skeleton h-20 rounded-2xl" />
         ))}
       </div>
@@ -69,30 +89,35 @@ export default function AdminSettingsPage() {
       </div>
 
       <div className="space-y-4">
-        {/* Estado de la tienda */}
+        {/* Estado de la tienda — auto-guarda */}
         <div className="bg-white rounded-2xl p-5 shadow-card">
-          <h2 className="font-bold text-gray-900 mb-4">🏪 Estado de la tienda</h2>
-          <label className="flex items-center justify-between cursor-pointer">
+          <h2 className="font-bold text-gray-900 mb-4">Estado de la tienda</h2>
+          <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-gray-800">Tienda abierta</p>
-              <p className="text-sm text-gray-500">Los clientes pueden hacer pedidos</p>
+              <p className="font-medium text-gray-800">
+                {settings.storeOpen ? "🟢 Abierta — aceptando pedidos" : "🔴 Cerrada — sin pedidos"}
+              </p>
+              <p className="text-sm text-gray-500 mt-0.5">Se guarda automáticamente al cambiar</p>
             </div>
             <button
-              onClick={() => setSettings((s) => ({ ...s, storeOpen: !s.storeOpen }))}
-              className={`relative w-14 h-7 rounded-full transition-colors ${
+              onClick={toggleStore}
+              disabled={togglingStore}
+              aria-label="Cambiar estado de la tienda"
+              className={`relative flex-shrink-0 w-14 h-7 rounded-full transition-colors duration-200 disabled:opacity-60 ${
                 settings.storeOpen ? "bg-green-500" : "bg-gray-300"
               }`}
             >
               <span
-                className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-transform ${
-                  settings.storeOpen ? "translate-x-8" : "translate-x-1"
+                className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-200 ${
+                  settings.storeOpen ? "translate-x-[30px]" : "translate-x-1"
                 }`}
               />
             </button>
-          </label>
+          </div>
+
           {!settings.storeOpen && (
-            <div className="mt-3">
-              <label className="text-sm font-medium text-gray-600 mb-1 block">
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <label className="text-sm font-medium text-gray-600 mb-1.5 block">
                 Mensaje cuando está cerrado
               </label>
               <input
@@ -108,91 +133,46 @@ export default function AdminSettingsPage() {
 
         {/* Delivery */}
         <div className="bg-white rounded-2xl p-5 shadow-card">
-          <h2 className="font-bold text-gray-900 mb-4">🛵 Delivery</h2>
+          <h2 className="font-bold text-gray-900 mb-4">Delivery</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-gray-600 mb-1 block">
-                Costo de envío (ARS)
-              </label>
-              <input
-                name="deliveryCost"
-                type="number"
-                value={settings.deliveryCost}
-                onChange={handleChange}
-                className="input-field"
-                placeholder="1500"
-              />
+              <label className="text-sm font-medium text-gray-600 mb-1 block">Costo de envío (ARS)</label>
+              <input name="deliveryCost" type="number" value={settings.deliveryCost} onChange={handleChange} className="input-field" placeholder="1500" />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-600 mb-1 block">
-                Pedido mínimo (ARS)
-              </label>
-              <input
-                name="minOrderAmount"
-                type="number"
-                value={settings.minOrderAmount}
-                onChange={handleChange}
-                className="input-field"
-                placeholder="5000"
-              />
+              <label className="text-sm font-medium text-gray-600 mb-1 block">Pedido mínimo (ARS)</label>
+              <input name="minOrderAmount" type="number" value={settings.minOrderAmount} onChange={handleChange} className="input-field" placeholder="5000" />
             </div>
           </div>
         </div>
 
         {/* WhatsApp */}
         <div className="bg-white rounded-2xl p-5 shadow-card">
-          <h2 className="font-bold text-gray-900 mb-4">📱 WhatsApp</h2>
-          <label className="text-sm font-medium text-gray-600 mb-1 block">
-            Número de WhatsApp (con código de país, sin +)
-          </label>
-          <input
-            name="whatsappNumber"
-            value={settings.whatsappNumber}
-            onChange={handleChange}
-            className="input-field"
-            placeholder="5492604000000"
-          />
-          <p className="text-xs text-gray-400 mt-1">
-            Ejemplo: 5492604123456 (54 = Argentina, 260 = San Rafael, luego el número)
-          </p>
+          <h2 className="font-bold text-gray-900 mb-4">WhatsApp</h2>
+          <label className="text-sm font-medium text-gray-600 mb-1 block">Número (con código de país, sin +)</label>
+          <input name="whatsappNumber" value={settings.whatsappNumber} onChange={handleChange} className="input-field" placeholder="5492604000000" />
+          <p className="text-xs text-gray-400 mt-1">Ejemplo: 5492604123456 (54=Argentina, 260=San Rafael)</p>
         </div>
 
         {/* Transferencia */}
         <div className="bg-white rounded-2xl p-5 shadow-card">
-          <h2 className="font-bold text-gray-900 mb-4">🏦 Transferencia bancaria</h2>
+          <h2 className="font-bold text-gray-900 mb-4">Transferencia bancaria</h2>
           <div className="space-y-3">
             <div>
               <label className="text-sm font-medium text-gray-600 mb-1 block">Alias</label>
-              <input
-                name="transferAlias"
-                value={settings.transferAlias}
-                onChange={handleChange}
-                className="input-field"
-                placeholder="grido.sanrafael.mp"
-              />
+              <input name="transferAlias" value={settings.transferAlias} onChange={handleChange} className="input-field" placeholder="grido.sanrafael.mp" />
             </div>
             <div>
               <label className="text-sm font-medium text-gray-600 mb-1 block">CBU (opcional)</label>
-              <input
-                name="transferCbu"
-                value={settings.transferCbu}
-                onChange={handleChange}
-                className="input-field"
-                placeholder="0000000000000000000000"
-              />
+              <input name="transferCbu" value={settings.transferCbu} onChange={handleChange} className="input-field" placeholder="0000000000000000000000" />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Save button */}
       <div className="mt-6">
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="w-full btn-primary h-12 text-base"
-        >
-          {saving ? "Guardando..." : "💾 Guardar configuración"}
+        <button onClick={handleSave} disabled={saving} className="w-full btn-primary h-12 text-base">
+          {saving ? "Guardando..." : "Guardar configuración"}
         </button>
       </div>
     </div>
