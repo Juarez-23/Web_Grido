@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
+import Link from "next/link";
 import { useCartStore } from "@/store/cartStore";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { GridoLogo } from "@/components/ui/GridoLogo";
@@ -54,6 +55,18 @@ export function Header() {
           </p>
         </div>
       </div>
+
+      {/* Contacto */}
+      <Link
+        href="/contacto"
+        className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 active:scale-90 transition-transform"
+        aria-label="Contacto"
+      >
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#134385" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+          <circle cx="12" cy="10" r="3" />
+        </svg>
+      </Link>
 
       {/* Carrito */}
       <button
