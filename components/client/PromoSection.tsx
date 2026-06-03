@@ -75,7 +75,6 @@ export function PromoSection() {
             key={promo.id}
             onClick={() => setSelected(promo)}
             className="promo-card flex-shrink-0 snap-start relative rounded-2xl overflow-hidden text-left"
-            style={{ transition: "transform 140ms cubic-bezier(0.25,1,0.5,1)" }}
             onPointerDown={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(0.97)"; }}
             onPointerUp={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
             onPointerLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
@@ -87,6 +86,7 @@ export function PromoSection() {
                 ? "#0d2050"
                 : FALLBACK_GRADIENTS[i % FALLBACK_GRADIENTS.length],
               boxShadow: "0 4px 20px rgba(13,32,80,0.22)",
+              transition: "transform 140ms cubic-bezier(0.25,1,0.5,1)",
             }}
           >
             {/* Background image */}
