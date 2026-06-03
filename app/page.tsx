@@ -188,22 +188,20 @@ export default function HomePage() {
     if (slug === selectedCategory) return;
     setIsChangingCat(true);
 
-    // Fade out del grid
     gsap.to(gridRef.current, {
       autoAlpha: 0,
-      y: 8,
-      duration: 0.18,
-      ease: "power2.in",
+      y: 14,
+      scale: 0.98,
+      duration: 0.2,
+      ease: "power3.in",
       onComplete: () => {
         setSelectedCategory(slug);
         setIsChangingCat(false);
-        // Fade in
-        gsap.to(gridRef.current, {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.22,
-          ease: "power2.out",
-        });
+        gsap.fromTo(
+          gridRef.current,
+          { autoAlpha: 0, y: -10, scale: 0.98 },
+          { autoAlpha: 1, y: 0, scale: 1, duration: 0.32, ease: "power3.out" }
+        );
       },
     });
   };
