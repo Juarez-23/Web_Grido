@@ -27,7 +27,7 @@ async function getDashboardData() {
   ]);
 
   const todayRevenue = todayOrders
-    .filter((o) => o.status !== "CANCELADO")
+    .filter((o) => o.status === "ENTREGADO")
     .reduce((sum, o) => sum + o.total, 0);
 
   return { todayOrders, todayRevenue, totalOrders, pendingOrders, products };

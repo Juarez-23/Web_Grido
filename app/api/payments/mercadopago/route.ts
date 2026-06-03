@@ -47,8 +47,10 @@ export async function POST(req: NextRequest) {
       data: { status: "ESPERANDO_PAGO" },
     });
 
+    const pref = preference as typeof preference & { mobile_init_point?: string };
     return NextResponse.json({
       initPoint: preference.init_point,
+      mobileInitPoint: pref.mobile_init_point,
       sandboxInitPoint: preference.sandbox_init_point,
       preferenceId: preference.id,
     });

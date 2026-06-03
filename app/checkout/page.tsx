@@ -86,7 +86,7 @@ export default function CheckoutPage() {
       const orderData = await orderRes.json();
       const order = orderData.data;
 
-      // 2. Si es Mercado Pago → redirigir a MP
+      // 2. Si es Mercado Pago → redirigir a la app de MP
       if (form.paymentMethod === "MERCADO_PAGO") {
         const mpRes = await fetch("/api/payments/mercadopago", {
           method: "POST",
@@ -94,8 +94,10 @@ export default function CheckoutPage() {
           body: JSON.stringify({ orderId: order.id }),
         });
         const mpData = await mpRes.json();
-        if (mpData.initPoint) {
-          window.location.href = mpData.initPoint;
+        // mobileInitPoint abre la app de MP en mobile, initPoint como fallback web
+        const mpUrl = mpData.mobileInitPoint || mpData.initPoint;
+        if (mpUrl) {
+          window.location.href = mpUrl;
           return;
         }
       }
