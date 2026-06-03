@@ -51,7 +51,7 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
     return (
       <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide">
         {[72, 110, 80, 95, 110, 85].map((w, i) => (
-          <div key={i} className="skeleton flex-shrink-0 rounded-2xl" style={{ width: w, height: 44 }} />
+          <div key={i} className="skeleton flex-shrink-0 rounded-full" style={{ width: w, height: 52 }} />
         ))}
       </div>
     );
@@ -72,24 +72,24 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
             onPointerUp={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
             onPointerLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
             className={[
-              "category-pill flex-shrink-0 whitespace-nowrap rounded-2xl select-none",
+              "category-pill flex-shrink-0 whitespace-nowrap rounded-full select-none",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grido-primary focus-visible:ring-offset-2",
               active
-                ? "bg-[#0d2050] text-white border-2 border-[#0d2050]"
-                : "bg-white text-gray-600 border-2 border-transparent",
+                ? "bg-[#0d2050] text-white"
+                : "bg-white text-gray-500 border border-gray-200",
             ].join(" ")}
             style={{
-              height: 48,
-              paddingLeft: 32,
-              paddingRight: 32,
-              fontFamily: "'Nunito', system-ui, sans-serif",
-              fontSize: 15,
-              fontWeight: active ? 800 : 600,
-              letterSpacing: "0.01em",
+              height: 52,
+              paddingLeft: active ? 28 : 22,
+              paddingRight: active ? 28 : 22,
+              fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+              fontSize: 14.5,
+              fontWeight: active ? 700 : 500,
+              letterSpacing: active ? "0.02em" : "0.01em",
               boxShadow: active
-                ? "0 4px 16px rgba(13,32,80,0.28)"
-                : "0 1px 4px rgba(0,0,0,0.07)",
-              transition: "background 160ms cubic-bezier(0.25,1,0.5,1), color 160ms, box-shadow 200ms cubic-bezier(0.25,1,0.5,1), border-color 160ms, transform 120ms cubic-bezier(0.25,1,0.5,1)",
+                ? "0 6px 20px rgba(13,32,80,0.30)"
+                : "0 1px 3px rgba(0,0,0,0.06)",
+              transition: "background 160ms cubic-bezier(0.25,1,0.5,1), color 160ms, box-shadow 200ms cubic-bezier(0.25,1,0.5,1), transform 120ms cubic-bezier(0.25,1,0.5,1), padding 160ms cubic-bezier(0.25,1,0.5,1)",
             }}
           >
             {cat.name}
