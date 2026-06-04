@@ -136,8 +136,8 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
               className="relative flex-shrink-0 whitespace-nowrap select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grido-primary focus-visible:ring-offset-2"
               style={{
                 height: 60,
-                paddingLeft: 26,
-                paddingRight: 26,
+                paddingLeft: 34,
+                paddingRight: 34,
                 borderRadius: 999,
                 border: "none",
                 outline: "none",
