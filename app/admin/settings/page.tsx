@@ -29,6 +29,7 @@ export default function AdminSettingsPage() {
 
   // Auto-guarda solo el estado de tienda abierta/cerrada
   const toggleStore = async () => {
+    if (togglingStore) return;
     const newValue = !settings.storeOpen;
     setSettings((s) => ({ ...s, storeOpen: newValue }));
     setTogglingStore(true);
@@ -36,14 +37,18 @@ export default function AdminSettingsPage() {
       const res = await fetch("/api/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...settings, storeOpen: newValue }),
+        // Solo enviamos storeOpen para evitar problemas con otros campos
+        body: JSON.stringify({ storeOpen: newValue }),
       });
-      if (!res.ok) throw new Error();
-      toast.success(newValue ? "Tienda abierta ✓" : "Tienda cerrada ✓");
-    } catch {
-      // Revertir si falla
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${res.status}`);
+      }
+      toast.success(newValue ? "✅ Tienda abierta" : "🔴 Tienda cerrada");
+    } catch (err) {
+      console.error("toggleStore error:", err);
       setSettings((s) => ({ ...s, storeOpen: !newValue }));
-      toast.error("Error al cambiar estado");
+      toast.error("No se pudo cambiar el estado");
     } finally {
       setTogglingStore(false);
     }
@@ -103,14 +108,34 @@ export default function AdminSettingsPage() {
               onClick={toggleStore}
               disabled={togglingStore}
               aria-label="Cambiar estado de la tienda"
-              className={`relative flex-shrink-0 w-14 h-7 rounded-full transition-colors duration-200 disabled:opacity-60 ${
-                settings.storeOpen ? "bg-green-500" : "bg-gray-300"
-              }`}
+              style={{
+                position: "relative",
+                flexShrink: 0,
+                width: 52,
+                height: 30,
+                borderRadius: 999,
+                border: "none",
+                cursor: togglingStore ? "not-allowed" : "pointer",
+                background: settings.storeOpen ? "#22c55e" : "#d1d5db",
+                transition: "background 220ms cubic-bezier(0.25,1,0.5,1)",
+                opacity: togglingStore ? 0.6 : 1,
+                outline: "none",
+                padding: 0,
+              }}
             >
               <span
-                className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-200 ${
-                  settings.storeOpen ? "translate-x-[30px]" : "translate-x-1"
-                }`}
+                style={{
+                  position: "absolute",
+                  top: 3,
+                  left: settings.storeOpen ? 25 : 3,
+                  width: 24,
+                  height: 24,
+                  background: "white",
+                  borderRadius: "50%",
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.22)",
+                  transition: "left 220ms cubic-bezier(0.25,1,0.5,1)",
+                  display: "block",
+                }}
               />
             </button>
           </div>
