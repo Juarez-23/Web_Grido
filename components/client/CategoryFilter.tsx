@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useLayoutEffect, useCallback } from "react";
+import { useRef, useLayoutEffect, useState, useCallback } from "react";
 import { gsap } from "@/lib/gsap";
 import type { Category } from "@/types";
 
@@ -22,47 +22,29 @@ const ALL: Category = {
 
 export function CategoryFilter({ categories, selected, onSelect, loading }: Props) {
   const options = [ALL, ...categories];
-  const containerRef = useRef<HTMLDivElement>(null);
   const pillRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const sliderRef = useRef<HTMLSpanElement>(null);
-  const glowRef = useRef<HTMLSpanElement>(null);
   const didMount = useRef(false);
 
-  // Positions the slider using CSS `left` + `width` (not transform),
-  // so there's no conflict between layout properties and GSAP transforms on pills
-  const positionSlider = useCallback((idx: number, animate: boolean) => {
-    const pill = pillRefs.current[idx];
-    const slider = sliderRef.current;
-    const glow = glowRef.current;
-    if (!pill || !slider) return;
+  // Slider position controlled by React state — no GSAP positioning conflicts
+  const [slider, setSlider] = useState({ left: 0, width: 0, ready: false });
 
-    // offsetLeft/offsetWidth are layout values — unaffected by GSAP transforms on the pill
+  const measureSlider = useCallback((idx: number) => {
+    const pill = pillRefs.current[idx];
+    if (!pill) return;
     const left = pill.offsetLeft;
     const width = pill.offsetWidth;
-
-    if (animate) {
-      gsap.to(slider, { left, width, duration: 0.55, ease: "expo.out" });
-      if (glow) gsap.to(glow, { left, width, duration: 0.7, ease: "expo.out" });
-    } else {
-      gsap.set(slider, { left, width });
-      if (glow) gsap.set(glow, { left, width });
-    }
+    // Debug: log what we're measuring
+    console.log("[CategoryFilter] pill idx:", idx, "offsetLeft:", left, "offsetWidth:", width);
+    setSlider({ left, width, ready: true });
   }, []);
 
-  // Runs after DOM layout is calculated, before browser paint
+  // Measure on first real render (after loading)
   useLayoutEffect(() => {
     if (loading || didMount.current) return;
     didMount.current = true;
 
     const idx = options.findIndex((c) => c.slug === selected);
-    positionSlider(idx === -1 ? 0 : idx, false);
-
-    // Slider fades in after being placed
-    gsap.fromTo(
-      [sliderRef.current, glowRef.current],
-      { autoAlpha: 0 },
-      { autoAlpha: 1, duration: 0.35, delay: 0.05 }
-    );
+    measureSlider(idx === -1 ? 0 : idx);
 
     // Staggered pill entrance
     const pills = pillRefs.current.filter(Boolean);
@@ -82,13 +64,12 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
-  // Slide to new active pill on selection change
+  // Re-measure when selection changes
   useLayoutEffect(() => {
     if (!didMount.current) return;
     const idx = options.findIndex((c) => c.slug === selected);
     if (idx === -1) return;
-
-    positionSlider(idx, true);
+    measureSlider(idx);
 
     const el = pillRefs.current[idx];
     if (el) {
@@ -98,7 +79,7 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
 
-  // Magnetic hover — Emil Kowalski signature
+  // Magnetic hover
   const handlePointerMove = useCallback((e: React.PointerEvent<HTMLButtonElement>, i: number) => {
     const el = pillRefs.current[i];
     if (!el || el.getAttribute("aria-selected") === "true") return;
@@ -147,43 +128,52 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
       <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-5 z-20"
         style={{ background: "linear-gradient(to left, #fff, transparent)" }} />
 
+      {/* Scrollable track — position:relative so absolute children position against it */}
       <div
-        ref={containerRef}
         className="relative flex gap-1.5 overflow-x-auto pb-3 px-4 scrollbar-hide"
         role="tablist"
         aria-label="Categorías"
       >
-        {/* Glow layer — GSAP owns `left` and `width`, no initial CSS left */}
+        {/* Glow — CSS-transition animated, exact same left/width as slider */}
         <span
-          ref={glowRef}
           aria-hidden
           style={{
             position: "absolute",
             top: 0,
+            left: slider.left,
+            width: slider.width,
             height: 44,
             borderRadius: 999,
-            background: "rgba(19,67,133,0.18)",
+            background: "rgba(19,67,133,0.2)",
             filter: "blur(14px)",
             pointerEvents: "none",
             zIndex: 0,
-            visibility: "hidden", // hidden until GSAP places it
+            opacity: slider.ready ? 1 : 0,
+            transition: slider.ready
+              ? "left 0.6s cubic-bezier(0.16,1,0.3,1), width 0.6s cubic-bezier(0.16,1,0.3,1), opacity 0.3s"
+              : "none",
           }}
         />
 
-        {/* Sliding pill — GSAP owns `left` and `width`, no initial CSS left */}
+        {/* Sliding pill — pure CSS transition, React state drives left/width */}
         <span
-          ref={sliderRef}
           aria-hidden
           style={{
             position: "absolute",
             top: 0,
+            left: slider.left,
+            width: slider.width,
             height: 44,
             borderRadius: 999,
             background: "linear-gradient(135deg, #1a54a8 0%, #0d2d5e 100%)",
-            boxShadow: "0 4px 20px rgba(19,67,133,0.4), 0 1px 4px rgba(19,67,133,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
+            boxShadow:
+              "0 4px 20px rgba(19,67,133,0.4), 0 1px 4px rgba(19,67,133,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
             pointerEvents: "none",
             zIndex: 1,
-            visibility: "hidden", // hidden until GSAP places it
+            opacity: slider.ready ? 1 : 0,
+            transition: slider.ready
+              ? "left 0.55s cubic-bezier(0.16,1,0.3,1), width 0.55s cubic-bezier(0.16,1,0.3,1), opacity 0.3s"
+              : "none",
           }}
         />
 
