@@ -125,9 +125,9 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
   if (loading) {
     return (
       <div className="flex gap-2 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-hide">
-        {[64, 90, 74, 82, 94, 76, 68].map((w, i) => (
+        {[58, 80, 66, 74, 84, 68, 62].map((w, i) => (
           <div key={i} className="skeleton flex-shrink-0"
-            style={{ width: w, height: 46, borderRadius: 999 }} />
+            style={{ width: w, height: 40, borderRadius: 999 }} />
         ))}
       </div>
     );
@@ -162,13 +162,13 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
               className={[
                 "relative flex-shrink-0 whitespace-nowrap select-none",
                 "flex items-center rounded-full cursor-pointer border-0",
-                "h-[46px] px-[22px]",
+                "h-[40px] px-[18px]",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grido-primary focus-visible:ring-offset-2",
                 active ? "text-white font-bold" : "text-gray-500 font-medium",
               ].join(" ")}
               style={{
                 fontFamily: "'Plus Jakarta Sans', 'Nunito', system-ui, sans-serif",
-                fontSize: 14,
+                fontSize: 13,
                 letterSpacing: active ? "-0.02em" : "0em",
                 background: "transparent",
                 transition: "color 300ms cubic-bezier(0.16,1,0.3,1), letter-spacing 300ms",
@@ -182,8 +182,8 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
                   position: "absolute",
                   inset: 0,
                   borderRadius: 999,
-                  background: "linear-gradient(135deg, #1e5bb8 0%, #0d2d5e 100%)",
-                  boxShadow: "0 6px 24px rgba(19,67,133,0.45), 0 2px 6px rgba(19,67,133,0.25), inset 0 1px 0 rgba(255,255,255,0.12)",
+                  background: "linear-gradient(160deg, #1f00d0 0%, #1200a0 100%)",
+                  boxShadow: "0 3px 12px rgba(18,0,160,0.3), inset 0 1px 0 rgba(255,255,255,0.15)",
                   opacity: 0, // GSAP controla opacity
                   pointerEvents: "none",
                   zIndex: 0,
@@ -208,8 +208,8 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
                   position: "absolute",
                   inset: -8,
                   borderRadius: 999,
-                  background: "rgba(19,67,133,0.2)",
-                  filter: "blur(14px)",
+                  background: "rgba(18,0,160,0.18)",
+                  filter: "blur(12px)",
                   opacity: active ? 1 : 0,
                   transition: "opacity 400ms cubic-bezier(0.16,1,0.3,1)",
                   pointerEvents: "none",
