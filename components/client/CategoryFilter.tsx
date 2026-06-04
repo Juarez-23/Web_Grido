@@ -116,7 +116,7 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
         style={{ background: "linear-gradient(to left, #fff, transparent)" }} />
 
       <div
-        className="flex gap-5 overflow-x-auto pb-4 px-4 scrollbar-hide"
+        className="flex gap-2 overflow-x-auto pb-3 px-4 scrollbar-hide"
         role="tablist"
         aria-label="Categorías"
       >
@@ -136,13 +136,13 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
               className={[
                 "relative flex-shrink-0 whitespace-nowrap select-none",
                 "flex items-center rounded-full cursor-pointer border-0",
-                "h-[60px] px-[44px]",
+                "h-[46px] px-[22px]",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grido-primary focus-visible:ring-offset-2",
                 active ? "text-white font-extrabold" : "text-gray-500 font-medium",
               ].join(" ")}
               style={{
                 fontFamily: "'Plus Jakarta Sans', 'Nunito', system-ui, sans-serif",
-                fontSize: 16,
+                fontSize: 14,
                 letterSpacing: active ? "-0.025em" : "0em",
                 background: "transparent",
                 gap: cat.icon ? 7 : 0,
