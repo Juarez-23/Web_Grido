@@ -20,10 +20,12 @@ const ALL: Category = {
   active: true,
 };
 
+const EASE = "cubic-bezier(0.16,1,0.3,1)";
+
 export function CategoryFilter({ categories, selected, onSelect, loading }: Props) {
   const options = [ALL, ...categories];
   const pillRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const bgRefs  = useRef<(HTMLSpanElement | null)[]>([]);
+  const bgRefs   = useRef<(HTMLSpanElement | null)[]>([]);
   const didMount = useRef(false);
   const prevIdx  = useRef(-1);
 
@@ -31,11 +33,6 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
   useLayoutEffect(() => {
     if (loading || didMount.current) return;
     didMount.current = true;
-
-    // Inicializa el fondo activo invisible — lo revela GSAP abajo
-    const initIdx = options.findIndex((c) => c.slug === selected);
-    const initBg = bgRefs.current[initIdx === -1 ? 0 : initIdx];
-    if (initBg) gsap.set(initBg, { opacity: 0, scale: 0.6 });
 
     const pills = pillRefs.current.filter(Boolean);
     gsap.fromTo(
@@ -47,47 +44,35 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
         stagger: { each: 0.055, ease: "power2.out" },
         ease: "expo.out",
         clearProps: "all",
-        onComplete: () => {
-          // Activa el fondo del pill inicial con spring una vez terminada la entrada
-          if (initBg) {
-            gsap.to(initBg, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.8)" });
-          }
-          prevIdx.current = initIdx === -1 ? 0 : initIdx;
-        },
       }
     );
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
-  // ── Cambio de selección ───────────────────────────────────────────────────
+  // ── Cambio de selección — GSAP anima solo el scale (spring) ──────────────
+  // React controla opacity vía prop `active`, así no hay conflicto entre renders
   useLayoutEffect(() => {
     if (!didMount.current) return;
 
     const nextIdx = options.findIndex((c) => c.slug === selected);
     if (nextIdx === -1) return;
 
-    const nextPill = pillRefs.current[nextIdx];
     const nextBg   = bgRefs.current[nextIdx];
-    const prevBg   = bgRefs.current[prevIdx.current];
+    const nextPill = pillRefs.current[nextIdx];
 
-    // Desactiva el fondo anterior
-    if (prevBg && prevIdx.current !== nextIdx) {
-      gsap.to(prevBg, { opacity: 0, scale: 0.75, duration: 0.25, ease: "power2.in" });
-    }
-
-    // Activa el nuevo fondo con spring
+    // Spring en el fondo (scale) — opacity la maneja React
     if (nextBg) {
       gsap.fromTo(nextBg,
-        { opacity: 0, scale: 0.65 },
-        { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" }
+        { scale: 0.6 },
+        { scale: 1, duration: 0.55, ease: "back.out(2.2)" }
       );
     }
 
     // Spring en el pill
     if (nextPill) {
       gsap.fromTo(nextPill,
-        { scale: 0.9 },
-        { scale: 1, duration: 0.55, ease: "back.out(2.8)" }
+        { scale: 0.92 },
+        { scale: 1, duration: 0.5, ease: "back.out(2.8)" }
       );
       nextPill.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
     }
@@ -96,11 +81,11 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
 
-  // ── Hover / Press — solo en pills inactivos ───────────────────────────────
+  // ── Hover / Press ─────────────────────────────────────────────────────────
   const handlePointerEnter = useCallback((i: number) => {
     const el = pillRefs.current[i];
     if (!el || el.getAttribute("aria-selected") === "true") return;
-    gsap.to(el, { y: -2, scale: 1.04, duration: 0.25, ease: "power2.out" });
+    gsap.to(el, { y: -2, scale: 1.05, duration: 0.22, ease: "power2.out" });
   }, []);
 
   const handlePointerLeave = useCallback((i: number) => {
@@ -171,10 +156,13 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
                 fontSize: 13,
                 letterSpacing: active ? "-0.02em" : "0em",
                 background: "transparent",
-                transition: "color 300ms cubic-bezier(0.16,1,0.3,1), letter-spacing 300ms",
+                transition: `color 280ms ${EASE}, letter-spacing 280ms`,
               }}
             >
-              {/* Fondo activo — animado por GSAP */}
+              {/* Fondo activo
+                  opacity controlada por React (active ? 1 : 0) con CSS transition
+                  scale controlada por GSAP (spring al activar)
+                  → no hay conflicto entre React re-renders y GSAP */}
               <span
                 ref={(el) => { bgRefs.current[i] = el; }}
                 aria-hidden
@@ -184,42 +172,28 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
                   borderRadius: 999,
                   background: "linear-gradient(160deg, #0d40e8 0%, #0828b8 100%)",
                   boxShadow: "0 3px 12px rgba(8,40,184,0.35), inset 0 1px 0 rgba(255,255,255,0.15)",
-                  opacity: 0, // GSAP controla opacity
+                  opacity: active ? 1 : 0,
+                  transition: `opacity 250ms ${EASE}`,
                   pointerEvents: "none",
                   zIndex: 0,
                 }}
               />
               {/* Fondo inactivo */}
-              <span
-                aria-hidden
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  borderRadius: 999,
-                  background: "#f3f4f6",
-                  pointerEvents: "none",
-                  zIndex: 0,
-                }}
-              />
+              <span aria-hidden style={{
+                position: "absolute", inset: 0,
+                borderRadius: 999, background: "#f3f4f6",
+                pointerEvents: "none", zIndex: 0,
+              }} />
               {/* Glow */}
-              <span
-                aria-hidden
-                style={{
-                  position: "absolute",
-                  inset: -8,
-                  borderRadius: 999,
-                  background: "rgba(8,40,184,0.2)",
-                  filter: "blur(12px)",
-                  opacity: active ? 1 : 0,
-                  transition: "opacity 400ms cubic-bezier(0.16,1,0.3,1)",
-                  pointerEvents: "none",
-                  zIndex: 0,
-                }}
-              />
-              {/* Texto — sin emojis */}
-              <span style={{ position: "relative", zIndex: 1 }}>
-                {cat.name}
-              </span>
+              <span aria-hidden style={{
+                position: "absolute", inset: -8, borderRadius: 999,
+                background: "rgba(8,40,184,0.2)", filter: "blur(12px)",
+                opacity: active ? 1 : 0,
+                transition: `opacity 380ms ${EASE}`,
+                pointerEvents: "none", zIndex: 0,
+              }} />
+              {/* Texto */}
+              <span style={{ position: "relative", zIndex: 1 }}>{cat.name}</span>
             </button>
           );
         })}
