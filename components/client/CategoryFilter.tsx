@@ -133,26 +133,20 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
               onPointerLeave={() => handlePointerLeave(i)}
               onPointerDown={() => handlePointerDown(i)}
               onPointerUp={() => handlePointerUp(i)}
-              className="relative flex-shrink-0 whitespace-nowrap select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grido-primary focus-visible:ring-offset-2"
+              className={[
+                "relative flex-shrink-0 whitespace-nowrap select-none",
+                "flex items-center rounded-full cursor-pointer border-0",
+                "h-[60px] px-[44px]",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grido-primary focus-visible:ring-offset-2",
+                active ? "text-white font-extrabold" : "text-gray-500 font-medium",
+              ].join(" ")}
               style={{
-                height: 60,
-                paddingLeft: 48,
-                paddingRight: 48,
-                borderRadius: 999,
-                border: "none",
-                outline: "none",
-                cursor: "pointer",
-                background: "transparent",
                 fontFamily: "'Plus Jakarta Sans', 'Nunito', system-ui, sans-serif",
                 fontSize: 16,
-                fontWeight: active ? 800 : 500,
                 letterSpacing: active ? "-0.025em" : "0em",
-                color: active ? "#ffffff" : "#6b7280",
-                transition: `color 350ms ${EASE}`,
-                display: "flex",
-                alignItems: "center",
+                background: "transparent",
                 gap: cat.icon ? 7 : 0,
-                position: "relative",
+                transition: `color 350ms ${EASE}`,
               }}
             >
               {/* Fondo activo */}
