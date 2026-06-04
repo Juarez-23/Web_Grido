@@ -36,7 +36,7 @@ export default function AdminPromotionsPage() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    fetch("/api/promotions")
+    fetch("/api/promotions?all=true")
       .then((r) => r.json())
       .then((d) => { setPromos(d.data || []); setLoading(false); });
   }, []);
