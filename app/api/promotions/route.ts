@@ -26,7 +26,6 @@ export async function POST(req: NextRequest) {
         description: body.description || null,
         image: body.image || null,
         badge: body.badge || null,
-        price: Number(body.price) || 0,
         active: body.active ?? true,
         order: Number(body.order) ?? 0,
       },
