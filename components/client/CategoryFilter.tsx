@@ -96,10 +96,10 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
 
   if (loading) {
     return (
-      <div className="flex gap-2 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-hide">
-        {[72, 130, 88, 105, 118, 94, 82].map((w, i) => (
+      <div className="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
+        {[80, 145, 96, 112, 128, 102, 90].map((w, i) => (
           <div key={i} className="skeleton flex-shrink-0"
-            style={{ width: w, height: 52, borderRadius: 999 }} />
+            style={{ width: w, height: 60, borderRadius: 999 }} />
         ))}
       </div>
     );
@@ -116,7 +116,7 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
         style={{ background: "linear-gradient(to left, #fff, transparent)" }} />
 
       <div
-        className="flex gap-2.5 overflow-x-auto pb-3 px-4 scrollbar-hide"
+        className="flex gap-3 overflow-x-auto pb-4 px-4 scrollbar-hide"
         role="tablist"
         aria-label="Categorías"
       >
@@ -135,23 +135,23 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
               onPointerUp={() => handlePointerUp(i)}
               className="relative flex-shrink-0 whitespace-nowrap select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grido-primary focus-visible:ring-offset-2"
               style={{
-                height: 52,
-                paddingLeft: 22,
-                paddingRight: 22,
+                height: 60,
+                paddingLeft: 26,
+                paddingRight: 26,
                 borderRadius: 999,
                 border: "none",
                 outline: "none",
                 cursor: "pointer",
                 background: "transparent",
                 fontFamily: "'Plus Jakarta Sans', 'Nunito', system-ui, sans-serif",
-                fontSize: 15,
-                fontWeight: active ? 700 : 500,
-                letterSpacing: active ? "-0.02em" : "0em",
+                fontSize: 16,
+                fontWeight: active ? 800 : 500,
+                letterSpacing: active ? "-0.025em" : "0em",
                 color: active ? "#ffffff" : "#6b7280",
                 transition: `color 350ms ${EASE}`,
                 display: "flex",
                 alignItems: "center",
-                gap: cat.icon ? 6 : 0,
+                gap: cat.icon ? 7 : 0,
                 position: "relative",
               }}
             >
@@ -163,24 +163,24 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
                   position: "absolute",
                   inset: 0,
                   borderRadius: 999,
-                  background: "linear-gradient(135deg, #1a54a8 0%, #0d2d5e 100%)",
-                  boxShadow: "0 6px 24px rgba(19,67,133,0.45), 0 2px 6px rgba(19,67,133,0.25), inset 0 1px 0 rgba(255,255,255,0.12)",
+                  background: "linear-gradient(135deg, #1e5bb8 0%, #0d2d5e 100%)",
+                  boxShadow: "0 8px 28px rgba(19,67,133,0.5), 0 2px 8px rgba(19,67,133,0.3), inset 0 1px 0 rgba(255,255,255,0.15)",
                   opacity: active ? 1 : 0,
-                  transition: `opacity 260ms ${EASE}`,
+                  transition: `opacity 250ms ${EASE}`,
                   pointerEvents: "none",
                   zIndex: 0,
                 }}
               />
-              {/* Fondo inactivo sutil */}
+              {/* Fondo inactivo */}
               <span
                 aria-hidden
                 style={{
                   position: "absolute",
                   inset: 0,
                   borderRadius: 999,
-                  background: "rgba(0,0,0,0.05)",
+                  background: "#f3f4f6",
                   opacity: active ? 0 : 1,
-                  transition: `opacity 260ms ${EASE}`,
+                  transition: `opacity 250ms ${EASE}`,
                   pointerEvents: "none",
                   zIndex: 0,
                 }}
@@ -190,20 +190,20 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
                 aria-hidden
                 style={{
                   position: "absolute",
-                  inset: -8,
+                  inset: -10,
                   borderRadius: 999,
-                  background: "rgba(19,67,133,0.22)",
-                  filter: "blur(14px)",
+                  background: "rgba(19,67,133,0.25)",
+                  filter: "blur(16px)",
                   opacity: active ? 1 : 0,
-                  transition: `opacity 380ms ${EASE}`,
+                  transition: `opacity 400ms ${EASE}`,
                   pointerEvents: "none",
                   zIndex: 0,
                 }}
               />
               {/* Contenido */}
-              <span style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: cat.icon ? 6 : 0 }}>
+              <span style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: cat.icon ? 7 : 0 }}>
                 {cat.icon && (
-                  <span style={{ fontSize: 16, lineHeight: 1, display: "inline-block" }}>
+                  <span style={{ fontSize: 17, lineHeight: 1, display: "inline-block" }}>
                     {cat.icon}
                   </span>
                 )}
