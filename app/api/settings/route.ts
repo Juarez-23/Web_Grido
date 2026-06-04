@@ -4,6 +4,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import type { AppSettings } from "@/types";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/settings - público (para mostrar costo delivery al cliente)
 export async function GET() {
   try {

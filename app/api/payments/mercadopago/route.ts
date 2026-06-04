@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createMercadoPagoPreference } from "@/lib/mercadopago";
 
+export const dynamic = "force-dynamic";
+
 // POST /api/payments/mercadopago — crear preferencia de pago
 export async function POST(req: NextRequest) {
   try {

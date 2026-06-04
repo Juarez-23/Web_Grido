@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { generateWhatsAppMessage, generateWhatsAppUrl } from "@/lib/whatsapp";
 import type { CheckoutFormData, CartItem } from "@/types";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   try {
     const { orderId } = await req.json();
