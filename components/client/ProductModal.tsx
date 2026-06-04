@@ -127,10 +127,10 @@ export function ProductModal({ product, onClose }: Props) {
       {/* Modal panel — starts below screen, GSAP slides it up */}
       <div
         ref={panelRef}
-        className="fixed inset-x-0 bottom-0 z-50 max-h-[92vh] overflow-hidden"
-        style={{ transform: "translateY(100%)" }}
+        className="fixed inset-x-0 bottom-0 z-50 overflow-hidden"
+        style={{ maxHeight: "92dvh", transform: "translateY(100%)" }}
       >
-        <div className="bg-white rounded-t-3xl shadow-modal flex flex-col max-h-[92vh]">
+        <div className="bg-white rounded-t-3xl shadow-modal flex flex-col" style={{ maxHeight: "92dvh" }}>
 
           {/* Handle bar */}
           <div className="flex justify-center pt-3 pb-1">

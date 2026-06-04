@@ -11,7 +11,6 @@ interface Promotion {
   description: string | null;
   image: string | null;
   badge: string | null;
-  price: number;
 }
 
 // Gradientes de fallback cuando no hay imagen
@@ -80,7 +79,7 @@ export function PromoSection() {
             onPointerLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
             aria-label={`Ver promoción: ${promo.title}`}
             style={{
-              width: 280,
+              width: "min(280px, calc(100vw - 56px))",
               height: 148,
               background: promo.image
                 ? "#0d2050"

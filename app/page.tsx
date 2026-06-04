@@ -269,7 +269,7 @@ export default function HomePage() {
       </div>
 
       {/* ── Content ── */}
-      <main className="max-w-2xl mx-auto px-4 pb-32">
+      <main className="max-w-2xl mx-auto px-4" style={{ paddingBottom: "calc(8rem + env(safe-area-inset-bottom, 0px))" }}>
         {/* Featured */}
         {!loading && featuredProducts.length > 0 && (
           <section className="mt-6">

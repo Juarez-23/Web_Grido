@@ -89,7 +89,7 @@ export default function ContactoPage() {
   };
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-white pb-16">
+    <div ref={containerRef} className="min-h-dvh bg-white pb-16">
 
       {/* ── Header ── */}
       <header className="contact-header sticky top-0 z-30 bg-white border-b border-gray-100 px-4 h-14 flex items-center gap-3">

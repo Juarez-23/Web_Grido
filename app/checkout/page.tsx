@@ -134,7 +134,7 @@ export default function CheckoutPage() {
   if (items.length === 0) return null;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-dvh bg-white">
       {/* Header */}
       <header className="sticky top-0 z-30 bg-white border-b border-gray-100 px-4 h-14 flex items-center gap-3">
         <button
@@ -343,7 +343,7 @@ export default function CheckoutPage() {
       </form>
 
       {/* Footer fijo con total y botón */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 pt-3 pb-safe shadow-modal z-30">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 pt-3 shadow-modal z-30" style={{ paddingBottom: "max(env(safe-area-inset-bottom, 0px), 16px)" }}>
         <div className="max-w-lg mx-auto">
           {/* Resumen de precios */}
           <div className="space-y-1 mb-3">
@@ -368,7 +368,7 @@ export default function CheckoutPage() {
             form="checkout-form"
             onClick={handleSubmit}
             disabled={loading || (settings !== null && !settings?.storeOpen)}
-            className="w-full btn-primary h-13 text-base flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full btn-primary h-14 text-base flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>

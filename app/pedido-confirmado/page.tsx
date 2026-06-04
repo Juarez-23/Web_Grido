@@ -28,7 +28,7 @@ function PedidoConfirmadoContent() {
   const isMPFailure = status === "failure";
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4">
+    <div className="min-h-dvh bg-white flex flex-col items-center justify-center px-4">
       <div className="max-w-sm w-full animate-scale-in">
         {/* Ícono principal */}
         <div className="flex justify-center mb-6">
@@ -128,7 +128,7 @@ function PedidoConfirmadoContent() {
 export default function PedidoConfirmadoPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-dvh flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-grido-primary border-t-transparent rounded-full animate-spin" />
       </div>
     }>

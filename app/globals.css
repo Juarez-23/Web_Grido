@@ -233,9 +233,13 @@ body {
 
 /* Safe area para iPhones con notch */
 .pb-safe {
-  padding-bottom: env(safe-area-inset-bottom, 16px);
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
 }
 
 .pt-safe {
   padding-top: env(safe-area-inset-top, 0px);
 }
+
+/* Utilitarios dvh para mobile browsers */
+.min-h-dvh { min-height: 100dvh; }
+.h-dvh     { height: 100dvh; }

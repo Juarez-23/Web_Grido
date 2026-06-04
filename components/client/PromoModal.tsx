@@ -4,7 +4,6 @@ import { useRef, useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { gsap } from "@/lib/gsap";
 import { useCartStore } from "@/store/cartStore";
-import { formatPrice } from "@/lib/whatsapp";
 import toast from "react-hot-toast";
 import type { Product } from "@/types";
 
@@ -14,7 +13,6 @@ interface Promotion {
   description: string | null;
   image: string | null;
   badge: string | null;
-  price: number;
 }
 
 interface Props {
@@ -58,7 +56,7 @@ export function PromoModal({ promo, onClose }: Props) {
       id: `promo-${promo.id}`,
       name: promo.title,
       description: promo.description || undefined,
-      price: promo.price,
+      price: 0,
       image: promo.image || undefined,
       maxFlavors: 0,
       active: true,
@@ -89,10 +87,10 @@ export function PromoModal({ promo, onClose }: Props) {
       {/* Panel */}
       <div
         ref={panelRef}
-        className="fixed inset-x-0 bottom-0 z-50 max-h-[88vh] overflow-hidden"
-        style={{ transform: "translateY(100%)" }}
+        className="fixed inset-x-0 bottom-0 z-50 overflow-hidden"
+        style={{ transform: "translateY(100%)", maxHeight: "88dvh" }}
       >
-        <div className="bg-white rounded-t-3xl shadow-modal flex flex-col max-h-[88vh]">
+        <div className="bg-white rounded-t-3xl shadow-modal flex flex-col" style={{ maxHeight: "88dvh" }}>
           {/* Handle */}
           <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
             <div className="w-10 h-1 bg-gray-200 rounded-full" />
@@ -134,14 +132,6 @@ export function PromoModal({ promo, onClose }: Props) {
                 >
                   {promo.title}
                 </h2>
-                {promo.price > 0 && (
-                  <p
-                    className="whitespace-nowrap"
-                    style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: 22, color: "#0d2050" }}
-                  >
-                    {formatPrice(promo.price)}
-                  </p>
-                )}
               </div>
 
               {promo.description && (
@@ -192,9 +182,7 @@ export function PromoModal({ promo, onClose }: Props) {
                   <circle cx="20" cy="21" r="1" fill="white"/>
                   <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
                 </svg>
-                {promo.price > 0
-                  ? `Agregar · ${formatPrice(promo.price * quantity)}`
-                  : "Agregar al carrito"}
+                Agregar al carrito
               </button>
             </div>
           </div>
