@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useLayoutEffect, useCallback } from "react";
 import { gsap } from "@/lib/gsap";
 import type { Category } from "@/types";
 
@@ -27,54 +27,56 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
   const sliderRef = useRef<HTMLSpanElement>(null);
   const glowRef = useRef<HTMLSpanElement>(null);
   const didMount = useRef(false);
+  const selectedRef = useRef(selected);
+  selectedRef.current = selected;
 
-  // Position the floating slider under the active pill
-  // Uses offsetLeft/offsetWidth to ignore any GSAP transforms on pills
+  // Measures the pill and moves the slider + glow to its position
   const positionSlider = useCallback((idx: number, animate: boolean) => {
     const pill = pillRefs.current[idx];
     const slider = sliderRef.current;
     const glow = glowRef.current;
     if (!pill || !slider) return;
 
+    // offsetLeft/offsetWidth ignore any GSAP x/y transforms on the pill itself
     const x = pill.offsetLeft;
     const w = pill.offsetWidth;
 
     if (animate) {
       gsap.to(slider, { x, width: w, duration: 0.55, ease: "expo.out" });
-      if (glow) gsap.to(glow, { x, width: w, duration: 0.65, ease: "expo.out" });
+      if (glow) gsap.to(glow, { x, width: w, duration: 0.7, ease: "expo.out" });
     } else {
       gsap.set(slider, { x, width: w });
       if (glow) gsap.set(glow, { x, width: w });
     }
   }, []);
 
-  // Initial mount: position slider + staggered entrance
-  useEffect(() => {
+  // useLayoutEffect runs synchronously after DOM mutations, before paint
+  // so offsetLeft is always accurate — no requestAnimationFrame needed
+  useLayoutEffect(() => {
     if (loading || didMount.current) return;
     didMount.current = true;
 
-    const idx = options.findIndex((c) => c.slug === selected);
+    const idx = options.findIndex((c) => c.slug === selectedRef.current);
     positionSlider(idx === -1 ? 0 : idx, false);
 
-    // Reveal slider
+    // Reveal slider + glow from nothing
     gsap.fromTo(
       [sliderRef.current, glowRef.current],
-      { autoAlpha: 0, scaleX: 0.6, transformOrigin: "left center" },
-      { autoAlpha: 1, scaleX: 1, duration: 0.5, delay: 0.1, ease: "back.out(1.5)" }
+      { autoAlpha: 0, scaleX: 0.5, transformOrigin: "left center" },
+      { autoAlpha: 1, scaleX: 1, duration: 0.45, delay: 0.08, ease: "back.out(1.4)" }
     );
 
-    // Staggered pill entrance
+    // Staggered pill entrance: blur + slide up
     const pills = pillRefs.current.filter(Boolean);
     gsap.fromTo(
       pills,
-      { y: 16, autoAlpha: 0, scale: 0.88, filter: "blur(3px)" },
+      { y: 14, autoAlpha: 0, scale: 0.88 },
       {
         y: 0,
         autoAlpha: 1,
         scale: 1,
-        filter: "blur(0px)",
-        duration: 0.6,
-        stagger: { each: 0.055, ease: "power3.out" },
+        duration: 0.55,
+        stagger: { each: 0.05, ease: "power2.out" },
         ease: "expo.out",
         clearProps: "all",
       }
@@ -82,26 +84,24 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
-  // Slide to new active pill
-  useEffect(() => {
+  // Slide the indicator when selection changes
+  useLayoutEffect(() => {
     if (!didMount.current) return;
     const idx = options.findIndex((c) => c.slug === selected);
     if (idx === -1) return;
 
     positionSlider(idx, true);
 
-    // Spring pop on the newly active pill text
+    // Spring pop on the newly active pill
     const el = pillRefs.current[idx];
     if (el) {
-      gsap.fromTo(el, { scale: 0.88 }, { scale: 1, duration: 0.55, ease: "back.out(2.8)" });
+      gsap.fromTo(el, { scale: 0.88 }, { scale: 1, duration: 0.5, ease: "back.out(2.6)" });
+      el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
     }
-
-    // Scroll active pill into view if needed
-    el?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
 
-  // Magnetic hover — signature Emil Kowalski micro-interaction
+  // Magnetic hover — Emil Kowalski signature
   const handlePointerMove = useCallback((e: React.PointerEvent<HTMLButtonElement>, i: number) => {
     const el = pillRefs.current[i];
     if (!el || el.getAttribute("aria-selected") === "true") return;
@@ -109,9 +109,9 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
     gsap.to(el, {
-      x: (e.clientX - cx) * 0.22,
-      y: (e.clientY - cy) * 0.16,
-      duration: 0.3,
+      x: (e.clientX - cx) * 0.2,
+      y: (e.clientY - cy) * 0.14,
+      duration: 0.28,
       ease: "power2.out",
     });
   }, []);
@@ -119,7 +119,7 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
   const handlePointerLeave = useCallback((i: number) => {
     const el = pillRefs.current[i];
     if (!el) return;
-    gsap.to(el, { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.35)" });
+    gsap.to(el, { x: 0, y: 0, duration: 0.65, ease: "elastic.out(1, 0.35)" });
   }, []);
 
   const handlePointerDown = useCallback((i: number) => {
@@ -131,18 +131,14 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
   const handlePointerUp = useCallback((i: number) => {
     const el = pillRefs.current[i];
     if (!el) return;
-    gsap.to(el, { scale: 1, x: 0, y: 0, duration: 0.55, ease: "back.out(2.4)" });
+    gsap.to(el, { scale: 1, x: 0, y: 0, duration: 0.5, ease: "back.out(2.2)" });
   }, []);
 
   if (loading) {
     return (
-      <div className="relative flex gap-2 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-hide">
-        {[68, 108, 78, 92, 106, 82, 72].map((w, i) => (
-          <div
-            key={i}
-            className="skeleton flex-shrink-0"
-            style={{ width: w, height: 44, borderRadius: 999 }}
-          />
+      <div className="flex gap-2 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-hide">
+        {[64, 108, 76, 90, 106, 80, 72].map((w, i) => (
+          <div key={i} className="skeleton flex-shrink-0" style={{ width: w, height: 44, borderRadius: 999 }} />
         ))}
       </div>
     );
@@ -150,44 +146,36 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
 
   return (
     <div className="relative -mx-4">
-      {/* Soft edge fades for the scroll overflow */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-6"
-        style={{ background: "linear-gradient(to right, #fff 30%, transparent)" }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-6"
-        style={{ background: "linear-gradient(to left, #fff 30%, transparent)" }}
-      />
+      {/* Scroll edge fades */}
+      <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-5 z-20"
+        style={{ background: "linear-gradient(to right, #fff, transparent)" }} />
+      <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-5 z-20"
+        style={{ background: "linear-gradient(to left, #fff, transparent)" }} />
 
       <div
         ref={containerRef}
         className="relative flex gap-1.5 overflow-x-auto pb-3 px-4 scrollbar-hide"
         role="tablist"
         aria-label="Categorías"
-        style={{ WebkitOverflowScrolling: "touch" }}
       >
-        {/* Diffused glow layer — renders before the pill so it bleeds outward */}
+        {/* Glow — same top/height as slider, no CSS transform, so GSAP can own it fully */}
         <span
           ref={glowRef}
           aria-hidden
           style={{
             position: "absolute",
-            top: "50%",
+            top: 0,
             left: 0,
             height: 44,
-            transform: "translateY(-50%)",
             borderRadius: 999,
-            background: "rgba(19,67,133,0.22)",
-            filter: "blur(12px)",
+            background: "rgba(19,67,133,0.18)",
+            filter: "blur(14px)",
             pointerEvents: "none",
             zIndex: 0,
           }}
         />
 
-        {/* Crisp sliding pill */}
+        {/* Sliding pill */}
         <span
           ref={sliderRef}
           aria-hidden
@@ -198,8 +186,7 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
             height: 44,
             borderRadius: 999,
             background: "linear-gradient(135deg, #1a54a8 0%, #0d2d5e 100%)",
-            boxShadow:
-              "0 4px 18px rgba(19,67,133,0.38), 0 1px 4px rgba(19,67,133,0.22), inset 0 1px 0 rgba(255,255,255,0.12)",
+            boxShadow: "0 4px 20px rgba(19,67,133,0.4), 0 1px 4px rgba(19,67,133,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
             pointerEvents: "none",
             zIndex: 1,
           }}
@@ -225,7 +212,7 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
                 paddingRight: 20,
                 borderRadius: 999,
                 zIndex: 2,
-                background: "transparent",
+                background: active ? "transparent" : "rgba(0,0,0,0.04)",
                 border: "none",
                 outline: "none",
                 cursor: "pointer",
@@ -234,22 +221,14 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
                 fontWeight: active ? 700 : 500,
                 letterSpacing: active ? "-0.02em" : "0.005em",
                 color: active ? "#ffffff" : "#71717a",
-                transition:
-                  "color 420ms cubic-bezier(0.16,1,0.3,1), font-weight 180ms",
+                transition: "color 380ms cubic-bezier(0.16,1,0.3,1), background 200ms",
                 display: "flex",
                 alignItems: "center",
-                gap: cat.icon ? 6 : 0,
+                gap: cat.icon ? 5 : 0,
               }}
             >
               {cat.icon && (
-                <span
-                  style={{
-                    fontSize: 15,
-                    lineHeight: 1,
-                    transition: "transform 300ms cubic-bezier(0.16,1,0.3,1)",
-                    transform: active ? "scale(1.1)" : "scale(1)",
-                  }}
-                >
+                <span style={{ fontSize: 15, lineHeight: 1, display: "inline-block" }}>
                   {cat.icon}
                 </span>
               )}
