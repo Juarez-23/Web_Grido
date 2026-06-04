@@ -20,92 +20,118 @@ const ALL: Category = {
   active: true,
 };
 
-// El fondo activo vive DENTRO de cada pill como una capa absoluta.
-// Cuando la categoría se activa → opacity 1. Cuando se desactiva → opacity 0.
-// CSS transition sobre opacity: correcto 100% del tiempo, sin mediciones externas.
-
 export function CategoryFilter({ categories, selected, onSelect, loading }: Props) {
   const options = [ALL, ...categories];
   const pillRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const bgRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const bgRefs  = useRef<(HTMLSpanElement | null)[]>([]);
   const didMount = useRef(false);
+  const prevIdx  = useRef(-1);
 
-  // Entrada staggered de las pills
+  // ── Entrada staggered ────────────────────────────────────────────────────
   useLayoutEffect(() => {
     if (loading || didMount.current) return;
     didMount.current = true;
 
+    // Inicializa el fondo activo invisible — lo revela GSAP abajo
+    const initIdx = options.findIndex((c) => c.slug === selected);
+    const initBg = bgRefs.current[initIdx === -1 ? 0 : initIdx];
+    if (initBg) gsap.set(initBg, { opacity: 0, scale: 0.6 });
+
     const pills = pillRefs.current.filter(Boolean);
     gsap.fromTo(
       pills,
-      { y: 14, autoAlpha: 0, scale: 0.88 },
+      { y: 18, autoAlpha: 0, scale: 0.85 },
       {
         y: 0, autoAlpha: 1, scale: 1,
-        duration: 0.55,
-        stagger: { each: 0.05, ease: "power2.out" },
+        duration: 0.6,
+        stagger: { each: 0.055, ease: "power2.out" },
         ease: "expo.out",
         clearProps: "all",
+        onComplete: () => {
+          // Activa el fondo del pill inicial con spring una vez terminada la entrada
+          if (initBg) {
+            gsap.to(initBg, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.8)" });
+          }
+          prevIdx.current = initIdx === -1 ? 0 : initIdx;
+        },
       }
     );
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
-  // Spring en el pill recién activo
+  // ── Cambio de selección ───────────────────────────────────────────────────
   useLayoutEffect(() => {
     if (!didMount.current) return;
-    const idx = options.findIndex((c) => c.slug === selected);
-    if (idx === -1) return;
-    const el = pillRefs.current[idx];
-    if (el) {
-      gsap.fromTo(el, { scale: 0.88 }, { scale: 1, duration: 0.5, ease: "back.out(2.6)" });
-      el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+
+    const nextIdx = options.findIndex((c) => c.slug === selected);
+    if (nextIdx === -1) return;
+
+    const nextPill = pillRefs.current[nextIdx];
+    const nextBg   = bgRefs.current[nextIdx];
+    const prevBg   = bgRefs.current[prevIdx.current];
+
+    // Desactiva el fondo anterior
+    if (prevBg && prevIdx.current !== nextIdx) {
+      gsap.to(prevBg, { opacity: 0, scale: 0.75, duration: 0.25, ease: "power2.in" });
     }
+
+    // Activa el nuevo fondo con spring
+    if (nextBg) {
+      gsap.fromTo(nextBg,
+        { opacity: 0, scale: 0.65 },
+        { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2)" }
+      );
+    }
+
+    // Spring en el pill
+    if (nextPill) {
+      gsap.fromTo(nextPill,
+        { scale: 0.9 },
+        { scale: 1, duration: 0.55, ease: "back.out(2.8)" }
+      );
+      nextPill.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+    }
+
+    prevIdx.current = nextIdx;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
 
-  // Magnetic hover
-  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLButtonElement>, i: number) => {
+  // ── Hover / Press — solo en pills inactivos ───────────────────────────────
+  const handlePointerEnter = useCallback((i: number) => {
     const el = pillRefs.current[i];
     if (!el || el.getAttribute("aria-selected") === "true") return;
-    const rect = el.getBoundingClientRect();
-    gsap.to(el, {
-      x: (e.clientX - (rect.left + rect.width / 2)) * 0.2,
-      y: (e.clientY - (rect.top + rect.height / 2)) * 0.14,
-      duration: 0.28,
-      ease: "power2.out",
-    });
+    gsap.to(el, { y: -2, scale: 1.04, duration: 0.25, ease: "power2.out" });
   }, []);
 
   const handlePointerLeave = useCallback((i: number) => {
     const el = pillRefs.current[i];
     if (!el) return;
-    gsap.to(el, { x: 0, y: 0, duration: 0.65, ease: "elastic.out(1, 0.35)" });
+    gsap.to(el, { y: 0, scale: 1, duration: 0.4, ease: "expo.out" });
   }, []);
 
   const handlePointerDown = useCallback((i: number) => {
     const el = pillRefs.current[i];
     if (!el) return;
-    gsap.to(el, { scale: 0.91, duration: 0.1, ease: "power3.in" });
+    gsap.to(el, { scale: 0.92, duration: 0.1, ease: "power3.in" });
   }, []);
 
   const handlePointerUp = useCallback((i: number) => {
     const el = pillRefs.current[i];
     if (!el) return;
-    gsap.to(el, { scale: 1, x: 0, y: 0, duration: 0.5, ease: "back.out(2.2)" });
+    gsap.to(el, { scale: 1, y: 0, duration: 0.5, ease: "back.out(2.4)" });
   }, []);
 
+  // ── Skeleton ──────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
-        {[80, 145, 96, 112, 128, 102, 90].map((w, i) => (
+      <div className="flex gap-2 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-hide">
+        {[64, 90, 74, 82, 94, 76, 68].map((w, i) => (
           <div key={i} className="skeleton flex-shrink-0"
-            style={{ width: w, height: 60, borderRadius: 999 }} />
+            style={{ width: w, height: 46, borderRadius: 999 }} />
         ))}
       </div>
     );
   }
-
-  const EASE = "cubic-bezier(0.16,1,0.3,1)";
 
   return (
     <div className="relative -mx-4">
@@ -129,7 +155,7 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
               role="tab"
               aria-selected={active}
               onClick={() => { if (cat.slug !== selected) onSelect(cat.slug); }}
-              onPointerMove={(e) => handlePointerMove(e, i)}
+              onPointerEnter={() => handlePointerEnter(i)}
               onPointerLeave={() => handlePointerLeave(i)}
               onPointerDown={() => handlePointerDown(i)}
               onPointerUp={() => handlePointerUp(i)}
@@ -138,18 +164,17 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
                 "flex items-center rounded-full cursor-pointer border-0",
                 "h-[46px] px-[22px]",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grido-primary focus-visible:ring-offset-2",
-                active ? "text-white font-extrabold" : "text-gray-500 font-medium",
+                active ? "text-white font-bold" : "text-gray-500 font-medium",
               ].join(" ")}
               style={{
                 fontFamily: "'Plus Jakarta Sans', 'Nunito', system-ui, sans-serif",
                 fontSize: 14,
-                letterSpacing: active ? "-0.025em" : "0em",
+                letterSpacing: active ? "-0.02em" : "0em",
                 background: "transparent",
-                gap: cat.icon ? 7 : 0,
-                transition: `color 350ms ${EASE}`,
+                transition: "color 300ms cubic-bezier(0.16,1,0.3,1), letter-spacing 300ms",
               }}
             >
-              {/* Fondo activo */}
+              {/* Fondo activo — animado por GSAP */}
               <span
                 ref={(el) => { bgRefs.current[i] = el; }}
                 aria-hidden
@@ -158,9 +183,8 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
                   inset: 0,
                   borderRadius: 999,
                   background: "linear-gradient(135deg, #1e5bb8 0%, #0d2d5e 100%)",
-                  boxShadow: "0 8px 28px rgba(19,67,133,0.5), 0 2px 8px rgba(19,67,133,0.3), inset 0 1px 0 rgba(255,255,255,0.15)",
-                  opacity: active ? 1 : 0,
-                  transition: `opacity 250ms ${EASE}`,
+                  boxShadow: "0 6px 24px rgba(19,67,133,0.45), 0 2px 6px rgba(19,67,133,0.25), inset 0 1px 0 rgba(255,255,255,0.12)",
+                  opacity: 0, // GSAP controla opacity
                   pointerEvents: "none",
                   zIndex: 0,
                 }}
@@ -173,8 +197,6 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
                   inset: 0,
                   borderRadius: 999,
                   background: "#f3f4f6",
-                  opacity: active ? 0 : 1,
-                  transition: `opacity 250ms ${EASE}`,
                   pointerEvents: "none",
                   zIndex: 0,
                 }}
@@ -184,23 +206,18 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
                 aria-hidden
                 style={{
                   position: "absolute",
-                  inset: -10,
+                  inset: -8,
                   borderRadius: 999,
-                  background: "rgba(19,67,133,0.25)",
-                  filter: "blur(16px)",
+                  background: "rgba(19,67,133,0.2)",
+                  filter: "blur(14px)",
                   opacity: active ? 1 : 0,
-                  transition: `opacity 400ms ${EASE}`,
+                  transition: "opacity 400ms cubic-bezier(0.16,1,0.3,1)",
                   pointerEvents: "none",
                   zIndex: 0,
                 }}
               />
-              {/* Contenido */}
-              <span style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: cat.icon ? 7 : 0 }}>
-                {cat.icon && (
-                  <span style={{ fontSize: 17, lineHeight: 1, display: "inline-block" }}>
-                    {cat.icon}
-                  </span>
-                )}
+              {/* Texto — sin emojis */}
+              <span style={{ position: "relative", zIndex: 1 }}>
                 {cat.name}
               </span>
             </button>
