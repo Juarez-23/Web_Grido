@@ -140,7 +140,7 @@ export function ProductModal({ product, onClose }: Props) {
           {/* Scrollable content */}
           <div className="overflow-y-auto flex-1">
             {/* Product Image */}
-            <div className="relative h-52 bg-gradient-to-br from-blue-50 to-indigo-100 mx-4 rounded-2xl overflow-hidden">
+            <div className="relative h-52 mx-4 rounded-2xl overflow-hidden" style={{ background: "#f8f9fb" }}>
               {product.image ? (
                 <Image
                   src={product.image}

@@ -160,15 +160,35 @@ export default function AdminFlavorsPage() {
                   <button
                     onClick={() => toggleAvailability(flavor)}
                     disabled={updatingId === flavor.id}
-                    className={`relative w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none ${
-                      flavor.available ? "bg-green-500" : "bg-gray-200"
-                    }`}
-                    title={flavor.available ? "Disponible - clic para marcar agotado" : "Agotado - clic para marcar disponible"}
+                    title={flavor.available ? "Disponible — clic para marcar agotado" : "Agotado — clic para marcar disponible"}
+                    style={{
+                      position: "relative",
+                      flexShrink: 0,
+                      width: 44,
+                      height: 26,
+                      borderRadius: 999,
+                      border: "none",
+                      cursor: updatingId === flavor.id ? "not-allowed" : "pointer",
+                      background: flavor.available ? "#22c55e" : "#d1d5db",
+                      transition: "background 200ms cubic-bezier(0.25,1,0.5,1)",
+                      opacity: updatingId === flavor.id ? 0.6 : 1,
+                      outline: "none",
+                      padding: 0,
+                    }}
                   >
                     <span
-                      className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 ${
-                        flavor.available ? "translate-x-6" : "translate-x-0.5"
-                      }`}
+                      style={{
+                        position: "absolute",
+                        top: 3,
+                        left: flavor.available ? 21 : 3,
+                        width: 20,
+                        height: 20,
+                        background: "white",
+                        borderRadius: "50%",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+                        transition: "left 200ms cubic-bezier(0.25,1,0.5,1)",
+                        display: "block",
+                      }}
                     />
                   </button>
 
