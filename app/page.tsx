@@ -198,7 +198,8 @@ export default function HomePage() {
       {/* ── Hero ── */}
       <section
         ref={heroRef}
-        className="bg-grido-gradient pt-16 pb-16 px-4 relative overflow-hidden rounded-b-[2.5rem]"
+        className="bg-grido-gradient pb-16 px-4 relative overflow-hidden rounded-b-[2.5rem]"
+        style={{ paddingTop: "calc(4rem + env(safe-area-inset-top, 0px))" }}
       >
         {/* Blobs decorativos */}
         <div className="hero-blob-1 absolute top-0 right-0 w-80 h-80 bg-white/[0.06] rounded-full -translate-y-40 translate-x-40 pointer-events-none" />
