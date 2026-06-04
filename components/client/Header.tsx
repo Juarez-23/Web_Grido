@@ -41,54 +41,59 @@ export function Header() {
   return (
     <header
       ref={headerRef}
-      className="fixed top-0 left-0 right-0 z-30 bg-white flex items-center justify-between px-4"
-      style={{
-        paddingTop: "env(safe-area-inset-top, 0px)",
-        height: "calc(3.5rem + env(safe-area-inset-top, 0px))",
-      }}
+      className="fixed top-0 left-0 right-0 z-30 bg-white"
+      style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
     >
-      {/* Logo Grido */}
-      <div className="flex items-center gap-2.5">
-        <GridoLogo size={38} />
-        <div>
-          <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "1.2rem", letterSpacing: "-0.03em", color: "#0d2050", lineHeight: 1 }}>
-            grido
-          </p>
-          <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#9ca3af", marginTop: 2, lineHeight: 1 }}>
-            San Rafael
-          </p>
+      {/* Contenido del header — siempre 56px de alto, centrado correctamente */}
+      <div className="h-14 flex items-center justify-between px-4">
+
+        {/* Logo Grido */}
+        <div className="flex items-center gap-2.5">
+          <GridoLogo size={36} />
+          <div>
+            <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "1.15rem", letterSpacing: "-0.03em", color: "#0d2050", lineHeight: 1 }}>
+              grido
+            </p>
+            <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#9ca3af", marginTop: 2, lineHeight: 1 }}>
+              San Rafael
+            </p>
+          </div>
         </div>
+
+        {/* Acciones */}
+        <div className="flex items-center gap-2">
+          {/* Contacto */}
+          <Link
+            href="/contacto"
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 active:scale-90 transition-transform"
+            aria-label="Contacto"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#134385" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+          </Link>
+
+          {/* Carrito */}
+          <button
+            onClick={toggleCart}
+            className="relative w-10 h-10 flex items-center justify-center rounded-2xl bg-blue-50 active:scale-90 transition-transform"
+            aria-label={`Carrito con ${count} productos`}
+          >
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#134385" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="9" cy="21" r="1" fill="#134385" />
+              <circle cx="20" cy="21" r="1" fill="#134385" />
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+            </svg>
+            {mounted && count > 0 && (
+              <span ref={badgeRef} className="cart-badge">
+                {count > 9 ? "9+" : count}
+              </span>
+            )}
+          </button>
+        </div>
+
       </div>
-
-      {/* Contacto */}
-      <Link
-        href="/contacto"
-        className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 active:scale-90 transition-transform"
-        aria-label="Contacto"
-      >
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#134385" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-          <circle cx="12" cy="10" r="3" />
-        </svg>
-      </Link>
-
-      {/* Carrito */}
-      <button
-        onClick={toggleCart}
-        className="relative w-11 h-11 flex items-center justify-center rounded-2xl bg-blue-50 active:scale-90 transition-transform"
-        aria-label={`Carrito con ${count} productos`}
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#134385" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="9" cy="21" r="1" fill="#134385" />
-          <circle cx="20" cy="21" r="1" fill="#134385" />
-          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-        </svg>
-        {mounted && count > 0 && (
-          <span ref={badgeRef} className="cart-badge">
-            {count > 9 ? "9+" : count}
-          </span>
-        )}
-      </button>
     </header>
   );
 }
