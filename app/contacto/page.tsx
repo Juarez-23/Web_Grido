@@ -1,22 +1,31 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { gsap } from "@/lib/gsap";
 import { useGSAP } from "@gsap/react";
 import { GridoLogo } from "@/components/ui/GridoLogo";
 
-const WHATSAPP_NUMBER = "5492604000000";
 const INSTAGRAM_URL = "https://www.instagram.com/grido_libertador?igsh=czh2OWo2dTBnNGwy";
 const FACEBOOK_URL = "https://www.facebook.com/share/1G3J8Q8BNy/?mibextid=wwXIfr";
-const PHONE_DISPLAY = "+54 9 2604 00-0000";
 const ADDRESS = "Av. El Libertador 962, San Rafael, Mendoza";
 const MAPS_EMBED =
   "https://maps.google.com/maps?q=Grido+Heladeria+Av+El+Libertador+962+San+Rafael+Mendoza+Argentina&output=embed&z=17";
+const DEFAULT_PHONE = "5492604000000";
 
 export default function ContactoPage() {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
+  const [whatsappNumber, setWhatsappNumber] = useState(DEFAULT_PHONE);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.data?.whatsappNumber) setWhatsappNumber(d.data.whatsappNumber);
+      })
+      .catch(() => {});
+  }, []);
 
   useGSAP(
     () => {
@@ -214,7 +223,7 @@ export default function ContactoPage() {
 
           {/* Teléfono / WhatsApp */}
           <a
-            href={`https://wa.me/${WHATSAPP_NUMBER}`}
+            href={`https://wa.me/${whatsappNumber}`}
             target="_blank"
             rel="noopener noreferrer"
             className="info-card block"
@@ -239,7 +248,7 @@ export default function ContactoPage() {
                   WhatsApp
                 </p>
                 <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: "0.8rem", color: "#6b7280", marginTop: 2 }}>
-                  {PHONE_DISPLAY}
+                  {whatsappNumber}
                 </p>
               </div>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
@@ -395,7 +404,7 @@ export default function ContactoPage() {
 
         {/* ── CTA WhatsApp full-width ── */}
         <a
-          href={`https://wa.me/${WHATSAPP_NUMBER}?text=Hola%20Grido%20San%20Rafael!%20Quiero%20hacer%20un%20pedido%20🍦`}
+          href={`https://wa.me/${whatsappNumber}?text=Hola%20Grido%20San%20Rafael!%20Quiero%20hacer%20un%20pedido%20🍦`}
           target="_blank"
           rel="noopener noreferrer"
           className="social-card block"

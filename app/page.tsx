@@ -8,11 +8,12 @@ import { ProductCard } from "@/components/client/ProductCard";
 import { ProductModal } from "@/components/client/ProductModal";
 import { CategoryFilter } from "@/components/client/CategoryFilter";
 import { PromoSection } from "@/components/client/PromoSection";
-import type { Product, Category } from "@/types";
+import type { Product, Category, AppSettings } from "@/types";
 
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [settings, setSettings] = useState<AppSettings | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("todos");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -26,16 +27,19 @@ export default function HomePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [productsRes, categoriesRes] = await Promise.all([
+        const [productsRes, categoriesRes, settingsRes] = await Promise.all([
           fetch("/api/products?active=true"),
           fetch("/api/categories?active=true"),
+          fetch("/api/settings"),
         ]);
-        const [productsData, categoriesData] = await Promise.all([
+        const [productsData, categoriesData, settingsData] = await Promise.all([
           productsRes.json(),
           categoriesRes.json(),
+          settingsRes.json(),
         ]);
         setProducts(productsData.data || []);
         setCategories(categoriesData.data || []);
+        setSettings(settingsData.data ?? null);
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
@@ -206,12 +210,19 @@ export default function HomePage() {
         <div className="hero-blob-2 absolute bottom-0 left-0 w-56 h-56 bg-white/[0.04] rounded-full translate-y-32 -translate-x-24 pointer-events-none" />
 
         <div className="hero-content relative max-w-lg mx-auto">
-          {/* Badge */}
+          {/* Badge estado */}
           <div className="flex items-center gap-2 mb-5">
-            <span className="hero-badge inline-flex items-center gap-1.5 bg-white/[0.14] text-white/90 text-[11px] font-semibold px-3 py-1.5 rounded-full border border-white/[0.16]">
-              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-              Abierto ahora
-            </span>
+            {settings === null || settings.storeOpen ? (
+              <span className="hero-badge inline-flex items-center gap-1.5 bg-white/[0.14] text-white/90 text-[11px] font-semibold px-3 py-1.5 rounded-full border border-white/[0.16]">
+                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+                Abierto ahora
+              </span>
+            ) : (
+              <span className="hero-badge inline-flex items-center gap-1.5 bg-red-500/80 text-white text-[11px] font-semibold px-3 py-1.5 rounded-full border border-red-400/40">
+                <span className="w-1.5 h-1.5 bg-white rounded-full" />
+                Cerrado temporalmente
+              </span>
+            )}
           </div>
 
           {/* Title */}
@@ -268,6 +279,21 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* ── Banner tienda cerrada ── */}
+      {settings && !settings.storeOpen && (
+        <div className="max-w-2xl mx-auto px-4 mt-4">
+          <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3 flex items-center gap-3">
+            <span className="text-lg flex-shrink-0">🔴</span>
+            <div>
+              <p className="font-bold text-red-800 text-sm">Tienda cerrada</p>
+              <p className="text-red-600 text-xs mt-0.5">
+                {settings.storeClosedMessage || "Estamos cerrados por el momento. ¡Volvemos pronto!"}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Content ── */}
       <main className="max-w-2xl mx-auto px-4" style={{ paddingBottom: "calc(8rem + env(safe-area-inset-bottom, 0px))" }}>
