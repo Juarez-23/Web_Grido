@@ -7,12 +7,12 @@ import { useGSAP } from "@gsap/react";
 import { GridoLogo } from "@/components/ui/GridoLogo";
 
 const WHATSAPP_NUMBER = "5492604000000";
-const INSTAGRAM_URL = "https://www.instagram.com/gridosanrafael";
-const FACEBOOK_URL = "https://www.facebook.com/gridosanrafael";
+const INSTAGRAM_URL = "https://www.instagram.com/grido_libertador?igsh=czh2OWo2dTBnNGwy";
+const FACEBOOK_URL = "https://www.facebook.com/share/1G3J8Q8BNy/?mibextid=wwXIfr";
 const PHONE_DISPLAY = "+54 9 2604 00-0000";
-const ADDRESS = "San Rafael, Mendoza, Argentina";
+const ADDRESS = "Av. El Libertador 962, San Rafael, Mendoza";
 const MAPS_EMBED =
-  "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d26623.946!2d-68.3303!3d-34.6177!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x967db9f79c5a5555%3A0x1!2sSan+Rafael%2C+Mendoza!5e0!3m2!1ses!2sar!4v1700000000000";
+  "https://maps.google.com/maps?q=Grido+Heladeria+Av+El+Libertador+962+San+Rafael+Mendoza+Argentina&output=embed&z=17";
 
 export default function ContactoPage() {
   const router = useRouter();
