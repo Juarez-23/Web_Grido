@@ -128,23 +128,7 @@ export default function HomePage() {
     });
   }, { dependencies: [loading] });
 
-  // ─── Category pills entrance ────────────────────────────────────────────────
-  useGSAP(() => {
-    if (loading) return;
-    gsap.from(".category-pill", {
-      y: 12,
-      autoAlpha: 0,
-      scale: 0.95,
-      duration: 0.32,
-      stagger: 0.04,
-      ease: "power4.out",
-      scrollTrigger: {
-        trigger: ".category-bar",
-        start: "top 94%",
-        once: true,
-      },
-    });
-  }, { dependencies: [loading] });
+  // Category pills entrance is handled inside CategoryFilter with useLayoutEffect
 
   // ─── Product grid — ScrollTrigger.batch ────────────────────────────────────
   useGSAP(

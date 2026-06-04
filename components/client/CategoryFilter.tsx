@@ -27,46 +27,44 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
   const sliderRef = useRef<HTMLSpanElement>(null);
   const glowRef = useRef<HTMLSpanElement>(null);
   const didMount = useRef(false);
-  const selectedRef = useRef(selected);
-  selectedRef.current = selected;
 
-  // Measures the pill and moves the slider + glow to its position
+  // Positions the slider using CSS `left` + `width` (not transform),
+  // so there's no conflict between layout properties and GSAP transforms on pills
   const positionSlider = useCallback((idx: number, animate: boolean) => {
     const pill = pillRefs.current[idx];
     const slider = sliderRef.current;
     const glow = glowRef.current;
     if (!pill || !slider) return;
 
-    // offsetLeft/offsetWidth ignore any GSAP x/y transforms on the pill itself
-    const x = pill.offsetLeft;
-    const w = pill.offsetWidth;
+    // offsetLeft/offsetWidth are layout values — unaffected by GSAP transforms on the pill
+    const left = pill.offsetLeft;
+    const width = pill.offsetWidth;
 
     if (animate) {
-      gsap.to(slider, { x, width: w, duration: 0.55, ease: "expo.out" });
-      if (glow) gsap.to(glow, { x, width: w, duration: 0.7, ease: "expo.out" });
+      gsap.to(slider, { left, width, duration: 0.55, ease: "expo.out" });
+      if (glow) gsap.to(glow, { left, width, duration: 0.7, ease: "expo.out" });
     } else {
-      gsap.set(slider, { x, width: w });
-      if (glow) gsap.set(glow, { x, width: w });
+      gsap.set(slider, { left, width });
+      if (glow) gsap.set(glow, { left, width });
     }
   }, []);
 
-  // useLayoutEffect runs synchronously after DOM mutations, before paint
-  // so offsetLeft is always accurate — no requestAnimationFrame needed
+  // Runs after DOM layout is calculated, before browser paint
   useLayoutEffect(() => {
     if (loading || didMount.current) return;
     didMount.current = true;
 
-    const idx = options.findIndex((c) => c.slug === selectedRef.current);
+    const idx = options.findIndex((c) => c.slug === selected);
     positionSlider(idx === -1 ? 0 : idx, false);
 
-    // Reveal slider + glow from nothing
+    // Slider fades in after being placed
     gsap.fromTo(
       [sliderRef.current, glowRef.current],
-      { autoAlpha: 0, scaleX: 0.5, transformOrigin: "left center" },
-      { autoAlpha: 1, scaleX: 1, duration: 0.45, delay: 0.08, ease: "back.out(1.4)" }
+      { autoAlpha: 0 },
+      { autoAlpha: 1, duration: 0.35, delay: 0.05 }
     );
 
-    // Staggered pill entrance: blur + slide up
+    // Staggered pill entrance
     const pills = pillRefs.current.filter(Boolean);
     gsap.fromTo(
       pills,
@@ -84,7 +82,7 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
-  // Slide the indicator when selection changes
+  // Slide to new active pill on selection change
   useLayoutEffect(() => {
     if (!didMount.current) return;
     const idx = options.findIndex((c) => c.slug === selected);
@@ -92,7 +90,6 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
 
     positionSlider(idx, true);
 
-    // Spring pop on the newly active pill
     const el = pillRefs.current[idx];
     if (el) {
       gsap.fromTo(el, { scale: 0.88 }, { scale: 1, duration: 0.5, ease: "back.out(2.6)" });
@@ -106,11 +103,9 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
     const el = pillRefs.current[i];
     if (!el || el.getAttribute("aria-selected") === "true") return;
     const rect = el.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
     gsap.to(el, {
-      x: (e.clientX - cx) * 0.2,
-      y: (e.clientY - cy) * 0.14,
+      x: (e.clientX - (rect.left + rect.width / 2)) * 0.2,
+      y: (e.clientY - (rect.top + rect.height / 2)) * 0.14,
       duration: 0.28,
       ease: "power2.out",
     });
@@ -158,37 +153,37 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
         role="tablist"
         aria-label="Categorías"
       >
-        {/* Glow — same top/height as slider, no CSS transform, so GSAP can own it fully */}
+        {/* Glow layer — GSAP owns `left` and `width`, no initial CSS left */}
         <span
           ref={glowRef}
           aria-hidden
           style={{
             position: "absolute",
             top: 0,
-            left: 0,
             height: 44,
             borderRadius: 999,
             background: "rgba(19,67,133,0.18)",
             filter: "blur(14px)",
             pointerEvents: "none",
             zIndex: 0,
+            visibility: "hidden", // hidden until GSAP places it
           }}
         />
 
-        {/* Sliding pill */}
+        {/* Sliding pill — GSAP owns `left` and `width`, no initial CSS left */}
         <span
           ref={sliderRef}
           aria-hidden
           style={{
             position: "absolute",
             top: 0,
-            left: 0,
             height: 44,
             borderRadius: 999,
             background: "linear-gradient(135deg, #1a54a8 0%, #0d2d5e 100%)",
             boxShadow: "0 4px 20px rgba(19,67,133,0.4), 0 1px 4px rgba(19,67,133,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
             pointerEvents: "none",
             zIndex: 1,
+            visibility: "hidden", // hidden until GSAP places it
           }}
         />
 
