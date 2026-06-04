@@ -116,7 +116,7 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
         style={{ background: "linear-gradient(to left, #fff, transparent)" }} />
 
       <div
-        className="flex gap-3 overflow-x-auto pb-4 px-4 scrollbar-hide"
+        className="flex gap-5 overflow-x-auto pb-4 px-4 scrollbar-hide"
         role="tablist"
         aria-label="Categorías"
       >
@@ -136,8 +136,8 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
               className="relative flex-shrink-0 whitespace-nowrap select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grido-primary focus-visible:ring-offset-2"
               style={{
                 height: 60,
-                paddingLeft: 34,
-                paddingRight: 34,
+                paddingLeft: 48,
+                paddingRight: 48,
                 borderRadius: 999,
                 border: "none",
                 outline: "none",
