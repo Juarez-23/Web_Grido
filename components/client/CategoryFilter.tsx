@@ -159,10 +159,13 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
                 transition: `color 280ms ${EASE}, letter-spacing 280ms`,
               }}
             >
-              {/* Fondo activo
-                  opacity controlada por React (active ? 1 : 0) con CSS transition
-                  scale controlada por GSAP (spring al activar)
-                  → no hay conflicto entre React re-renders y GSAP */}
+              {/* Fondo inactivo — z-index 0, siempre debajo */}
+              <span aria-hidden style={{
+                position: "absolute", inset: 0,
+                borderRadius: 999, background: "#f3f4f6",
+                pointerEvents: "none", zIndex: 0,
+              }} />
+              {/* Fondo activo — z-index 1, encima del gris */}
               <span
                 ref={(el) => { bgRefs.current[i] = el; }}
                 aria-hidden
@@ -175,15 +178,9 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
                   opacity: active ? 1 : 0,
                   transition: `opacity 250ms ${EASE}`,
                   pointerEvents: "none",
-                  zIndex: 0,
+                  zIndex: 1,
                 }}
               />
-              {/* Fondo inactivo */}
-              <span aria-hidden style={{
-                position: "absolute", inset: 0,
-                borderRadius: 999, background: "#f3f4f6",
-                pointerEvents: "none", zIndex: 0,
-              }} />
               {/* Glow */}
               <span aria-hidden style={{
                 position: "absolute", inset: -8, borderRadius: 999,
