@@ -22,16 +22,32 @@ const ALL: Category = {
 
 export function CategoryFilter({ categories, selected, onSelect, loading }: Props) {
   const options = [ALL, ...categories];
+  const containerRef = useRef<HTMLDivElement>(null);
   const pillRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const didMount = useRef(false);
 
-  // animate:false → instant placement (first render)
-  // animate:true  → CSS transition (on user selection change)
   const [slider, setSlider] = useState({ left: 0, width: 0, ready: false, animate: false });
 
-  // ── 1. Primera vez que los pills están en el DOM ──────────────────────────
-  // Corre cuando `loading` cambia de true→false.
-  // `selected` NO está en los deps de este efecto, así que no hay conflicto.
+  // Mide la posición de un pill relativa al container usando getBoundingClientRect
+  // (independiente de offsetParent y de transforms CSS)
+  const measure = useCallback((pill: HTMLButtonElement): { left: number; width: number } | null => {
+    const container = containerRef.current;
+    if (!container) return null;
+
+    // Resetea cualquier transform GSAP antes de medir, para obtener la posición real de layout
+    gsap.set(pill, { x: 0, y: 0 });
+
+    const pRect = pill.getBoundingClientRect();
+    const cRect = container.getBoundingClientRect();
+
+    // left relativo al container, incluyendo el scroll horizontal
+    const left = pRect.left - cRect.left + container.scrollLeft;
+    const width = pRect.width;
+
+    return { left, width };
+  }, []);
+
+  // ── Primera colocación: sin animación ──────────────────────────────────────
   useLayoutEffect(() => {
     if (loading || didMount.current) return;
     didMount.current = true;
@@ -39,11 +55,11 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
     const idx = options.findIndex((c) => c.slug === selected);
     const pill = pillRefs.current[idx === -1 ? 0 : idx];
     if (pill) {
-      // Sin animación: el slider aparece directamente en la posición correcta
-      setSlider({ left: pill.offsetLeft, width: pill.offsetWidth, ready: true, animate: false });
+      const pos = measure(pill);
+      if (pos) setSlider({ ...pos, ready: true, animate: false });
     }
 
-    // Entrada staggered de las pills
+    // Staggered pill entrance
     const pills = pillRefs.current.filter(Boolean);
     gsap.fromTo(
       pills,
@@ -59,18 +75,18 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
-  // ── 2. El usuario cambia de categoría ────────────────────────────────────
-  // Corre SOLO cuando `selected` cambia (no en el mount inicial de loading).
+  // ── Cambio de selección: con animación ────────────────────────────────────
   useLayoutEffect(() => {
-    if (!didMount.current) return; // espera a que el primer efecto haya corrido
+    if (!didMount.current) return;
     const idx = options.findIndex((c) => c.slug === selected);
     if (idx === -1) return;
     const pill = pillRefs.current[idx];
     if (!pill) return;
 
-    // Con animación: el slider desliza hasta la nueva posición
-    setSlider({ left: pill.offsetLeft, width: pill.offsetWidth, ready: true, animate: true });
+    const pos = measure(pill);
+    if (pos) setSlider({ ...pos, ready: true, animate: true });
 
+    // Spring en el pill activo
     gsap.fromTo(pill, { scale: 0.88 }, { scale: 1, duration: 0.5, ease: "back.out(2.6)" });
     pill.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -122,56 +138,40 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
 
   return (
     <div className="relative -mx-4">
-      {/* Fade edges */}
       <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-5 z-20"
         style={{ background: "linear-gradient(to right, #fff, transparent)" }} />
       <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-5 z-20"
         style={{ background: "linear-gradient(to left, #fff, transparent)" }} />
 
       <div
+        ref={containerRef}
         className="relative flex gap-1.5 overflow-x-auto pb-3 px-4 scrollbar-hide"
         role="tablist"
         aria-label="Categorías"
       >
         {/* Glow */}
-        <span
-          aria-hidden
-          style={{
-            position: "absolute",
-            top: 0,
-            left: slider.left,
-            width: slider.width,
-            height: 44,
-            borderRadius: 999,
-            background: "rgba(19,67,133,0.2)",
-            filter: "blur(14px)",
-            pointerEvents: "none",
-            zIndex: 0,
-            // Solo transiciona posición cuando es un cambio de selección (animate:true)
-            // Primera colocación (animate:false) → sin transición → aparece directo en su lugar
-            transition: slider.animate ? `left 0.65s ${EASE}, width 0.65s ${EASE}` : "none",
-            opacity: slider.ready ? 1 : 0,
-          }}
-        />
+        <span aria-hidden style={{
+          position: "absolute", top: 0,
+          left: slider.left, width: slider.width, height: 44,
+          borderRadius: 999,
+          background: "rgba(19,67,133,0.2)",
+          filter: "blur(14px)",
+          pointerEvents: "none", zIndex: 0,
+          opacity: slider.ready ? 1 : 0,
+          transition: slider.animate ? `left 0.65s ${EASE}, width 0.65s ${EASE}` : "none",
+        }} />
 
-        {/* Slider pill */}
-        <span
-          aria-hidden
-          style={{
-            position: "absolute",
-            top: 0,
-            left: slider.left,
-            width: slider.width,
-            height: 44,
-            borderRadius: 999,
-            background: "linear-gradient(135deg, #1a54a8 0%, #0d2d5e 100%)",
-            boxShadow: "0 4px 20px rgba(19,67,133,0.4), 0 1px 4px rgba(19,67,133,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
-            pointerEvents: "none",
-            zIndex: 1,
-            transition: slider.animate ? `left 0.55s ${EASE}, width 0.55s ${EASE}` : "none",
-            opacity: slider.ready ? 1 : 0,
-          }}
-        />
+        {/* Sliding pill */}
+        <span aria-hidden style={{
+          position: "absolute", top: 0,
+          left: slider.left, width: slider.width, height: 44,
+          borderRadius: 999,
+          background: "linear-gradient(135deg, #1a54a8 0%, #0d2d5e 100%)",
+          boxShadow: "0 4px 20px rgba(19,67,133,0.4), 0 1px 4px rgba(19,67,133,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
+          pointerEvents: "none", zIndex: 1,
+          opacity: slider.ready ? 1 : 0,
+          transition: slider.animate ? `left 0.55s ${EASE}, width 0.55s ${EASE}` : "none",
+        }} />
 
         {options.map((cat, i) => {
           const active = selected === cat.slug;
@@ -188,31 +188,20 @@ export function CategoryFilter({ categories, selected, onSelect, loading }: Prop
               onPointerUp={() => handlePointerUp(i)}
               className="relative flex-shrink-0 whitespace-nowrap select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grido-primary focus-visible:ring-offset-2"
               style={{
-                height: 44,
-                paddingLeft: 20,
-                paddingRight: 20,
-                borderRadius: 999,
-                zIndex: 2,
+                height: 44, paddingLeft: 20, paddingRight: 20,
+                borderRadius: 999, zIndex: 2,
                 background: active ? "transparent" : "rgba(0,0,0,0.04)",
-                border: "none",
-                outline: "none",
-                cursor: "pointer",
+                border: "none", outline: "none", cursor: "pointer",
                 fontFamily: "'Plus Jakarta Sans', 'Nunito', system-ui, sans-serif",
                 fontSize: 13.5,
                 fontWeight: active ? 700 : 500,
                 letterSpacing: active ? "-0.02em" : "0.005em",
                 color: active ? "#ffffff" : "#71717a",
                 transition: `color 380ms ${EASE}, background 200ms`,
-                display: "flex",
-                alignItems: "center",
-                gap: cat.icon ? 5 : 0,
+                display: "flex", alignItems: "center", gap: cat.icon ? 5 : 0,
               }}
             >
-              {cat.icon && (
-                <span style={{ fontSize: 15, lineHeight: 1, display: "inline-block" }}>
-                  {cat.icon}
-                </span>
-              )}
+              {cat.icon && <span style={{ fontSize: 15, lineHeight: 1, display: "inline-block" }}>{cat.icon}</span>}
               {cat.name}
             </button>
           );
