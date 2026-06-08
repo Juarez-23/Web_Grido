@@ -249,11 +249,11 @@ export default function HomePage() {
             Delivery y retiro en sucursal
           </p>
 
-          {/* Botones */}
+          {/* Botones — ambos glass */}
           <div className="flex gap-2.5 flex-wrap">
             <button
-              className="hero-badge inline-flex items-center gap-2 bg-white text-[#08125a] text-sm font-bold px-4 py-2 rounded-full shadow-md active:scale-95 transition-transform"
-              style={{ fontFamily: "'Nunito', sans-serif" }}
+              className="hero-badge inline-flex items-center gap-2 text-white text-sm font-bold px-4 py-2 rounded-full active:scale-95 transition-transform backdrop-blur-md border border-white/30"
+              style={{ fontFamily: "'Nunito', sans-serif", background: "rgba(255,255,255,0.18)" }}
               onClick={() => document.querySelector("main")?.scrollIntoView({ behavior: "smooth" })}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -263,8 +263,8 @@ export default function HomePage() {
               Pedir ahora
             </button>
             <button
-              className="hero-badge inline-flex items-center gap-2 bg-white/[0.12] text-white text-sm font-bold px-4 py-2 rounded-full border border-white/25 active:scale-95 transition-transform"
-              style={{ fontFamily: "'Nunito', sans-serif" }}
+              className="hero-badge inline-flex items-center gap-2 text-white text-sm font-bold px-4 py-2 rounded-full active:scale-95 transition-transform backdrop-blur-md border border-white/20"
+              style={{ fontFamily: "'Nunito', sans-serif", background: "rgba(255,255,255,0.10)" }}
               onClick={() => document.querySelector("main")?.scrollIntoView({ behavior: "smooth" })}
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
