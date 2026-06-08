@@ -183,7 +183,7 @@ export default function HomePage() {
       {/* ── Hero ── */}
       <section
         ref={heroRef}
-        className="relative overflow-hidden rounded-b-[2.5rem]"
+        className="relative overflow-hidden"
         style={{
           height: "clamp(340px, 52vw, 480px)",
           paddingTop: "calc(3.5rem + env(safe-area-inset-top, 0px))",
@@ -249,37 +249,13 @@ export default function HomePage() {
             Delivery y retiro en sucursal
           </p>
 
-          {/* Botones — ambos glass */}
-          <div className="flex gap-2.5 flex-wrap">
-            <button
-              className="hero-badge inline-flex items-center gap-2 text-white text-sm font-bold px-4 py-2 rounded-full active:scale-95 transition-transform backdrop-blur-md border border-white/30"
-              style={{ fontFamily: "'Nunito', sans-serif", background: "rgba(255,255,255,0.18)" }}
-              onClick={() => document.querySelector("main")?.scrollIntoView({ behavior: "smooth" })}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="1" y="3" width="15" height="13" rx="2" /><polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-                <circle cx="5.5" cy="18.5" r="2.5" fill="currentColor" stroke="none" /><circle cx="18.5" cy="18.5" r="2.5" fill="currentColor" stroke="none" />
-              </svg>
-              Pedir ahora
-            </button>
-            <button
-              className="hero-badge inline-flex items-center gap-2 text-white text-sm font-bold px-4 py-2 rounded-full active:scale-95 transition-transform backdrop-blur-md border border-white/20"
-              style={{ fontFamily: "'Nunito', sans-serif", background: "rgba(255,255,255,0.10)" }}
-              onClick={() => document.querySelector("main")?.scrollIntoView({ behavior: "smooth" })}
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" />
-              </svg>
-              Ver menú
-            </button>
-          </div>
         </div>
       </section>
 
-      {/* ── Stats card — flota sobre el borde del hero ── */}
-      <div className="max-w-2xl mx-auto px-4 -mt-7 relative z-10">
+      {/* ── Stats card — ancho completo bajo el hero ── */}
+      <div className="-mt-7 relative z-10">
         <div
-          className="stats-card bg-white rounded-2xl overflow-hidden grid grid-cols-3 divide-x divide-gray-100"
+          className="stats-card bg-white overflow-hidden grid grid-cols-3 divide-x divide-gray-100"
           style={{ boxShadow: "0 4px 32px rgba(26,13,140,0.14), 0 1px 6px rgba(26,13,140,0.07)" }}
         >
           <div className="flex flex-col items-center py-4 gap-1">
