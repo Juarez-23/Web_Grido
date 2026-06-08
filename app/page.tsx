@@ -183,136 +183,148 @@ export default function HomePage() {
       {/* ── Hero ── */}
       <section
         ref={heroRef}
-        className="relative overflow-hidden rounded-b-[2.5rem]"
-        style={{
-          height: "clamp(340px, 56vw, 500px)",
-          paddingTop: "calc(3.5rem + env(safe-area-inset-top, 0px))",
-        }}
+        className="relative overflow-hidden rounded-b-[2rem]"
+        style={{ background: "#08125a" }}
       >
-        {/* Foto de fondo */}
-        <img
-          src="/GridoAfuera.jpeg"
-          alt="Grido El Libertador"
-          className="absolute inset-0 w-full h-full object-cover object-center"
-          draggable={false}
-        />
+        {/* ── Layout: columnas en desktop, stack en mobile ── */}
+        <div className="flex flex-col md:flex-row md:items-stretch">
 
-        {/* Overlay gradiente: oscuro a la izquierda, transparente a la derecha */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(105deg, rgba(8,18,80,0.88) 0%, rgba(8,18,80,0.72) 38%, rgba(8,18,80,0.32) 65%, transparent 100%)",
-          }}
-        />
-
-        {/* Contenido */}
-        <div className="hero-content relative h-full flex flex-col justify-center px-5 max-w-lg" style={{ paddingBottom: "2rem" }}>
-          {/* Badge estado */}
-          <div className="flex items-center gap-2 mb-4">
-            {settings === null || settings.storeOpen ? (
-              <span className="hero-badge inline-flex items-center gap-1.5 bg-white/[0.18] text-white text-[11px] font-semibold px-3 py-1.5 rounded-full border border-white/[0.22] backdrop-blur-sm">
-                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-                Abierto ahora
-              </span>
-            ) : (
-              <span className="hero-badge inline-flex items-center gap-1.5 bg-red-500/80 text-white text-[11px] font-semibold px-3 py-1.5 rounded-full border border-red-400/40">
-                <span className="w-1.5 h-1.5 bg-white rounded-full" />
-                Cerrado temporalmente
-              </span>
-            )}
-          </div>
-
-          {/* Title */}
-          <h1
-            className="hero-title text-white leading-[0.92] mb-3"
-            style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "clamp(2.4rem, 10vw, 3.4rem)", letterSpacing: "-0.03em" }}
+          {/* Panel izquierdo — contenido navy */}
+          <div
+            className="hero-content flex flex-col justify-center px-6 py-10 md:py-14 relative z-10"
+            style={{
+              paddingTop: "calc(3.5rem + env(safe-area-inset-top, 0px) + 1.5rem)",
+              flex: "0 0 auto",
+              width: "min(100%, 420px)",
+              background: "#08125a",
+            }}
           >
-            Grido<br />El Libertador
-          </h1>
+            {/* Badge estado */}
+            <div className="mb-5">
+              {settings === null || settings.storeOpen ? (
+                <span className="hero-badge inline-flex items-center gap-1.5 bg-white/[0.14] text-white text-[11px] font-semibold px-3 py-1.5 rounded-full border border-white/[0.18]">
+                  <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+                  Abierto ahora
+                </span>
+              ) : (
+                <span className="hero-badge inline-flex items-center gap-1.5 bg-red-500/80 text-white text-[11px] font-semibold px-3 py-1.5 rounded-full border border-red-400/40">
+                  <span className="w-1.5 h-1.5 bg-white rounded-full" />
+                  Cerrado temporalmente
+                </span>
+              )}
+            </div>
 
-          {/* Address */}
-          <div className="hero-sub flex items-center gap-1.5 mb-1">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" />
-              <circle cx="12" cy="10" r="3" />
-            </svg>
-            <p className="text-white/75 text-sm" style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500 }}>
-              Av. Libertador · San Rafael, Mendoza
-            </p>
-          </div>
-          <p className="hero-sub2 text-white/45 text-xs mb-6" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400 }}>
-            Delivery y retiro en sucursal
-          </p>
-
-          {/* CTA buttons */}
-          <div className="flex gap-3 flex-wrap">
-            <a
-              href="#menu"
-              className="hero-badge inline-flex items-center gap-2 bg-white text-[#08125a] text-sm font-bold px-5 py-2.5 rounded-full shadow-lg active:scale-95 transition-transform"
-              style={{ fontFamily: "'Nunito', sans-serif" }}
-              onClick={(e) => { e.preventDefault(); document.querySelector("main")?.scrollIntoView({ behavior: "smooth" }); }}
+            {/* Título */}
+            <h1
+              className="hero-title text-white mb-3"
+              style={{
+                fontFamily: "'Nunito', sans-serif",
+                fontWeight: 800,
+                fontSize: "clamp(2.2rem, 8vw, 3.2rem)",
+                letterSpacing: "-0.03em",
+                lineHeight: 0.95,
+              }}
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              Grido<br />El Libertador
+            </h1>
+
+            {/* Dirección */}
+            <div className="hero-sub flex items-center gap-1.5 mb-1">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.65)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              <p className="text-white/65 text-sm" style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500 }}>
+                Av. Libertador · San Rafael, Mendoza
+              </p>
+            </div>
+            <p className="hero-sub2 text-white/35 text-xs mb-8" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400 }}>
+              Delivery y retiro en sucursal
+            </p>
+
+            {/* CTA buttons */}
+            <div className="flex gap-3 flex-wrap">
+              <button
+                className="hero-badge inline-flex items-center gap-2 bg-white text-[#08125a] text-sm font-bold px-5 py-2.5 rounded-full shadow-md active:scale-95 transition-transform"
+                style={{ fontFamily: "'Nunito', sans-serif" }}
+                onClick={() => document.querySelector("main")?.scrollIntoView({ behavior: "smooth" })}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="1" y="3" width="15" height="13" rx="2" />
+                  <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                  <circle cx="5.5" cy="18.5" r="2.5" fill="currentColor" stroke="none" />
+                  <circle cx="18.5" cy="18.5" r="2.5" fill="currentColor" stroke="none" />
+                </svg>
+                Pedir ahora
+              </button>
+              <button
+                className="hero-badge inline-flex items-center gap-2 bg-white/[0.1] text-white text-sm font-bold px-5 py-2.5 rounded-full border border-white/25 active:scale-95 transition-transform"
+                style={{ fontFamily: "'Nunito', sans-serif" }}
+                onClick={() => document.querySelector("main")?.scrollIntoView({ behavior: "smooth" })}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <path d="M16 10a4 4 0 0 1-8 0" />
+                </svg>
+                Ver menú
+              </button>
+            </div>
+          </div>
+
+          {/* Panel derecho — imagen (desktop) / imagen abajo (mobile) */}
+          <div className="flex-1 relative overflow-hidden" style={{ minHeight: 180 }}>
+            {/* Fade lateral izquierdo para fundir con el panel navy en desktop */}
+            <div
+              className="hidden md:block absolute inset-y-0 left-0 w-16 z-10 pointer-events-none"
+              style={{ background: "linear-gradient(to right, #08125a 0%, transparent 100%)" }}
+            />
+            <img
+              src="/GridoAfuera.jpeg"
+              alt="Sucursal Grido El Libertador"
+              className="w-full h-auto md:h-full md:object-cover md:object-left"
+              draggable={false}
+            />
+          </div>
+        </div>
+
+        {/* ── Stats — integrado dentro del hero, sobre fondo navy ── */}
+        <div style={{ background: "rgba(255,255,255,0.05)", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+          <div
+            className="stats-card max-w-2xl mx-auto grid grid-cols-3"
+            style={{ borderTop: "none" }}
+          >
+            {/* Delivery */}
+            <div className="flex flex-col items-center py-4 gap-1" style={{ borderRight: "1px solid rgba(255,255,255,0.08)" }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="1" y="3" width="15" height="13" rx="2" />
                 <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-                <circle cx="5.5" cy="18.5" r="2.5" fill="currentColor" stroke="none" />
-                <circle cx="18.5" cy="18.5" r="2.5" fill="currentColor" stroke="none" />
+                <circle cx="5.5" cy="18.5" r="2.5" fill="rgba(255,255,255,0.7)" stroke="none" />
+                <circle cx="18.5" cy="18.5" r="2.5" fill="rgba(255,255,255,0.7)" stroke="none" />
               </svg>
-              Pedir ahora
-            </a>
-            <a
-              href="#menu"
-              className="hero-badge inline-flex items-center gap-2 bg-white/[0.12] text-white text-sm font-bold px-5 py-2.5 rounded-full border border-white/30 backdrop-blur-sm active:scale-95 transition-transform"
-              style={{ fontFamily: "'Nunito', sans-serif" }}
-              onClick={(e) => { e.preventDefault(); document.querySelector("main")?.scrollIntoView({ behavior: "smooth" }); }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <path d="M16 10a4 4 0 0 1-8 0" />
+              <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 13, color: "#fff", lineHeight: 1, marginTop: 2 }}>30–45</p>
+              <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500, fontSize: 9, color: "rgba(255,255,255,0.4)", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 2 }}>min delivery</p>
+            </div>
+            {/* Retiro */}
+            <div className="flex flex-col items-center py-4 gap-1" style={{ borderRight: "1px solid rgba(255,255,255,0.08)" }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
               </svg>
-              Ver menú
-            </a>
+              <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 13, color: "#fff", lineHeight: 1, marginTop: 2 }}>15–20</p>
+              <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500, fontSize: 9, color: "rgba(255,255,255,0.4)", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 2 }}>min retiro</p>
+            </div>
+            {/* Rating */}
+            <div className="flex flex-col items-center py-4 gap-1">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#f59e0b" stroke="none">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+              <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 13, color: "#fff", lineHeight: 1, marginTop: 2 }}>4.8</p>
+              <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500, fontSize: 9, color: "rgba(255,255,255,0.4)", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 2 }}>calificación</p>
+            </div>
           </div>
         </div>
       </section>
-
-      {/* ── Stats card — flota sobre el borde del hero ── */}
-      <div className="max-w-2xl mx-auto px-4 -mt-7 relative z-10">
-        <div className="stats-card bg-white rounded-2xl overflow-hidden grid grid-cols-3 divide-x divide-gray-100"
-          style={{ boxShadow: "0 4px 32px rgba(26,13,140,0.14), 0 1px 6px rgba(26,13,140,0.07)" }}
-        >
-          {/* Delivery */}
-          <div className="flex flex-col items-center py-4 gap-1">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#1a0d8c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="1" y="3" width="15" height="13" rx="2" />
-              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-              <circle cx="5.5" cy="18.5" r="2.5" fill="#1a0d8c" stroke="none" />
-              <circle cx="18.5" cy="18.5" r="2.5" fill="#1a0d8c" stroke="none" />
-            </svg>
-            <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 13, color: "#0d2050", lineHeight: 1, marginTop: 2 }}>30–45</p>
-            <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500, fontSize: 9, color: "#9ca3af", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 2 }}>min delivery</p>
-          </div>
-          {/* Retiro */}
-          <div className="flex flex-col items-center py-4 gap-1">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0d2050" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-              <polyline points="9 22 9 12 15 12 15 22" />
-            </svg>
-            <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 13, color: "#0d2050", lineHeight: 1, marginTop: 2 }}>15–20</p>
-            <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500, fontSize: 9, color: "#9ca3af", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 2 }}>min retiro</p>
-          </div>
-          {/* Rating */}
-          <div className="flex flex-col items-center py-4 gap-1">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="#f59e0b" stroke="none">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-            </svg>
-            <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 13, color: "#0d2050", lineHeight: 1, marginTop: 2 }}>4.8</p>
-            <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500, fontSize: 9, color: "#9ca3af", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 2 }}>calificación</p>
-          </div>
-        </div>
-      </div>
 
       {/* ── Banner tienda cerrada ── */}
       {settings && !settings.storeOpen && (
