@@ -211,7 +211,7 @@ export default function HomePage() {
 
         {/* Contenido */}
         <div
-          className="hero-content relative h-full flex flex-col justify-center px-5 max-w-xs"
+          className="hero-content relative h-full flex flex-col justify-center px-5 pb-8 max-w-xs"
         >
           {/* Badge */}
           <div className="mb-4">
