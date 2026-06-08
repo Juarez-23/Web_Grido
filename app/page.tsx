@@ -200,9 +200,18 @@ export default function HomePage() {
           draggable={false}
         />
 
-        {/* Overlay gradiente azul de izquierda a derecha — la foto se ve detrás */}
+        {/* Overlay mobile — gradiente original */}
         <div
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 pointer-events-none md:hidden"
+          style={{
+            background:
+              "linear-gradient(to right, rgba(8,18,80,0.96) 0%, rgba(8,18,80,0.85) 20%, rgba(8,18,80,0.45) 38%, rgba(8,18,80,0.10) 55%, transparent 70%)",
+          }}
+        />
+
+        {/* Overlay desktop — gradiente azul de izquierda a derecha, foto visible detrás */}
+        <div
+          className="absolute inset-0 pointer-events-none hidden md:block"
           style={{
             background:
               "linear-gradient(to right, rgba(8,18,90,0.97) 0%, rgba(8,18,90,0.90) 20%, rgba(8,18,80,0.72) 38%, rgba(8,18,80,0.35) 58%, rgba(8,18,80,0.08) 75%, transparent 88%)",
