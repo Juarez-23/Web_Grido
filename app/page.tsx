@@ -187,6 +187,7 @@ export default function HomePage() {
         style={{
           height: "clamp(340px, 52vw, 480px)",
           paddingTop: "calc(3.5rem + env(safe-area-inset-top, 0px))",
+          background: "#08125a",
         }}
       >
         {/* Imagen a escala natural — sin zoom, alineada a la derecha */}
