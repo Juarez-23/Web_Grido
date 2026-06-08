@@ -189,22 +189,21 @@ export default function HomePage() {
           paddingTop: "calc(3.5rem + env(safe-area-inset-top, 0px))",
         }}
       >
-        {/* Imagen de fondo completa */}
+        {/* Imagen a escala natural — sin zoom, alineada a la derecha */}
         <img
           src="/GridoAfuera.jpeg"
           alt=""
           aria-hidden
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ objectPosition: "35% center" }}
+          className="absolute right-0 top-0 h-full w-auto"
           draggable={false}
         />
 
-        {/* Overlay: muy oscuro a la izquierda, casi transparente a la derecha */}
+        {/* Overlay: oscuro a la izquierda (texto), fade hacia la imagen natural */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(95deg, rgba(8,18,80,0.96) 0%, rgba(8,18,80,0.90) 20%, rgba(8,18,80,0.65) 38%, rgba(8,18,80,0.22) 58%, rgba(8,18,80,0.04) 75%, transparent 100%)",
+              "linear-gradient(95deg, rgba(8,18,80,0.98) 0%, rgba(8,18,80,0.92) 22%, rgba(8,18,80,0.60) 40%, rgba(8,18,80,0.18) 58%, rgba(8,18,80,0.04) 72%, transparent 100%)",
           }}
         />
 
