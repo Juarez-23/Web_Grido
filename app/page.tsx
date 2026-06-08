@@ -54,25 +54,6 @@ export default function HomePage() {
     () => {
       if (!heroRef.current) return;
 
-      // Blobs flotantes en loop
-      gsap.to(".hero-blob-1", {
-        y: -24,
-        x: 14,
-        duration: 5,
-        ease: "sine.inOut",
-        repeat: -1,
-        yoyo: true,
-      });
-      gsap.to(".hero-blob-2", {
-        y: 18,
-        x: -12,
-        duration: 6,
-        ease: "sine.inOut",
-        repeat: -1,
-        yoyo: true,
-        delay: 1,
-      });
-
       // Parallax sutil del contenido hero al hacer scroll
       gsap.to(".hero-content", {
         y: 35,
@@ -92,7 +73,7 @@ export default function HomePage() {
         delay: 0.05,
       });
 
-      tl.from(".hero-badge", { y: 14, autoAlpha: 0, scale: 0.95, duration: 0.38 })
+      tl.from(".hero-badge", { y: 14, autoAlpha: 0, scale: 0.95, duration: 0.38, stagger: 0.1 })
         .from(".hero-title", { y: 28, autoAlpha: 0, duration: 0.46 }, "-=0.16")
         .from(
           [".hero-sub", ".hero-sub2"],
@@ -202,18 +183,35 @@ export default function HomePage() {
       {/* ── Hero ── */}
       <section
         ref={heroRef}
-        className="bg-grido-gradient pb-16 px-4 relative overflow-hidden rounded-b-[2.5rem]"
-        style={{ paddingTop: "calc(3.5rem + env(safe-area-inset-top, 0px) + 1rem)" }}
+        className="relative overflow-hidden rounded-b-[2.5rem]"
+        style={{
+          height: "clamp(340px, 56vw, 500px)",
+          paddingTop: "calc(3.5rem + env(safe-area-inset-top, 0px))",
+        }}
       >
-        {/* Blobs decorativos */}
-        <div className="hero-blob-1 absolute top-0 right-0 w-80 h-80 bg-white/[0.06] rounded-full -translate-y-40 translate-x-40 pointer-events-none" />
-        <div className="hero-blob-2 absolute bottom-0 left-0 w-56 h-56 bg-white/[0.04] rounded-full translate-y-32 -translate-x-24 pointer-events-none" />
+        {/* Foto de fondo */}
+        <img
+          src="/GridoAfuera.jpeg"
+          alt="Grido El Libertador"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          draggable={false}
+        />
 
-        <div className="hero-content relative max-w-lg mx-auto">
+        {/* Overlay gradiente: oscuro a la izquierda, transparente a la derecha */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(105deg, rgba(8,18,80,0.88) 0%, rgba(8,18,80,0.72) 38%, rgba(8,18,80,0.32) 65%, transparent 100%)",
+          }}
+        />
+
+        {/* Contenido */}
+        <div className="hero-content relative h-full flex flex-col justify-center px-5 max-w-lg" style={{ paddingBottom: "2rem" }}>
           {/* Badge estado */}
-          <div className="flex items-center gap-2 mb-5">
+          <div className="flex items-center gap-2 mb-4">
             {settings === null || settings.storeOpen ? (
-              <span className="hero-badge inline-flex items-center gap-1.5 bg-white/[0.14] text-white/90 text-[11px] font-semibold px-3 py-1.5 rounded-full border border-white/[0.16]">
+              <span className="hero-badge inline-flex items-center gap-1.5 bg-white/[0.18] text-white text-[11px] font-semibold px-3 py-1.5 rounded-full border border-white/[0.22] backdrop-blur-sm">
                 <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
                 Abierto ahora
               </span>
@@ -227,20 +225,56 @@ export default function HomePage() {
 
           {/* Title */}
           <h1
-            className="hero-title text-white leading-[0.9] mb-4"
-            style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "clamp(2.6rem, 11vw, 3.6rem)", letterSpacing: "-0.03em" }}
+            className="hero-title text-white leading-[0.92] mb-3"
+            style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "clamp(2.4rem, 10vw, 3.4rem)", letterSpacing: "-0.03em" }}
           >
-            Helados<br />Grido
+            Grido<br />El Libertador
           </h1>
 
           {/* Address */}
-          <p className="hero-sub text-white/60 text-sm tracking-wide" style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500 }}>
-            Av. Libertador · San Rafael, Mendoza
-          </p>
-          <p className="hero-sub2 text-white/35 text-xs mt-1" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400 }}>
+          <div className="hero-sub flex items-center gap-1.5 mb-1">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.75)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <p className="text-white/75 text-sm" style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500 }}>
+              Av. Libertador · San Rafael, Mendoza
+            </p>
+          </div>
+          <p className="hero-sub2 text-white/45 text-xs mb-6" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400 }}>
             Delivery y retiro en sucursal
           </p>
 
+          {/* CTA buttons */}
+          <div className="flex gap-3 flex-wrap">
+            <a
+              href="#menu"
+              className="hero-badge inline-flex items-center gap-2 bg-white text-[#08125a] text-sm font-bold px-5 py-2.5 rounded-full shadow-lg active:scale-95 transition-transform"
+              style={{ fontFamily: "'Nunito', sans-serif" }}
+              onClick={(e) => { e.preventDefault(); document.querySelector("main")?.scrollIntoView({ behavior: "smooth" }); }}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="1" y="3" width="15" height="13" rx="2" />
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                <circle cx="5.5" cy="18.5" r="2.5" fill="currentColor" stroke="none" />
+                <circle cx="18.5" cy="18.5" r="2.5" fill="currentColor" stroke="none" />
+              </svg>
+              Pedir ahora
+            </a>
+            <a
+              href="#menu"
+              className="hero-badge inline-flex items-center gap-2 bg-white/[0.12] text-white text-sm font-bold px-5 py-2.5 rounded-full border border-white/30 backdrop-blur-sm active:scale-95 transition-transform"
+              style={{ fontFamily: "'Nunito', sans-serif" }}
+              onClick={(e) => { e.preventDefault(); document.querySelector("main")?.scrollIntoView({ behavior: "smooth" }); }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <path d="M16 10a4 4 0 0 1-8 0" />
+              </svg>
+              Ver menú
+            </a>
+          </div>
         </div>
       </section>
 
