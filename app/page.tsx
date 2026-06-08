@@ -190,13 +190,13 @@ export default function HomePage() {
           background: "#08125a",
         }}
       >
-        {/* Imagen de fondo — cubre 100% del hero */}
+        {/* Imagen de fondo — estirada para cubrir el ancho sin zoom */}
         <img
-          src="/GridoAfuera.jpeg"
+          src="/Gridolocal2.jpeg"
           alt=""
           aria-hidden
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ objectPosition: "center top" }}
+          className="absolute inset-0 w-full h-full"
+          style={{ objectFit: "fill" }}
           draggable={false}
         />
 
