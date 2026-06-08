@@ -190,23 +190,26 @@ export default function HomePage() {
           background: "#08125a",
         }}
       >
-        {/* Imagen de fondo completa */}
+        {/* Imagen centrada a escala natural — sin zoom ni recorte */}
         <img
           src="/GridoAfuera.jpeg"
           alt=""
           aria-hidden
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ objectPosition: "center 30%" }}
+          className="absolute top-0 h-full w-auto"
+          style={{ left: "50%", transform: "translateX(-50%)" }}
           draggable={false}
         />
 
-        {/* Overlay: muy oscuro a la izquierda para el texto, se abre hacia la derecha */}
+        {/* Fade izquierdo — oscuro para texto legible */}
         <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(100deg, rgba(8,18,80,0.97) 0%, rgba(8,18,80,0.88) 22%, rgba(8,18,80,0.55) 40%, rgba(8,18,80,0.15) 60%, transparent 80%)",
-          }}
+          className="absolute inset-y-0 left-0 w-3/5 pointer-events-none"
+          style={{ background: "linear-gradient(to right, rgba(8,18,80,0.97) 0%, rgba(8,18,80,0.88) 28%, rgba(8,18,80,0.50) 55%, transparent 100%)" }}
+        />
+
+        {/* Fade derecho — mismo estilo que el izquierdo */}
+        <div
+          className="absolute inset-y-0 right-0 w-2/5 pointer-events-none"
+          style={{ background: "linear-gradient(to left, rgba(8,18,80,0.82) 0%, rgba(8,18,80,0.40) 40%, transparent 100%)" }}
         />
 
         {/* Contenido */}
