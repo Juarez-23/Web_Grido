@@ -190,28 +190,28 @@ export default function HomePage() {
           background: "#08125a",
         }}
       >
-        {/* Imagen alineada a la derecha — tamaño natural por altura, sin zoom */}
+        {/* Imagen de fondo — cubre 100% del hero */}
         <img
           src="/GridoAfuera.jpeg"
           alt=""
           aria-hidden
-          className="absolute right-0 top-0 h-full w-auto"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition: "center top" }}
           draggable={false}
         />
 
-        {/* Gradiente izquierdo — sólido en el 30% y se funde suavemente hacia el centro */}
+        {/* Overlay gradiente azul de izquierda a derecha — la foto se ve detrás */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "linear-gradient(to right, #08125a 0%, #08125a 28%, rgba(8,18,90,0.93) 36%, rgba(8,18,80,0.70) 46%, rgba(8,18,80,0.30) 58%, rgba(8,18,80,0.05) 70%, transparent 78%)",
+              "linear-gradient(to right, rgba(8,18,90,0.97) 0%, rgba(8,18,90,0.90) 20%, rgba(8,18,80,0.72) 38%, rgba(8,18,80,0.35) 58%, rgba(8,18,80,0.08) 75%, transparent 88%)",
           }}
         />
 
         {/* Contenido */}
         <div
-          className="hero-content relative h-full flex flex-col justify-center px-8 pb-8"
-          style={{ maxWidth: "48%" }}
+          className="hero-content relative h-full flex flex-col justify-center px-5 pb-8 max-w-xs md:max-w-[44%] md:px-8"
         >
           {/* Badge */}
           <div className="mb-4">
