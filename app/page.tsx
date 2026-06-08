@@ -183,143 +183,128 @@ export default function HomePage() {
       {/* ── Hero ── */}
       <section
         ref={heroRef}
-        className="relative overflow-hidden rounded-b-[2rem]"
-        style={{ background: "#08125a" }}
+        className="relative overflow-hidden rounded-b-[2.5rem]"
+        style={{
+          height: "clamp(340px, 52vw, 480px)",
+          paddingTop: "calc(3.5rem + env(safe-area-inset-top, 0px))",
+        }}
       >
-        {/* ─── MOBILE: imagen como fondo absoluto ─── */}
+        {/* Imagen de fondo completa */}
         <img
           src="/GridoAfuera.jpeg"
           alt=""
           aria-hidden
-          className="md:hidden absolute inset-0 w-full h-full object-cover object-[60%_center]"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition: "35% center" }}
           draggable={false}
         />
+
+        {/* Overlay: muy oscuro a la izquierda, casi transparente a la derecha */}
         <div
-          className="md:hidden absolute inset-0"
-          style={{ background: "linear-gradient(100deg, rgba(8,18,80,0.93) 0%, rgba(8,18,80,0.82) 45%, rgba(8,18,80,0.45) 75%, rgba(8,18,80,0.15) 100%)" }}
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(95deg, rgba(8,18,80,0.96) 0%, rgba(8,18,80,0.90) 20%, rgba(8,18,80,0.65) 38%, rgba(8,18,80,0.22) 58%, rgba(8,18,80,0.04) 75%, transparent 100%)",
+          }}
         />
 
-        {/* ─── Contenedor principal ─── */}
+        {/* Contenido */}
         <div
-          className="relative flex flex-row items-stretch"
-          style={{ minHeight: "clamp(330px, 52vw, 460px)" }}
+          className="hero-content relative h-full flex flex-col justify-center px-5 max-w-xs"
         >
-          {/* Panel contenido — siempre visible */}
-          <div
-            className="hero-content flex flex-col justify-center px-5 md:px-7 relative z-10 flex-shrink-0"
-            style={{
-              paddingTop: "calc(3.5rem + env(safe-area-inset-top, 0px) + 1rem)",
-              paddingBottom: "1.5rem",
-              width: "min(100%, 390px)",
-            }}
+          {/* Badge */}
+          <div className="mb-4">
+            {settings === null || settings.storeOpen ? (
+              <span className="hero-badge inline-flex items-center gap-1.5 bg-white/[0.15] text-white text-[11px] font-semibold px-3 py-1.5 rounded-full border border-white/[0.20]">
+                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+                Abierto ahora
+              </span>
+            ) : (
+              <span className="hero-badge inline-flex items-center gap-1.5 bg-red-500/80 text-white text-[11px] font-semibold px-3 py-1.5 rounded-full border border-red-400/40">
+                <span className="w-1.5 h-1.5 bg-white rounded-full" />
+                Cerrado temporalmente
+              </span>
+            )}
+          </div>
+
+          {/* Título */}
+          <h1
+            className="hero-title text-white mb-3"
+            style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "clamp(2.2rem, 9vw, 3.2rem)", letterSpacing: "-0.03em", lineHeight: 0.93 }}
           >
-            {/* Badge */}
-            <div className="mb-4">
-              {settings === null || settings.storeOpen ? (
-                <span className="hero-badge inline-flex items-center gap-1.5 bg-white/[0.15] text-white text-[11px] font-semibold px-3 py-1.5 rounded-full border border-white/[0.18]">
-                  <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-                  Abierto ahora
-                </span>
-              ) : (
-                <span className="hero-badge inline-flex items-center gap-1.5 bg-red-500/80 text-white text-[11px] font-semibold px-3 py-1.5 rounded-full border border-red-400/40">
-                  <span className="w-1.5 h-1.5 bg-white rounded-full" />
-                  Cerrado temporalmente
-                </span>
-              )}
-            </div>
+            Grido<br />El Libertador
+          </h1>
 
-            {/* Título */}
-            <h1
-              className="hero-title text-white mb-3"
-              style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "clamp(2rem, 7vw, 3rem)", letterSpacing: "-0.03em", lineHeight: 0.95 }}
-            >
-              Grido<br />El Libertador
-            </h1>
-
-            {/* Dirección */}
-            <div className="hero-sub flex items-center gap-1.5 mb-1">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.65)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
-              </svg>
-              <p className="text-white/65 text-sm" style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500 }}>
-                Av. Libertador · San Rafael, Mendoza
-              </p>
-            </div>
-            <p className="hero-sub2 text-white/35 text-xs mb-6" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400 }}>
-              Delivery y retiro en sucursal
+          {/* Dirección */}
+          <div className="hero-sub flex items-center gap-1.5 mb-1">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
+            </svg>
+            <p className="text-white/70 text-sm" style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500 }}>
+              Av. Libertador · San Rafael, Mendoza
             </p>
-
-            {/* Botones */}
-            <div className="flex gap-2.5 flex-wrap">
-              <button
-                className="hero-badge inline-flex items-center gap-2 bg-white text-[#08125a] text-sm font-bold px-4 py-2 rounded-full shadow-md active:scale-95 transition-transform"
-                style={{ fontFamily: "'Nunito', sans-serif" }}
-                onClick={() => document.querySelector("main")?.scrollIntoView({ behavior: "smooth" })}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="1" y="3" width="15" height="13" rx="2" /><polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-                  <circle cx="5.5" cy="18.5" r="2.5" fill="currentColor" stroke="none" /><circle cx="18.5" cy="18.5" r="2.5" fill="currentColor" stroke="none" />
-                </svg>
-                Pedir ahora
-              </button>
-              <button
-                className="hero-badge inline-flex items-center gap-2 bg-white/[0.1] text-white text-sm font-bold px-4 py-2 rounded-full border border-white/25 active:scale-95 transition-transform"
-                style={{ fontFamily: "'Nunito', sans-serif" }}
-                onClick={() => document.querySelector("main")?.scrollIntoView({ behavior: "smooth" })}
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" />
-                </svg>
-                Ver menú
-              </button>
-            </div>
           </div>
+          <p className="hero-sub2 text-white/40 text-xs mb-6" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400 }}>
+            Delivery y retiro en sucursal
+          </p>
 
-          {/* ─── DESKTOP: imagen en columna derecha ─── */}
-          <div className="hidden md:block flex-1 relative overflow-hidden">
-            {/* Fade para fundir con el navy izquierdo */}
-            <div
-              className="absolute inset-y-0 left-0 w-20 z-10 pointer-events-none"
-              style={{ background: "linear-gradient(to right, #08125a 0%, transparent 100%)" }}
-            />
-            <img
-              src="/GridoAfuera.jpeg"
-              alt="Sucursal Grido El Libertador"
-              className="absolute inset-0 w-full h-full object-contain object-left"
-              style={{ background: "#08125a" }}
-              draggable={false}
-            />
-          </div>
-        </div>
-
-        {/* ── Stats integrados al fondo del hero ── */}
-        <div style={{ background: "rgba(255,255,255,0.05)", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-          <div className="stats-card max-w-2xl mx-auto grid grid-cols-3">
-            <div className="flex flex-col items-center py-3.5 gap-1" style={{ borderRight: "1px solid rgba(255,255,255,0.08)" }}>
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.65)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          {/* Botones */}
+          <div className="flex gap-2.5 flex-wrap">
+            <button
+              className="hero-badge inline-flex items-center gap-2 bg-white text-[#08125a] text-sm font-bold px-4 py-2 rounded-full shadow-md active:scale-95 transition-transform"
+              style={{ fontFamily: "'Nunito', sans-serif" }}
+              onClick={() => document.querySelector("main")?.scrollIntoView({ behavior: "smooth" })}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="1" y="3" width="15" height="13" rx="2" /><polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-                <circle cx="5.5" cy="18.5" r="2.5" fill="rgba(255,255,255,0.65)" stroke="none" /><circle cx="18.5" cy="18.5" r="2.5" fill="rgba(255,255,255,0.65)" stroke="none" />
+                <circle cx="5.5" cy="18.5" r="2.5" fill="currentColor" stroke="none" /><circle cx="18.5" cy="18.5" r="2.5" fill="currentColor" stroke="none" />
               </svg>
-              <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 13, color: "#fff", lineHeight: 1, marginTop: 2 }}>30–45</p>
-              <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500, fontSize: 9, color: "rgba(255,255,255,0.38)", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 2 }}>min delivery</p>
-            </div>
-            <div className="flex flex-col items-center py-3.5 gap-1" style={{ borderRight: "1px solid rgba(255,255,255,0.08)" }}>
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.65)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
+              Pedir ahora
+            </button>
+            <button
+              className="hero-badge inline-flex items-center gap-2 bg-white/[0.12] text-white text-sm font-bold px-4 py-2 rounded-full border border-white/25 active:scale-95 transition-transform"
+              style={{ fontFamily: "'Nunito', sans-serif" }}
+              onClick={() => document.querySelector("main")?.scrollIntoView({ behavior: "smooth" })}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" />
               </svg>
-              <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 13, color: "#fff", lineHeight: 1, marginTop: 2 }}>15–20</p>
-              <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500, fontSize: 9, color: "rgba(255,255,255,0.38)", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 2 }}>min retiro</p>
-            </div>
-            <div className="flex flex-col items-center py-3.5 gap-1">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="#f59e0b" stroke="none">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-              </svg>
-              <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 13, color: "#fff", lineHeight: 1, marginTop: 2 }}>4.8</p>
-              <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500, fontSize: 9, color: "rgba(255,255,255,0.38)", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 2 }}>calificación</p>
-            </div>
+              Ver menú
+            </button>
           </div>
         </div>
       </section>
+
+      {/* ── Stats card — flota sobre el borde del hero ── */}
+      <div className="max-w-2xl mx-auto px-4 -mt-7 relative z-10">
+        <div
+          className="stats-card bg-white rounded-2xl overflow-hidden grid grid-cols-3 divide-x divide-gray-100"
+          style={{ boxShadow: "0 4px 32px rgba(26,13,140,0.14), 0 1px 6px rgba(26,13,140,0.07)" }}
+        >
+          <div className="flex flex-col items-center py-4 gap-1">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#1a0d8c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="1" y="3" width="15" height="13" rx="2" /><polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+              <circle cx="5.5" cy="18.5" r="2.5" fill="#1a0d8c" stroke="none" /><circle cx="18.5" cy="18.5" r="2.5" fill="#1a0d8c" stroke="none" />
+            </svg>
+            <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 13, color: "#0d2050", lineHeight: 1, marginTop: 2 }}>30–45</p>
+            <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500, fontSize: 9, color: "#9ca3af", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 2 }}>min delivery</p>
+          </div>
+          <div className="flex flex-col items-center py-4 gap-1">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0d2050" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 13, color: "#0d2050", lineHeight: 1, marginTop: 2 }}>15–20</p>
+            <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500, fontSize: 9, color: "#9ca3af", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 2 }}>min retiro</p>
+          </div>
+          <div className="flex flex-col items-center py-4 gap-1">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="#f59e0b" stroke="none">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg>
+            <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 13, color: "#0d2050", lineHeight: 1, marginTop: 2 }}>4.8</p>
+            <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500, fontSize: 9, color: "#9ca3af", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 2 }}>calificación</p>
+          </div>
+        </div>
+      </div>
 
       {/* ── Banner tienda cerrada ── */}
       {settings && !settings.storeOpen && (
