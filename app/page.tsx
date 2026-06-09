@@ -66,6 +66,23 @@ export default function HomePage() {
         },
       });
 
+      // Parallax de la imagen del hero: zoom + desplazamiento sutil al scrollear
+      gsap.fromTo(
+        ".hero-img",
+        { scale: 1, yPercent: 0 },
+        {
+          scale: 1.18,
+          yPercent: 10,
+          ease: "none",
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: 1,
+          },
+        }
+      );
+
       // Timeline de entrada del hero
       const easeExpo = "power4.out";
       const tl = gsap.timeline({
@@ -195,8 +212,8 @@ export default function HomePage() {
           src="/Gridolocal2.jpeg"
           alt=""
           aria-hidden
-          className="absolute inset-0 w-full h-full md:hidden"
-          style={{ objectFit: "fill" }}
+          className="hero-img absolute inset-0 w-full h-full md:hidden"
+          style={{ objectFit: "fill", willChange: "transform" }}
           draggable={false}
           fetchPriority="high"
           decoding="async"
@@ -207,8 +224,8 @@ export default function HomePage() {
           src="/imagen32.jpeg"
           alt=""
           aria-hidden
-          className="absolute top-0 right-0 h-full hidden md:block"
-          style={{ width: "70%", objectFit: "fill" }}
+          className="hero-img absolute top-0 right-0 h-full hidden md:block"
+          style={{ width: "70%", objectFit: "fill", willChange: "transform" }}
           draggable={false}
           fetchPriority="high"
           decoding="async"
