@@ -190,12 +190,22 @@ export default function HomePage() {
           background: "#08125a",
         }}
       >
-        {/* Imagen de fondo — estirada para cubrir el ancho sin zoom */}
+        {/* Imagen mobile — estirada para cubrir el ancho sin zoom */}
         <img
           src="/Gridolocal2.jpeg"
           alt=""
           aria-hidden
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 w-full h-full md:hidden"
+          style={{ objectFit: "fill" }}
+          draggable={false}
+        />
+
+        {/* Imagen desktop — imagen32, completa y estirada sin zoom */}
+        <img
+          src="/imagen32.jpeg"
+          alt=""
+          aria-hidden
+          className="absolute inset-0 w-full h-full hidden md:block"
           style={{ objectFit: "fill" }}
           draggable={false}
         />
