@@ -25,11 +25,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Pedido no encontrado" }, { status: 404 });
     }
 
-    // Obtener número de WhatsApp de settings
-    const whatsappSetting = await prisma.setting.findUnique({
-      where: { key: "whatsappNumber" },
-    });
+    // Obtener settings necesarios
+    const [whatsappSetting, aliasSetting, cbuSetting] = await Promise.all([
+      prisma.setting.findUnique({ where: { key: "whatsappNumber" } }),
+      prisma.setting.findUnique({ where: { key: "transferAlias" } }),
+      prisma.setting.findUnique({ where: { key: "transferCbu" } }),
+    ]);
     const whatsappNumber = whatsappSetting?.value || process.env.WHATSAPP_NUMBER || "5492604000000";
+    const transferAlias = aliasSetting?.value || undefined;
+    const transferCbu = cbuSetting?.value || undefined;
 
     // Construir datos para el mensaje
     const formData: CheckoutFormData = {
@@ -57,7 +61,9 @@ export async function POST(req: NextRequest) {
       cartItems,
       order.subtotal,
       order.deliveryCost,
-      order.total
+      order.total,
+      transferAlias,
+      transferCbu
     );
 
     const url = generateWhatsAppUrl(whatsappNumber, message);

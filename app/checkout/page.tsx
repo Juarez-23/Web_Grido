@@ -23,46 +23,32 @@ export default function CheckoutPage() {
   });
 
   useEffect(() => {
-    if (items.length === 0) {
-      router.replace("/");
-      return;
-    }
-    fetch("/api/settings")
-      .then((r) => r.json())
-      .then((d) => setSettings(d.data ?? null));
+    if (items.length === 0) { router.replace("/"); return; }
+    fetch("/api/settings").then((r) => r.json()).then((d) => setSettings(d.data ?? null));
   }, []);
 
   const subtotal = getSubtotal();
-  const deliveryCost =
-    form.deliveryType === "DELIVERY" ? (settings?.deliveryCost ?? 1500) : 0;
+  const deliveryCost = form.deliveryType === "DELIVERY" ? (settings?.deliveryCost ?? 1500) : 0;
   const total = subtotal + deliveryCost;
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!form.customerName.trim() || !form.customerPhone.trim()) {
-      toast.error("Completá tu nombre y teléfono");
-      return;
+      toast.error("Completá tu nombre y teléfono"); return;
     }
     if (form.deliveryType === "DELIVERY" && !form.address?.trim()) {
-      toast.error("Ingresá la dirección de entrega");
-      return;
+      toast.error("Ingresá la dirección de entrega"); return;
     }
-
     if (settings && settings.storeOpen === false) {
-      toast.error("La tienda está cerrada en este momento");
-      return;
+      toast.error("La tienda está cerrada en este momento"); return;
     }
 
     setLoading(true);
     try {
-      // 1. Crear pedido en la base de datos
       const orderRes = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -73,9 +59,7 @@ export default function CheckoutPage() {
           deliveryType: form.deliveryType,
           paymentMethod: form.paymentMethod,
           notes: form.notes,
-          subtotal,
-          deliveryCost,
-          total,
+          subtotal, deliveryCost, total,
           items: items.map((item) => ({
             productId: item.product.id,
             quantity: item.quantity,
@@ -87,11 +71,10 @@ export default function CheckoutPage() {
       });
 
       if (!orderRes.ok) throw new Error("Error al crear el pedido");
-
       const orderData = await orderRes.json();
       const order = orderData.data;
 
-      // 2. Si es Mercado Pago → redirigir a la app de MP
+      // Mercado Pago → redirigir a la app
       if (form.paymentMethod === "MERCADO_PAGO") {
         const mpRes = await fetch("/api/payments/mercadopago", {
           method: "POST",
@@ -99,30 +82,19 @@ export default function CheckoutPage() {
           body: JSON.stringify({ orderId: order.id }),
         });
         const mpData = await mpRes.json();
-        // mobileInitPoint abre la app de MP en mobile, initPoint como fallback web
         const mpUrl = mpData.mobileInitPoint || mpData.initPoint;
-        if (mpUrl) {
-          window.location.href = mpUrl;
-          return;
-        }
+        if (mpUrl) { window.location.href = mpUrl; return; }
       }
 
-      // 3. Generar mensaje de WhatsApp y redirigir
+      // WhatsApp para transferencia y efectivo
       const whatsappRes = await fetch("/api/orders/whatsapp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderId: order.id }),
       });
       const whatsappData = await whatsappRes.json();
-
       clearCart();
-
-      // Redirigir a página de confirmación
-      router.push(
-        `/pedido-confirmado?order=${order.id}&wa=${encodeURIComponent(
-          whatsappData.url || ""
-        )}`
-      );
+      router.push(`/pedido-confirmado?order=${order.id}&wa=${encodeURIComponent(whatsappData.url || "")}&method=${form.paymentMethod}`);
     } catch (err) {
       console.error(err);
       toast.error("Error al procesar el pedido. Intentá de nuevo.");
@@ -133,8 +105,67 @@ export default function CheckoutPage() {
 
   if (items.length === 0) return null;
 
+  const paymentMethods = [
+    {
+      value: "MERCADO_PAGO",
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="20" fill="#00AACC"/>
+          <path d="M10 22c0-5.523 4.477-10 10-10s10 4.477 10 10" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+          <circle cx="14" cy="22" r="2.5" fill="white"/>
+          <circle cx="26" cy="22" r="2.5" fill="white"/>
+        </svg>
+      ),
+      label: "Mercado Pago",
+      sub: "Crédito, débito o saldo MP",
+      color: "#00AACC",
+      bgColor: "#f0faff",
+      borderColor: "#00AACC",
+      detail: "Serás redirigido a Mercado Pago para completar el pago de forma segura.",
+    },
+    {
+      value: "TRANSFERENCIA",
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="2" y="5" width="20" height="14" rx="2"/>
+          <line x1="2" y1="10" x2="22" y2="10"/>
+        </svg>
+      ),
+      label: "Transferencia",
+      sub: "Transferencia bancaria / alias",
+      color: "#6366f1",
+      bgColor: "#f5f3ff",
+      borderColor: "#6366f1",
+      detail: settings?.transferAlias
+        ? `Alias: ${settings.transferAlias}${settings.transferCbu ? ` · CBU: ${settings.transferCbu}` : ""}`
+        : "Enviá el comprobante por WhatsApp.",
+    },
+    {
+      value: "EFECTIVO",
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="2" y="6" width="20" height="12" rx="2"/>
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M6 12h.01M18 12h.01"/>
+        </svg>
+      ),
+      label: "Efectivo",
+      sub: "Pagás al momento de la entrega",
+      color: "#16a34a",
+      bgColor: "#f0fdf4",
+      borderColor: "#16a34a",
+      detail: "Tené el importe exacto listo. El repartidor lleva cambio limitado.",
+    },
+  ];
+
+  const submitLabel = {
+    MERCADO_PAGO: "Pagar con Mercado Pago →",
+    TRANSFERENCIA: "Confirmar y enviar por WhatsApp →",
+    EFECTIVO: "Confirmar y enviar por WhatsApp →",
+  }[form.paymentMethod] || "Confirmar pedido →";
+
   return (
-    <div className="min-h-dvh bg-white">
+    <div className="min-h-dvh bg-gray-50">
       {/* Header */}
       <header className="sticky top-0 z-30 bg-white border-b border-gray-100 px-4 h-14 flex items-center gap-3">
         <button
@@ -154,33 +185,31 @@ export default function CheckoutPage() {
             <span className="text-xl">🔴</span>
             <div>
               <p className="font-bold text-red-800 text-sm">Tienda cerrada</p>
-              <p className="text-red-600 text-sm mt-0.5">
-                {settings.storeClosedMessage || "Estamos cerrados por el momento."}
-              </p>
+              <p className="text-red-600 text-sm mt-0.5">{settings.storeClosedMessage || "Estamos cerrados por el momento."}</p>
             </div>
           </div>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="max-w-lg mx-auto px-4 pb-40 pt-4 space-y-4">
+      <form onSubmit={handleSubmit} className="max-w-lg mx-auto px-4 pb-44 pt-4 space-y-4">
 
         {/* Resumen del carrito */}
         <section className="bg-white rounded-2xl p-4 shadow-card">
-          <h2 className="font-bold text-gray-800 mb-3">🛒 Tu pedido</h2>
-          <div className="space-y-2">
+          <h2 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide text-gray-500">Tu pedido</h2>
+          <div className="space-y-2.5">
             {items.map((item) => (
               <div key={item.cartId} className="flex justify-between items-start gap-2">
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-800 truncate">
-                    {item.quantity}× {item.product.name}
+                  <p className="text-sm font-semibold text-gray-800">
+                    <span className="text-gray-400 font-normal">{item.quantity}×</span> {item.product.name}
                   </p>
                   {item.selectedFlavors.length > 0 && (
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <p className="text-xs text-gray-400 mt-0.5">
                       {item.selectedFlavors.map((f) => f.name).join(", ")}
                     </p>
                   )}
                 </div>
-                <span className="text-sm font-semibold text-gray-800 whitespace-nowrap">
+                <span className="text-sm font-bold text-gray-800 whitespace-nowrap">
                   {formatPrice(item.product.price * item.quantity)}
                 </span>
               </div>
@@ -190,143 +219,115 @@ export default function CheckoutPage() {
 
         {/* Datos personales */}
         <section className="bg-white rounded-2xl p-4 shadow-card">
-          <h2 className="font-bold text-gray-800 mb-4">👤 Tus datos</h2>
+          <h2 className="font-bold text-gray-800 mb-4 text-sm uppercase tracking-wide text-gray-500">Tus datos</h2>
           <div className="space-y-3">
             <div>
-              <label className="text-sm font-medium text-gray-600 mb-1.5 block">
-                Nombre completo *
-              </label>
-              <input
-                name="customerName"
-                value={form.customerName}
-                onChange={handleChange}
-                placeholder="Juan García"
-                className="input-field"
-                required
-              />
+              <label className="text-sm font-medium text-gray-600 mb-1.5 block">Nombre completo *</label>
+              <input name="customerName" value={form.customerName} onChange={handleChange} placeholder="Juan García" className="input-field" required />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-600 mb-1.5 block">
-                Teléfono *
-              </label>
-              <input
-                name="customerPhone"
-                value={form.customerPhone}
-                onChange={handleChange}
-                placeholder="2604 000000"
-                type="tel"
-                className="input-field"
-                required
-              />
+              <label className="text-sm font-medium text-gray-600 mb-1.5 block">Teléfono *</label>
+              <input name="customerPhone" value={form.customerPhone} onChange={handleChange} placeholder="2604 000000" type="tel" className="input-field" required />
             </div>
           </div>
         </section>
 
         {/* Tipo de entrega */}
         <section className="bg-white rounded-2xl p-4 shadow-card">
-          <h2 className="font-bold text-gray-800 mb-4">📦 Tipo de entrega</h2>
+          <h2 className="font-bold text-gray-800 mb-4 text-sm uppercase tracking-wide text-gray-500">Tipo de entrega</h2>
           <div className="grid grid-cols-2 gap-2">
             {[
-              { value: "DELIVERY", label: "🛵 Delivery", sub: `+${formatPrice(settings?.deliveryCost ?? 1500)}` },
-              { value: "RETIRO", label: "🏪 Retiro", sub: "Gratis" },
+              { value: "DELIVERY", label: "Delivery", icon: "🛵", sub: `+${formatPrice(settings?.deliveryCost ?? 1500)}` },
+              { value: "RETIRO", label: "Retiro", icon: "🏪", sub: "Sin costo" },
             ].map((opt) => (
               <label
                 key={opt.value}
-                className={`cursor-pointer rounded-xl border-2 p-3 transition-all ${
-                  form.deliveryType === opt.value
-                    ? "border-grido-primary bg-blue-50"
-                    : "border-gray-200 bg-white"
+                className={`cursor-pointer rounded-xl border-2 p-3.5 transition-all ${
+                  form.deliveryType === opt.value ? "border-grido-primary bg-blue-50" : "border-gray-200 bg-white"
                 }`}
               >
-                <input
-                  type="radio"
-                  name="deliveryType"
-                  value={opt.value}
-                  checked={form.deliveryType === opt.value}
-                  onChange={handleChange}
-                  className="sr-only"
-                />
-                <p className="font-semibold text-sm text-gray-800">{opt.label}</p>
-                <p
-                  className={`text-xs mt-0.5 ${
-                    form.deliveryType === opt.value
-                      ? "text-grido-primary"
-                      : "text-gray-500"
-                  }`}
-                >
-                  {opt.sub}
-                </p>
+                <input type="radio" name="deliveryType" value={opt.value} checked={form.deliveryType === opt.value} onChange={handleChange} className="sr-only" />
+                <p className="text-xl mb-1">{opt.icon}</p>
+                <p className="font-bold text-sm text-gray-800">{opt.label}</p>
+                <p className={`text-xs mt-0.5 font-medium ${form.deliveryType === opt.value ? "text-grido-primary" : "text-gray-400"}`}>{opt.sub}</p>
               </label>
             ))}
           </div>
-
           {form.deliveryType === "DELIVERY" && (
             <div className="mt-3">
-              <label className="text-sm font-medium text-gray-600 mb-1.5 block">
-                Dirección de entrega *
-              </label>
-              <input
-                name="address"
-                value={form.address}
-                onChange={handleChange}
-                placeholder="Calle 123, Barrio Centro"
-                className="input-field"
-              />
+              <label className="text-sm font-medium text-gray-600 mb-1.5 block">Dirección de entrega *</label>
+              <input name="address" value={form.address} onChange={handleChange} placeholder="Calle 123, Barrio Centro" className="input-field" />
             </div>
           )}
         </section>
 
         {/* Método de pago */}
         <section className="bg-white rounded-2xl p-4 shadow-card">
-          <h2 className="font-bold text-gray-800 mb-4">💳 Método de pago</h2>
-          <div className="space-y-2">
-            {[
-              {
-                value: "MERCADO_PAGO",
-                label: "💳 Mercado Pago",
-                sub: "Tarjeta, débito o MP",
-              },
-              {
-                value: "TRANSFERENCIA",
-                label: "🏦 Transferencia",
-                sub: settings?.transferAlias ? `Alias: ${settings.transferAlias}` : "Alias bancario",
-              },
-              { value: "EFECTIVO", label: "💵 Efectivo", sub: "Al momento de la entrega" },
-            ].map((opt) => (
-              <label
-                key={opt.value}
-                className={`flex items-center gap-3 cursor-pointer rounded-xl border-2 p-3 transition-all ${
-                  form.paymentMethod === opt.value
-                    ? "border-grido-primary bg-blue-50"
-                    : "border-gray-200 bg-white"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value={opt.value}
-                  checked={form.paymentMethod === opt.value}
-                  onChange={handleChange}
-                  className="sr-only"
-                />
-                <div className="flex-1">
-                  <p className="font-semibold text-sm text-gray-800">{opt.label}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{opt.sub}</p>
-                </div>
-                {form.paymentMethod === opt.value && (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M20 6L9 17l-5-5" stroke="#134385" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
-              </label>
-            ))}
+          <h2 className="font-bold text-gray-800 mb-4 text-sm uppercase tracking-wide text-gray-500">Método de pago</h2>
+          <div className="space-y-2.5">
+            {paymentMethods.map((opt) => {
+              const isSelected = form.paymentMethod === opt.value;
+              return (
+                <label
+                  key={opt.value}
+                  className="block cursor-pointer"
+                >
+                  <input type="radio" name="paymentMethod" value={opt.value} checked={isSelected} onChange={handleChange} className="sr-only" />
+                  <div
+                    className="rounded-xl border-2 p-3.5 transition-all"
+                    style={{
+                      borderColor: isSelected ? opt.borderColor : "#e5e7eb",
+                      backgroundColor: isSelected ? opt.bgColor : "white",
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      {/* Ícono */}
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: opt.color }}>
+                        {opt.icon}
+                      </div>
+                      {/* Texto */}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-sm text-gray-800">{opt.label}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">{opt.sub}</p>
+                      </div>
+                      {/* Check */}
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${isSelected ? "border-transparent" : "border-gray-300"}`}
+                        style={{ backgroundColor: isSelected ? opt.color : "transparent" }}>
+                        {isSelected && (
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M20 6L9 17l-5-5" />
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Detalle expandible */}
+                    {isSelected && (
+                      <div className="mt-3 pt-3 border-t" style={{ borderColor: `${opt.color}30` }}>
+                        <p className="text-xs font-medium" style={{ color: opt.color }}>
+                          {opt.value === "TRANSFERENCIA" && settings?.transferAlias ? (
+                            <>
+                              🏦 Alias: <strong>{settings.transferAlias}</strong>
+                              {settings.transferCbu && <><br />CBU: <strong>{settings.transferCbu}</strong></>}
+                              <br />Enviá el comprobante por WhatsApp.
+                            </>
+                          ) : (
+                            opt.detail
+                          )}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </label>
+              );
+            })}
           </div>
         </section>
 
         {/* Notas */}
         <section className="bg-white rounded-2xl p-4 shadow-card">
-          <label className="font-bold text-gray-800 mb-2 block">
-            📝 Notas adicionales <span className="font-normal text-gray-400 text-sm">(opcional)</span>
+          <label className="text-sm uppercase tracking-wide text-gray-500 font-bold mb-2 block">
+            Notas <span className="font-normal text-gray-400">(opcional)</span>
           </label>
           <textarea
             name="notes"
@@ -337,35 +338,30 @@ export default function CheckoutPage() {
             className="input-field resize-none"
           />
         </section>
-
-        {/* Espacio para el footer fijo */}
-        <div className="h-4" />
       </form>
 
-      {/* Footer fijo con total y botón */}
+      {/* Footer fijo */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 pt-3 shadow-modal z-30" style={{ paddingBottom: "max(env(safe-area-inset-bottom, 0px), 16px)" }}>
         <div className="max-w-lg mx-auto">
           {/* Resumen de precios */}
           <div className="space-y-1 mb-3">
-            <div className="flex justify-between text-sm text-gray-600">
+            <div className="flex justify-between text-sm text-gray-500">
               <span>Subtotal</span>
-              <span className="font-medium">{formatPrice(subtotal)}</span>
+              <span className="font-medium text-gray-700">{formatPrice(subtotal)}</span>
             </div>
             {form.deliveryType === "DELIVERY" && (
-              <div className="flex justify-between text-sm text-gray-600">
+              <div className="flex justify-between text-sm text-gray-500">
                 <span>Envío</span>
-                <span className="font-medium">{formatPrice(deliveryCost)}</span>
+                <span className="font-medium text-gray-700">{formatPrice(deliveryCost)}</span>
               </div>
             )}
-            <div className="flex justify-between text-base font-bold text-gray-900 pt-1 border-t border-gray-100">
+            <div className="flex justify-between text-base font-black text-gray-900 pt-1.5 border-t border-gray-100">
               <span>TOTAL</span>
               <span className="text-grido-primary">{formatPrice(total)}</span>
             </div>
           </div>
 
           <button
-            type="submit"
-            form="checkout-form"
             onClick={handleSubmit}
             disabled={loading || (settings !== null && !settings?.storeOpen)}
             className="w-full btn-primary h-14 text-base flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -378,11 +374,7 @@ export default function CheckoutPage() {
                 </svg>
                 Procesando...
               </>
-            ) : (
-              <>
-                Confirmar pedido →
-              </>
-            )}
+            ) : submitLabel}
           </button>
         </div>
       </div>
