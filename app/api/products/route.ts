@@ -25,7 +25,10 @@ export async function GET(req: NextRequest) {
       orderBy: [{ featured: "desc" }, { category: { order: "asc" } }, { name: "asc" }],
     });
 
-    return NextResponse.json({ data: products });
+    return NextResponse.json(
+      { data: products },
+      { headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120" } }
+    );
   } catch (error) {
     console.error("GET /api/products error:", error);
     return NextResponse.json({ error: "Error al obtener productos" }, { status: 500 });

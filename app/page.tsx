@@ -198,6 +198,8 @@ export default function HomePage() {
           className="absolute inset-0 w-full h-full md:hidden"
           style={{ objectFit: "fill" }}
           draggable={false}
+          fetchPriority="high"
+          decoding="async"
         />
 
         {/* Imagen desktop — imagen32, completa y estirada sin zoom */}
@@ -208,6 +210,8 @@ export default function HomePage() {
           className="absolute inset-0 w-full h-full hidden md:block"
           style={{ objectFit: "fill" }}
           draggable={false}
+          fetchPriority="high"
+          decoding="async"
         />
 
         {/* Overlay mobile — gradiente original */}

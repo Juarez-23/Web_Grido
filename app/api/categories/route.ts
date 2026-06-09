@@ -19,7 +19,10 @@ export async function GET(req: NextRequest) {
       include: { _count: { select: { products: true } } },
     });
 
-    return NextResponse.json({ data: categories });
+    return NextResponse.json(
+      { data: categories },
+      { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } }
+    );
   } catch (error) {
     return NextResponse.json({ error: "Error al obtener categorías" }, { status: 500 });
   }

@@ -23,7 +23,10 @@ export async function GET() {
       storeClosedMessage: map.storeClosedMessage || "Estamos cerrados por el momento.",
     };
 
-    return NextResponse.json({ data: appSettings });
+    return NextResponse.json(
+      { data: appSettings },
+      { headers: { "Cache-Control": "public, s-maxage=15, stale-while-revalidate=60" } }
+    );
   } catch (error) {
     return NextResponse.json({ error: "Error al obtener configuración" }, { status: 500 });
   }
