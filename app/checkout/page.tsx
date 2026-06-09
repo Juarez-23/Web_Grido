@@ -12,6 +12,8 @@ export default function CheckoutPage() {
   const { items, getSubtotal, clearCart } = useCartStore();
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [loading, setLoading] = useState(false);
+  const [locationUrl, setLocationUrl] = useState<string | null>(null);
+  const [gettingLocation, setGettingLocation] = useState(false);
 
   const [form, setForm] = useState<CheckoutFormData>({
     customerName: "",
@@ -49,6 +51,34 @@ export default function CheckoutPage() {
     });
   };
 
+  // Geolocalización: tomar ubicación actual del dispositivo
+  const handleGetLocation = () => {
+    if (!("geolocation" in navigator)) {
+      toast.error("Tu navegador no soporta geolocalización");
+      return;
+    }
+    setGettingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
+        setLocationUrl(url);
+        setGettingLocation(false);
+        toast.success("📍 Ubicación obtenida");
+      },
+      (err) => {
+        console.error("Geolocation error:", err);
+        setGettingLocation(false);
+        if (err.code === err.PERMISSION_DENIED) {
+          toast.error("Activá los permisos de ubicación para usar esta opción");
+        } else {
+          toast.error("No se pudo obtener tu ubicación. Intentá de nuevo.");
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.customerName.trim() || !form.customerPhone.trim()) {
@@ -66,13 +96,19 @@ export default function CheckoutPage() {
 
     setLoading(true);
     try {
+      // Combinar dirección escrita + link de ubicación GPS (si lo compartió)
+      const fullAddress =
+        form.deliveryType === "DELIVERY"
+          ? `${form.address}${locationUrl ? ` | 📍 Ubicación GPS: ${locationUrl}` : ""}`
+          : undefined;
+
       const orderRes = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           customerName: form.customerName,
           customerPhone: form.customerPhone,
-          address: form.deliveryType === "DELIVERY" ? form.address : undefined,
+          address: fullAddress,
           deliveryType: form.deliveryType,
           paymentMethod: form.paymentMethod,
           notes: form.notes,
@@ -242,9 +278,65 @@ export default function CheckoutPage() {
             ))}
           </div>
           {form.deliveryType === "DELIVERY" && (
-            <div className="mt-3">
-              <label className="text-sm font-medium text-gray-600 mb-1.5 block">Dirección de entrega *</label>
-              <input name="address" value={form.address} onChange={handleChange} placeholder="Calle 123, Barrio Centro" className="input-field" />
+            <div className="mt-3 space-y-3">
+              <div>
+                <label className="text-sm font-medium text-gray-600 mb-1.5 block">Dirección de entrega *</label>
+                <input name="address" value={form.address} onChange={handleChange} placeholder="Calle 123, Barrio Centro" className="input-field" />
+              </div>
+
+              {/* Ubicación GPS */}
+              {locationUrl ? (
+                <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl p-3">
+                  <div className="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-green-800">Ubicación compartida</p>
+                    <a href={locationUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-green-600 underline">
+                      Ver en Google Maps
+                    </a>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setLocationUrl(null)}
+                    className="text-gray-400 hover:text-red-500 p-1"
+                    aria-label="Quitar ubicación"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleGetLocation}
+                  disabled={gettingLocation}
+                  className="w-full flex items-center justify-center gap-2 border-2 border-grido-primary text-grido-primary font-semibold rounded-xl py-3 text-sm active:scale-95 transition-transform disabled:opacity-60"
+                >
+                  {gettingLocation ? (
+                    <>
+                      <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Obteniendo ubicación...
+                    </>
+                  ) : (
+                    <>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
+                      </svg>
+                      Usar mi ubicación actual
+                    </>
+                  )}
+                </button>
+              )}
+              <p className="text-[11px] text-gray-400 text-center">
+                Compartí tu ubicación para que el repartidor te encuentre más rápido 🛵
+              </p>
             </div>
           )}
         </section>
