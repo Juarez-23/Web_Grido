@@ -48,6 +48,7 @@ export function generateWhatsAppMessage(
     timeZone: "America/Argentina/Buenos_Aires",
     hour: "2-digit",
     minute: "2-digit",
+    hour12: false,
   });
 
   // Detalle de productos con precio unitario y subtotal
