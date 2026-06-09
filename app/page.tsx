@@ -225,7 +225,7 @@ export default function HomePage() {
           alt=""
           aria-hidden
           className="hero-img absolute top-0 right-0 h-full hidden md:block"
-          style={{ width: "70%", objectFit: "fill", willChange: "transform" }}
+          style={{ width: "60%", objectFit: "fill", willChange: "transform" }}
           draggable={false}
           fetchPriority="high"
           decoding="async"
@@ -245,7 +245,7 @@ export default function HomePage() {
           className="absolute inset-0 pointer-events-none hidden md:block"
           style={{
             background:
-              "linear-gradient(to right, #08125a 0%, #08125a 30%, rgba(8,18,90,0.92) 40%, rgba(8,18,85,0.6) 50%, rgba(8,18,80,0.3) 62%, rgba(8,18,80,0.1) 74%, transparent 86%)",
+              "linear-gradient(to right, #08125a 0%, #08125a 40%, rgba(8,18,90,0.92) 49%, rgba(8,18,85,0.6) 58%, rgba(8,18,80,0.3) 68%, rgba(8,18,80,0.1) 78%, transparent 88%)",
           }}
         />
 
