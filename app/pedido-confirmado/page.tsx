@@ -15,15 +15,18 @@ function PedidoConfirmadoContent() {
   const isTransfer = method === "TRANSFERENCIA";
   const isCash = method === "EFECTIVO";
 
+  // waUrl ya viene decodificado por useSearchParams (no decodificar de nuevo)
+  const waLink = waUrl || null;
+
   // Auto-abrir WhatsApp
   useEffect(() => {
-    if (waUrl && !whatsappOpened) {
+    if (waLink && !whatsappOpened) {
       setTimeout(() => {
-        window.open(decodeURIComponent(waUrl), "_blank");
+        window.open(waLink, "_blank");
         setWhatsappOpened(true);
       }, 900);
     }
-  }, [waUrl]);
+  }, [waLink]);
 
   return (
     <div className="min-h-dvh bg-gray-50 flex flex-col items-center justify-center px-4 py-10">
@@ -85,9 +88,9 @@ function PedidoConfirmadoContent() {
 
         {/* Botones */}
         <div className="space-y-3">
-          {waUrl && (
+          {waLink && (
             <a
-              href={decodeURIComponent(waUrl)}
+              href={waLink}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full flex items-center justify-center gap-2.5 text-white font-bold rounded-2xl py-4 text-base active:scale-95 transition-transform shadow-md"

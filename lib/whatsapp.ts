@@ -54,7 +54,7 @@ export function generateWhatsAppMessage(
 
   // ── Encabezado ──
   let msg = `🍦 *GRIDO SAN RAFAEL*\n`;
-  msg += `*Pedido #${orderNumber}*\n`;
+  msg += `*Pedido N° ${orderNumber}*\n`;
   msg += `${line}\n\n`;
 
   // ── Cliente ──
