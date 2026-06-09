@@ -202,13 +202,13 @@ export default function HomePage() {
           decoding="async"
         />
 
-        {/* Imagen desktop — imagen32 anclada a la derecha, ocupa ~80% para estirar menos */}
+        {/* Imagen desktop — imagen32 anclada a la derecha, ocupa ~70% para estirar menos */}
         <img
           src="/imagen32.jpeg"
           alt=""
           aria-hidden
           className="absolute top-0 right-0 h-full hidden md:block"
-          style={{ width: "80%", objectFit: "fill" }}
+          style={{ width: "70%", objectFit: "fill" }}
           draggable={false}
           fetchPriority="high"
           decoding="async"
@@ -228,7 +228,7 @@ export default function HomePage() {
           className="absolute inset-0 pointer-events-none hidden md:block"
           style={{
             background:
-              "linear-gradient(to right, #08125a 0%, #08125a 24%, rgba(8,18,90,0.92) 33%, rgba(8,18,85,0.65) 44%, rgba(8,18,80,0.35) 56%, rgba(8,18,80,0.12) 70%, transparent 84%)",
+              "linear-gradient(to right, #08125a 0%, #08125a 30%, rgba(8,18,90,0.92) 40%, rgba(8,18,85,0.6) 50%, rgba(8,18,80,0.3) 62%, rgba(8,18,80,0.1) 74%, transparent 86%)",
           }}
         />
 
