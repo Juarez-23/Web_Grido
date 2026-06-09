@@ -22,7 +22,6 @@ export default function CheckoutPage() {
     deliveryType: "DELIVERY",
     paymentMethod: "TRANSFERENCIA",
     notes: "",
-    cashAmount: "",
   });
 
   useEffect(() => {
@@ -33,11 +32,6 @@ export default function CheckoutPage() {
   const subtotal = getSubtotal();
   const deliveryCost = form.deliveryType === "DELIVERY" ? (settings?.deliveryCost ?? 1500) : 0;
   const total = subtotal + deliveryCost;
-
-  // Cálculo del vuelto (solo efectivo)
-  const cashAmountNum = parseFloat((form.cashAmount || "").replace(/[^\d]/g, "")) || 0;
-  const change = cashAmountNum - total;
-  const cashIsValid = cashAmountNum === 0 || cashAmountNum >= total;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -87,9 +81,6 @@ export default function CheckoutPage() {
     if (form.deliveryType === "DELIVERY" && !form.address?.trim()) {
       toast.error("Ingresá la dirección de entrega"); return;
     }
-    if (form.paymentMethod === "EFECTIVO" && cashAmountNum > 0 && cashAmountNum < total) {
-      toast.error("El monto con el que pagás no puede ser menor al total"); return;
-    }
     if (settings && settings.storeOpen === false) {
       toast.error("La tienda está cerrada en este momento"); return;
     }
@@ -99,7 +90,7 @@ export default function CheckoutPage() {
       // Combinar dirección escrita + link de ubicación GPS (si lo compartió)
       const fullAddress =
         form.deliveryType === "DELIVERY"
-          ? `${form.address}${locationUrl ? ` | 📍 Ubicación GPS: ${locationUrl}` : ""}`
+          ? `${form.address}${locationUrl ? ` | Ubicación GPS: ${locationUrl}` : ""}`
           : undefined;
 
       const orderRes = await fetch("/api/orders", {
@@ -112,7 +103,6 @@ export default function CheckoutPage() {
           deliveryType: form.deliveryType,
           paymentMethod: form.paymentMethod,
           notes: form.notes,
-          cashAmount: form.paymentMethod === "EFECTIVO" && cashAmountNum > 0 ? cashAmountNum : undefined,
           subtotal, deliveryCost, total,
           items: items.map((item) => ({
             productId: item.product.id,
@@ -128,14 +118,11 @@ export default function CheckoutPage() {
       const orderData = await orderRes.json();
       const order = orderData.data;
 
-      // Generar mensaje de WhatsApp (transferencia y efectivo)
+      // Generar mensaje de WhatsApp
       const whatsappRes = await fetch("/api/orders/whatsapp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          orderId: order.id,
-          cashAmount: form.paymentMethod === "EFECTIVO" && cashAmountNum > 0 ? cashAmountNum : undefined,
-        }),
+        body: JSON.stringify({ orderId: order.id }),
       });
       const whatsappData = await whatsappRes.json();
       clearCart();
@@ -390,41 +377,6 @@ export default function CheckoutPage() {
                       </div>
                     )}
 
-                    {/* Efectivo: con cuánto paga */}
-                    {isSelected && opt.value === "EFECTIVO" && (
-                      <div className="mt-3 pt-3 border-t" style={{ borderColor: `${opt.color}30` }}>
-                        <label className="text-xs font-semibold text-gray-700 mb-1.5 block">
-                          ¿Con cuánto vas a pagar? <span className="font-normal text-gray-400">(opcional)</span>
-                        </label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-                          <input
-                            name="cashAmount"
-                            value={form.cashAmount}
-                            onChange={handleChange}
-                            inputMode="numeric"
-                            placeholder="Ej: 20000"
-                            className="input-field pl-7"
-                          />
-                        </div>
-                        {/* Feedback del vuelto */}
-                        {cashAmountNum > 0 && (
-                          cashIsValid ? (
-                            <div className="mt-2 flex items-center justify-between bg-green-50 rounded-lg px-3 py-2">
-                              <span className="text-xs font-medium text-green-700">Tu vuelto será</span>
-                              <span className="text-sm font-bold text-green-700">{formatPrice(change)}</span>
-                            </div>
-                          ) : (
-                            <p className="mt-2 text-xs font-medium text-red-500">
-                              El monto debe ser mayor o igual al total ({formatPrice(total)}).
-                            </p>
-                          )
-                        )}
-                        <p className="mt-2 text-[11px] text-gray-400">
-                          Así el repartidor lleva el vuelto justo 💵
-                        </p>
-                      </div>
-                    )}
                   </div>
                 </label>
               );

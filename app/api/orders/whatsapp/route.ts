@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
-    const { orderId, cashAmount } = await req.json();
+    const { orderId } = await req.json();
 
     const order = await prisma.order.findUnique({
       where: { id: orderId },
@@ -62,11 +62,7 @@ export async function POST(req: NextRequest) {
       order.subtotal,
       order.deliveryCost,
       order.total,
-      {
-        transferAlias,
-        transferCbu,
-        cashAmount: typeof cashAmount === "number" ? cashAmount : undefined,
-      }
+      { transferAlias, transferCbu }
     );
 
     const url = generateWhatsAppUrl(whatsappNumber, message);

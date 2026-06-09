@@ -24,6 +24,7 @@ const config: Config = {
       animation: {
         "slide-up": "slideUp 0.3s ease-out",
         "slide-in-right": "slideInRight 0.3s ease-out",
+        "slide-in-left": "slideInLeft 0.25s ease-out",
         "fade-in": "fadeIn 0.2s ease-out",
         "bounce-subtle": "bounceSubtle 0.4s ease-out",
         "pulse-red": "pulseRed 2s infinite",
@@ -36,6 +37,10 @@ const config: Config = {
         slideInRight: {
           "0%": { transform: "translateX(100%)", opacity: "0" },
           "100%": { transform: "translateX(0)", opacity: "1" },
+        },
+        slideInLeft: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(0)" },
         },
         fadeIn: {
           "0%": { opacity: "0" },

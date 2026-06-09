@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { useState, useEffect } from "react";
 
 interface Props {
   user: { name?: string; email?: string; role?: string };
@@ -19,14 +20,18 @@ const navItems = [
 
 export function AdminSidebar({ user }: Props) {
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
 
-  const isActive = (href: string, exact?: boolean) => {
-    if (exact) return pathname === href;
-    return pathname.startsWith(href);
-  };
+  const isActive = (href: string, exact?: boolean) =>
+    exact ? pathname === href : pathname.startsWith(href);
 
-  return (
-    <aside className="w-56 bg-gray-900 flex flex-col h-full flex-shrink-0">
+  // Cerrar el drawer al cambiar de ruta
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  const navContent = (
+    <>
       {/* Logo */}
       <div className="px-5 py-5 border-b border-gray-800">
         <div className="flex items-center gap-3">
@@ -35,13 +40,13 @@ export function AdminSidebar({ user }: Props) {
           </div>
           <div>
             <p className="text-white font-black text-sm leading-none">GRIDO</p>
-            <p className="text-gray-500 text-xs">San Rafael</p>
+            <p className="text-gray-500 text-xs">El Libertador</p>
           </div>
         </div>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {navItems.map((item) => (
           <Link
             key={item.href}
@@ -75,6 +80,58 @@ export function AdminSidebar({ user }: Props) {
           Cerrar sesión
         </button>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* ── Sidebar desktop ── */}
+      <aside className="hidden md:flex w-56 bg-gray-900 flex-col h-full flex-shrink-0">
+        {navContent}
+      </aside>
+
+      {/* ── Topbar mobile ── */}
+      <header className="md:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-gray-900 flex items-center justify-between px-4">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 bg-grido-primary rounded-lg flex items-center justify-center">
+            <span className="text-white font-black text-xs">G</span>
+          </div>
+          <p className="text-white font-black text-sm">GRIDO Admin</p>
+        </div>
+        <button
+          onClick={() => setOpen(true)}
+          className="w-9 h-9 flex items-center justify-center rounded-lg text-white active:scale-90 transition-transform"
+          aria-label="Abrir menú"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </header>
+
+      {/* ── Drawer mobile ── */}
+      {open && (
+        <div className="md:hidden fixed inset-0 z-50">
+          {/* Overlay */}
+          <div
+            className="absolute inset-0 bg-black/50 animate-fade-in"
+            onClick={() => setOpen(false)}
+          />
+          {/* Panel */}
+          <aside className="absolute top-0 left-0 bottom-0 w-64 bg-gray-900 flex flex-col animate-slide-in-left">
+            <button
+              onClick={() => setOpen(false)}
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-white"
+              aria-label="Cerrar menú"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+            {navContent}
+          </aside>
+        </div>
+      )}
+    </>
   );
 }

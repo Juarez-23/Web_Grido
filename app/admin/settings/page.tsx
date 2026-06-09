@@ -78,7 +78,7 @@ export default function AdminSettingsPage() {
 
   if (loading) {
     return (
-      <div className="p-6 max-w-2xl mx-auto space-y-4">
+      <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-4">
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="skeleton h-20 rounded-2xl" />
         ))}
@@ -87,7 +87,7 @@ export default function AdminSettingsPage() {
   }
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
+    <div className="p-4 md:p-6 max-w-2xl mx-auto">
       <div className="mb-6">
         <h1 className="text-2xl font-black text-gray-900">Configuración</h1>
         <p className="text-gray-500 text-sm">Ajustes generales del negocio</p>

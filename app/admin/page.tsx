@@ -45,7 +45,7 @@ export default async function AdminDashboard() {
   ];
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-4 md:p-6 max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-black text-gray-900">Dashboard</h1>
