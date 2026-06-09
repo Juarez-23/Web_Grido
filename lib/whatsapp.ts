@@ -10,6 +10,12 @@ export function formatPrice(amount: number): string {
   }).format(amount);
 }
 
+interface WhatsAppOptions {
+  transferAlias?: string;
+  transferCbu?: string;
+  cashAmount?: number; // Monto con el que paga (efectivo)
+}
+
 // Genera el mensaje de WhatsApp con el pedido completo
 export function generateWhatsAppMessage(
   orderNumber: number,
@@ -18,78 +24,91 @@ export function generateWhatsAppMessage(
   subtotal: number,
   deliveryCost: number,
   total: number,
-  transferAlias?: string,
-  transferCbu?: string
+  options: WhatsAppOptions = {}
 ): string {
+  const { transferAlias, transferCbu, cashAmount } = options;
+
   const deliveryLabel =
     formData.deliveryType === "DELIVERY" ? "🛵 Delivery" : "🏪 Retiro en sucursal";
 
   const paymentLabels: Record<string, string> = {
-    MERCADO_PAGO: "💳 Mercado Pago",
     TRANSFERENCIA: "🏦 Transferencia bancaria",
     EFECTIVO: "💵 Efectivo",
+    MERCADO_PAGO: "💳 Mercado Pago",
   };
 
-  // Líneas de productos
+  // Detalle de productos con precio unitario y subtotal
   const productLines = items
     .map((item) => {
+      const lineTotal = item.product.price * item.quantity;
+      const unit = formatPrice(item.product.price);
       const flavors =
         item.selectedFlavors.length > 0
-          ? `\n     📌 ${item.selectedFlavors.map((f) => f.name).join(", ")}`
+          ? `\n   _Sabores: ${item.selectedFlavors.map((f) => f.name).join(", ")}_`
           : "";
-      return `▸ *${item.quantity}x ${item.product.name}* — ${formatPrice(item.product.price * item.quantity)}${flavors}`;
+      return `▸ *${item.quantity}x* ${item.product.name}\n   ${item.quantity} × ${unit} = *${formatPrice(lineTotal)}*${flavors}`;
     })
     .join("\n");
 
-  // Encabezado
-  let msg = `🍦 *GRIDO SAN RAFAEL — Pedido #${orderNumber}*\n`;
-  msg += `━━━━━━━━━━━━━━━━━━━━━\n\n`;
+  const line = "━━━━━━━━━━━━━━━━━";
 
-  // Datos del cliente
-  msg += `👤 *${formData.customerName}*\n`;
-  msg += `📞 ${formData.customerPhone}\n`;
-  msg += `📦 ${deliveryLabel}\n`;
+  // ── Encabezado ──
+  let msg = `🍦 *GRIDO SAN RAFAEL*\n`;
+  msg += `*Pedido #${orderNumber}*\n`;
+  msg += `${line}\n\n`;
+
+  // ── Cliente ──
+  msg += `👤 *Cliente:* ${formData.customerName}\n`;
+  msg += `📞 *Tel:* ${formData.customerPhone}\n`;
+  msg += `📦 *Entrega:* ${deliveryLabel}\n`;
   if (formData.deliveryType === "DELIVERY" && formData.address) {
-    msg += `📍 ${formData.address}\n`;
+    msg += `📍 *Dirección:* ${formData.address}\n`;
   }
 
-  // Detalle del pedido
-  msg += `\n🛒 *PRODUCTOS*\n`;
-  msg += `─────────────────────\n`;
+  // ── Productos ──
+  msg += `\n🛒 *DETALLE DEL PEDIDO*\n`;
+  msg += `${line}\n`;
   msg += `${productLines}\n`;
-  msg += `─────────────────────\n`;
+  msg += `${line}\n`;
 
-  // Totales
-  if (formData.deliveryType === "DELIVERY" && deliveryCost > 0) {
-    msg += `🛵 Envío: ${formatPrice(deliveryCost)}\n`;
+  // ── Totales ──
+  msg += `\n💰 *RESUMEN*\n`;
+  msg += `Subtotal: ${formatPrice(subtotal)}\n`;
+  if (formData.deliveryType === "DELIVERY") {
+    msg += `Envío: ${formatPrice(deliveryCost)}\n`;
   }
-  msg += `💰 *TOTAL: ${formatPrice(total)}*\n\n`;
+  msg += `*TOTAL A PAGAR: ${formatPrice(total)}*\n`;
 
-  // Método de pago
-  msg += `💳 *Pago:* ${paymentLabels[formData.paymentMethod] || formData.paymentMethod}\n`;
-
-  if (formData.paymentMethod === "TRANSFERENCIA") {
-    msg += `\n🏦 *Datos para transferir:*\n`;
-    if (transferAlias) msg += `  • Alias: *${transferAlias}*\n`;
-    if (transferCbu) msg += `  • CBU: *${transferCbu}*\n`;
-    msg += `  ⚠️ Enviá el comprobante por este chat\n`;
-  }
-
-  if (formData.paymentMethod === "MERCADO_PAGO") {
-    msg += `✅ _El pago fue realizado a través de Mercado Pago_\n`;
-  }
+  // ── Pago ──
+  msg += `\n💳 *FORMA DE PAGO*\n`;
+  msg += `${paymentLabels[formData.paymentMethod] || formData.paymentMethod}\n`;
 
   if (formData.paymentMethod === "EFECTIVO") {
-    msg += `💵 _Pago al momento de la entrega_\n`;
+    if (cashAmount && cashAmount > 0) {
+      const change = cashAmount - total;
+      msg += `Paga con: *${formatPrice(cashAmount)}*\n`;
+      msg += `Vuelto a llevar: *${formatPrice(change > 0 ? change : 0)}*\n`;
+    } else {
+      msg += `_No especificó con cuánto paga (consultar vuelto)_\n`;
+    }
   }
 
-  // Notas
+  if (formData.paymentMethod === "TRANSFERENCIA") {
+    if (transferAlias || transferCbu) {
+      msg += `\n📲 *Datos para transferir:*\n`;
+      if (transferAlias) msg += `Alias: *${transferAlias}*\n`;
+      if (transferCbu) msg += `CBU: *${transferCbu}*\n`;
+    }
+    msg += `⚠️ _Recordá enviar el comprobante por este chat._\n`;
+  }
+
+  // ── Notas ──
   if (formData.notes?.trim()) {
     msg += `\n📝 *Notas:* ${formData.notes}\n`;
   }
 
-  msg += `\n━━━━━━━━━━━━━━━━━━━━━\n`;
-  msg += `_Pedido realizado desde web-grido.vercel.app_`;
+  msg += `\n${line}\n`;
+  msg += `_¡Gracias por tu compra! 🍦_`;
 
   return msg;
 }

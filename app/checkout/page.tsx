@@ -20,6 +20,7 @@ export default function CheckoutPage() {
     deliveryType: "DELIVERY",
     paymentMethod: "EFECTIVO",
     notes: "",
+    cashAmount: "",
   });
 
   useEffect(() => {
@@ -30,6 +31,11 @@ export default function CheckoutPage() {
   const subtotal = getSubtotal();
   const deliveryCost = form.deliveryType === "DELIVERY" ? (settings?.deliveryCost ?? 1500) : 0;
   const total = subtotal + deliveryCost;
+
+  // Cálculo del vuelto (solo efectivo)
+  const cashAmountNum = parseFloat((form.cashAmount || "").replace(/[^\d]/g, "")) || 0;
+  const change = cashAmountNum - total;
+  const cashIsValid = cashAmountNum === 0 || cashAmountNum >= total;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -42,6 +48,9 @@ export default function CheckoutPage() {
     }
     if (form.deliveryType === "DELIVERY" && !form.address?.trim()) {
       toast.error("Ingresá la dirección de entrega"); return;
+    }
+    if (form.paymentMethod === "EFECTIVO" && cashAmountNum > 0 && cashAmountNum < total) {
+      toast.error("El monto con el que pagás no puede ser menor al total"); return;
     }
     if (settings && settings.storeOpen === false) {
       toast.error("La tienda está cerrada en este momento"); return;
@@ -59,6 +68,7 @@ export default function CheckoutPage() {
           deliveryType: form.deliveryType,
           paymentMethod: form.paymentMethod,
           notes: form.notes,
+          cashAmount: form.paymentMethod === "EFECTIVO" && cashAmountNum > 0 ? cashAmountNum : undefined,
           subtotal, deliveryCost, total,
           items: items.map((item) => ({
             productId: item.product.id,
@@ -74,23 +84,14 @@ export default function CheckoutPage() {
       const orderData = await orderRes.json();
       const order = orderData.data;
 
-      // Mercado Pago → redirigir a la app
-      if (form.paymentMethod === "MERCADO_PAGO") {
-        const mpRes = await fetch("/api/payments/mercadopago", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId: order.id }),
-        });
-        const mpData = await mpRes.json();
-        const mpUrl = mpData.mobileInitPoint || mpData.initPoint;
-        if (mpUrl) { window.location.href = mpUrl; return; }
-      }
-
-      // WhatsApp para transferencia y efectivo
+      // Generar mensaje de WhatsApp (transferencia y efectivo)
       const whatsappRes = await fetch("/api/orders/whatsapp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId: order.id }),
+        body: JSON.stringify({
+          orderId: order.id,
+          cashAmount: form.paymentMethod === "EFECTIVO" && cashAmountNum > 0 ? cashAmountNum : undefined,
+        }),
       });
       const whatsappData = await whatsappRes.json();
       clearCart();
@@ -107,23 +108,6 @@ export default function CheckoutPage() {
 
   const paymentMethods = [
     {
-      value: "MERCADO_PAGO",
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 40 40" fill="none">
-          <circle cx="20" cy="20" r="20" fill="#00AACC"/>
-          <path d="M10 22c0-5.523 4.477-10 10-10s10 4.477 10 10" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
-          <circle cx="14" cy="22" r="2.5" fill="white"/>
-          <circle cx="26" cy="22" r="2.5" fill="white"/>
-        </svg>
-      ),
-      label: "Mercado Pago",
-      sub: "Crédito, débito o saldo MP",
-      color: "#00AACC",
-      bgColor: "#f0faff",
-      borderColor: "#00AACC",
-      detail: "Serás redirigido a Mercado Pago para completar el pago de forma segura.",
-    },
-    {
       value: "TRANSFERENCIA",
       icon: (
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -136,9 +120,6 @@ export default function CheckoutPage() {
       color: "#6366f1",
       bgColor: "#f5f3ff",
       borderColor: "#6366f1",
-      detail: settings?.transferAlias
-        ? `Alias: ${settings.transferAlias}${settings.transferCbu ? ` · CBU: ${settings.transferCbu}` : ""}`
-        : "Enviá el comprobante por WhatsApp.",
     },
     {
       value: "EFECTIVO",
@@ -154,15 +135,8 @@ export default function CheckoutPage() {
       color: "#16a34a",
       bgColor: "#f0fdf4",
       borderColor: "#16a34a",
-      detail: "Tené el importe exacto listo. El repartidor lleva cambio limitado.",
     },
   ];
-
-  const submitLabel = {
-    MERCADO_PAGO: "Pagar con Mercado Pago →",
-    TRANSFERENCIA: "Confirmar y enviar por WhatsApp →",
-    EFECTIVO: "Confirmar y enviar por WhatsApp →",
-  }[form.paymentMethod] || "Confirmar pedido →";
 
   return (
     <div className="min-h-dvh bg-gray-50">
@@ -195,7 +169,7 @@ export default function CheckoutPage() {
 
         {/* Resumen del carrito */}
         <section className="bg-white rounded-2xl p-4 shadow-card">
-          <h2 className="font-bold text-gray-800 mb-3 text-sm uppercase tracking-wide text-gray-500">Tu pedido</h2>
+          <h2 className="font-bold mb-3 text-sm uppercase tracking-wide text-gray-500">Tu pedido</h2>
           <div className="space-y-2.5">
             {items.map((item) => (
               <div key={item.cartId} className="flex justify-between items-start gap-2">
@@ -219,7 +193,7 @@ export default function CheckoutPage() {
 
         {/* Datos personales */}
         <section className="bg-white rounded-2xl p-4 shadow-card">
-          <h2 className="font-bold text-gray-800 mb-4 text-sm uppercase tracking-wide text-gray-500">Tus datos</h2>
+          <h2 className="font-bold mb-4 text-sm uppercase tracking-wide text-gray-500">Tus datos</h2>
           <div className="space-y-3">
             <div>
               <label className="text-sm font-medium text-gray-600 mb-1.5 block">Nombre completo *</label>
@@ -234,7 +208,7 @@ export default function CheckoutPage() {
 
         {/* Tipo de entrega */}
         <section className="bg-white rounded-2xl p-4 shadow-card">
-          <h2 className="font-bold text-gray-800 mb-4 text-sm uppercase tracking-wide text-gray-500">Tipo de entrega</h2>
+          <h2 className="font-bold mb-4 text-sm uppercase tracking-wide text-gray-500">Tipo de entrega</h2>
           <div className="grid grid-cols-2 gap-2">
             {[
               { value: "DELIVERY", label: "Delivery", icon: "🛵", sub: `+${formatPrice(settings?.deliveryCost ?? 1500)}` },
@@ -263,15 +237,12 @@ export default function CheckoutPage() {
 
         {/* Método de pago */}
         <section className="bg-white rounded-2xl p-4 shadow-card">
-          <h2 className="font-bold text-gray-800 mb-4 text-sm uppercase tracking-wide text-gray-500">Método de pago</h2>
+          <h2 className="font-bold mb-4 text-sm uppercase tracking-wide text-gray-500">Método de pago</h2>
           <div className="space-y-2.5">
             {paymentMethods.map((opt) => {
               const isSelected = form.paymentMethod === opt.value;
               return (
-                <label
-                  key={opt.value}
-                  className="block cursor-pointer"
-                >
+                <label key={opt.value} className="block cursor-pointer">
                   <input type="radio" name="paymentMethod" value={opt.value} checked={isSelected} onChange={handleChange} className="sr-only" />
                   <div
                     className="rounded-xl border-2 p-3.5 transition-all"
@@ -281,16 +252,13 @@ export default function CheckoutPage() {
                     }}
                   >
                     <div className="flex items-center gap-3">
-                      {/* Ícono */}
                       <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: opt.color }}>
                         {opt.icon}
                       </div>
-                      {/* Texto */}
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-sm text-gray-800">{opt.label}</p>
                         <p className="text-xs text-gray-500 mt-0.5">{opt.sub}</p>
                       </div>
-                      {/* Check */}
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ${isSelected ? "border-transparent" : "border-gray-300"}`}
                         style={{ backgroundColor: isSelected ? opt.color : "transparent" }}>
                         {isSelected && (
@@ -301,19 +269,53 @@ export default function CheckoutPage() {
                       </div>
                     </div>
 
-                    {/* Detalle expandible */}
-                    {isSelected && (
+                    {/* Transferencia: alias/CBU */}
+                    {isSelected && opt.value === "TRANSFERENCIA" && (
+                      <div className="mt-3 pt-3 border-t text-xs font-medium" style={{ borderColor: `${opt.color}30`, color: opt.color }}>
+                        {settings?.transferAlias ? (
+                          <>
+                            🏦 Alias: <strong>{settings.transferAlias}</strong>
+                            {settings.transferCbu && <><br />CBU: <strong>{settings.transferCbu}</strong></>}
+                            <br />Enviá el comprobante por WhatsApp.
+                          </>
+                        ) : (
+                          "Te pasamos los datos para transferir por WhatsApp."
+                        )}
+                      </div>
+                    )}
+
+                    {/* Efectivo: con cuánto paga */}
+                    {isSelected && opt.value === "EFECTIVO" && (
                       <div className="mt-3 pt-3 border-t" style={{ borderColor: `${opt.color}30` }}>
-                        <p className="text-xs font-medium" style={{ color: opt.color }}>
-                          {opt.value === "TRANSFERENCIA" && settings?.transferAlias ? (
-                            <>
-                              🏦 Alias: <strong>{settings.transferAlias}</strong>
-                              {settings.transferCbu && <><br />CBU: <strong>{settings.transferCbu}</strong></>}
-                              <br />Enviá el comprobante por WhatsApp.
-                            </>
+                        <label className="text-xs font-semibold text-gray-700 mb-1.5 block">
+                          ¿Con cuánto vas a pagar? <span className="font-normal text-gray-400">(opcional)</span>
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                          <input
+                            name="cashAmount"
+                            value={form.cashAmount}
+                            onChange={handleChange}
+                            inputMode="numeric"
+                            placeholder="Ej: 20000"
+                            className="input-field pl-7"
+                          />
+                        </div>
+                        {/* Feedback del vuelto */}
+                        {cashAmountNum > 0 && (
+                          cashIsValid ? (
+                            <div className="mt-2 flex items-center justify-between bg-green-50 rounded-lg px-3 py-2">
+                              <span className="text-xs font-medium text-green-700">Tu vuelto será</span>
+                              <span className="text-sm font-bold text-green-700">{formatPrice(change)}</span>
+                            </div>
                           ) : (
-                            opt.detail
-                          )}
+                            <p className="mt-2 text-xs font-medium text-red-500">
+                              El monto debe ser mayor o igual al total ({formatPrice(total)}).
+                            </p>
+                          )
+                        )}
+                        <p className="mt-2 text-[11px] text-gray-400">
+                          Así el repartidor lleva el vuelto justo 💵
                         </p>
                       </div>
                     )}
@@ -343,7 +345,6 @@ export default function CheckoutPage() {
       {/* Footer fijo */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 pt-3 shadow-modal z-30" style={{ paddingBottom: "max(env(safe-area-inset-bottom, 0px), 16px)" }}>
         <div className="max-w-lg mx-auto">
-          {/* Resumen de precios */}
           <div className="space-y-1 mb-3">
             <div className="flex justify-between text-sm text-gray-500">
               <span>Subtotal</span>
@@ -374,7 +375,7 @@ export default function CheckoutPage() {
                 </svg>
                 Procesando...
               </>
-            ) : submitLabel}
+            ) : "Confirmar y enviar por WhatsApp →"}
           </button>
         </div>
       </div>

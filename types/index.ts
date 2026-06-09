@@ -119,6 +119,7 @@ export interface CheckoutFormData {
   deliveryType: DeliveryType;
   paymentMethod: PaymentMethod;
   notes?: string;
+  cashAmount?: string; // Con cuánto paga (efectivo) para calcular vuelto
 }
 
 // ─── SETTINGS ───────────────────────────────

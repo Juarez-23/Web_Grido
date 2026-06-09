@@ -1,59 +1,29 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 function PedidoConfirmadoContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const orderId = searchParams.get("order");
   const waUrl = searchParams.get("wa");
-  const status = searchParams.get("status"); // MP: success | failure | pending
-  const method = searchParams.get("method"); // EFECTIVO | TRANSFERENCIA | MERCADO_PAGO
+  const method = searchParams.get("method"); // EFECTIVO | TRANSFERENCIA
 
   const [whatsappOpened, setWhatsappOpened] = useState(false);
 
-  const isMPSuccess = status === "success";
-  const isMPPending = status === "pending";
-  const isMPFailure = status === "failure";
-  const isMPFlow = isMPSuccess || isMPPending || isMPFailure;
   const isTransfer = method === "TRANSFERENCIA";
   const isCash = method === "EFECTIVO";
 
-  // Auto-abrir WhatsApp para efectivo y transferencia
+  // Auto-abrir WhatsApp
   useEffect(() => {
-    if (waUrl && !whatsappOpened && !isMPFlow) {
+    if (waUrl && !whatsappOpened) {
       setTimeout(() => {
         window.open(decodeURIComponent(waUrl), "_blank");
         setWhatsappOpened(true);
       }, 900);
     }
-  }, [waUrl, isMPFlow]);
-
-  if (isMPFailure) {
-    return (
-      <div className="min-h-dvh bg-white flex flex-col items-center justify-center px-4">
-        <div className="max-w-sm w-full text-center">
-          <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-5xl">❌</span>
-          </div>
-          <h1 className="text-2xl font-black text-gray-900 mb-2">Pago no realizado</h1>
-          <p className="text-gray-500 text-sm mb-8">
-            Hubo un problema con el pago en Mercado Pago. Podés intentarlo de nuevo o elegir otro método.
-          </p>
-          <div className="space-y-3">
-            <button onClick={() => router.back()} className="w-full btn-primary py-4 text-base">
-              Volver e intentar de nuevo
-            </button>
-            <Link href="/" className="w-full flex items-center justify-center gap-2 bg-white text-gray-600 font-semibold rounded-2xl py-4 border border-gray-200">
-              🏠 Volver al inicio
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  }, [waUrl]);
 
   return (
     <div className="min-h-dvh bg-gray-50 flex flex-col items-center justify-center px-4 py-10">
@@ -61,61 +31,18 @@ function PedidoConfirmadoContent() {
 
         {/* Ícono de éxito */}
         <div className="flex justify-center mb-6">
-          <div className="relative">
-            <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center">
-              <span className="text-5xl">🎉</span>
-            </div>
-            {isMPSuccess && (
-              <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-[#00AACC] rounded-full flex items-center justify-center">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 6L9 17l-5-5" />
-                </svg>
-              </div>
-            )}
+          <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center">
+            <span className="text-5xl">🎉</span>
           </div>
         </div>
 
-        {/* Título */}
-        <h1 className="text-2xl font-black text-gray-900 text-center mb-2">
-          {isMPPending ? "Pago pendiente" : "¡Pedido confirmado!"}
-        </h1>
+        <h1 className="text-2xl font-black text-gray-900 text-center mb-2">¡Pedido confirmado!</h1>
         <p className="text-gray-500 text-center text-sm mb-6">
-          {isMPPending
-            ? "Tu pago está siendo procesado por Mercado Pago."
-            : isMPSuccess
-            ? "El pago fue aprobado. Tu pedido está en camino."
-            : "Recibimos tu pedido. Envialo por WhatsApp para que el local lo confirme."}
+          Recibimos tu pedido. Envialo por WhatsApp para que el local lo confirme.
         </p>
 
         {/* Card de estado */}
         <div className="bg-white rounded-2xl p-5 shadow-card mb-4 space-y-3">
-
-          {/* Estado del pago */}
-          {isMPSuccess && (
-            <div className="flex items-center gap-3 p-3 bg-green-50 rounded-xl">
-              <div className="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 6L9 17l-5-5" />
-                </svg>
-              </div>
-              <div>
-                <p className="font-bold text-green-800 text-sm">Pago aprobado</p>
-                <p className="text-green-600 text-xs">Mercado Pago confirmó tu pago</p>
-              </div>
-            </div>
-          )}
-
-          {isMPPending && (
-            <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-xl">
-              <div className="w-9 h-9 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-lg">⏳</span>
-              </div>
-              <div>
-                <p className="font-bold text-yellow-800 text-sm">Pago en proceso</p>
-                <p className="text-yellow-600 text-xs">Mercado Pago está verificando el pago</p>
-              </div>
-            </div>
-          )}
 
           {isTransfer && (
             <div className="flex items-center gap-3 p-3 bg-indigo-50 rounded-xl">
@@ -145,9 +72,9 @@ function PedidoConfirmadoContent() {
           <div className="bg-gray-50 rounded-xl p-3">
             <p className="text-xs font-bold text-gray-600 uppercase tracking-wide mb-2">Próximos pasos</p>
             <ol className="space-y-1.5 text-sm text-gray-600">
-              {!isMPFlow && <li className="flex gap-2"><span className="font-bold text-grido-primary">1.</span> Enviá el pedido por WhatsApp</li>}
-              <li className="flex gap-2"><span className="font-bold text-grido-primary">{isMPFlow ? "1." : "2."}</span> El local confirma y prepara</li>
-              <li className="flex gap-2"><span className="font-bold text-grido-primary">{isMPFlow ? "2." : "3."}</span> ¡Recibís tu helado! 🍦</li>
+              <li className="flex gap-2"><span className="font-bold text-grido-primary">1.</span> Enviá el pedido por WhatsApp</li>
+              <li className="flex gap-2"><span className="font-bold text-grido-primary">2.</span> El local confirma y prepara</li>
+              <li className="flex gap-2"><span className="font-bold text-grido-primary">3.</span> ¡Recibís tu helado! 🍦</li>
             </ol>
           </div>
 
@@ -158,7 +85,7 @@ function PedidoConfirmadoContent() {
 
         {/* Botones */}
         <div className="space-y-3">
-          {waUrl && !isMPFailure && (
+          {waUrl && (
             <a
               href={decodeURIComponent(waUrl)}
               target="_blank"

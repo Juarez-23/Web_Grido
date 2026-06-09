@@ -7,6 +7,15 @@ export const dynamic = "force-dynamic";
 // POST /api/payments/mercadopago — crear preferencia de pago
 export async function POST(req: NextRequest) {
   try {
+    // Validar que MP esté configurado antes de seguir
+    if (!process.env.MP_ACCESS_TOKEN) {
+      console.error("MP_ACCESS_TOKEN no está configurado");
+      return NextResponse.json(
+        { error: "Mercado Pago no está disponible en este momento. Elegí otro método de pago." },
+        { status: 503 }
+      );
+    }
+
     const { orderId } = await req.json();
 
     const order = await prisma.order.findUnique({

@@ -14,7 +14,7 @@
     "db:studio": "prisma studio",
     "db:generate": "prisma generate",
     "db:seed-products": "npx ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed-products.ts",
-    "db:seed-grido-market": "npx ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed-grido-market.ts"
+    "db:seed-grido-market": "npx ts-node --project tsconfig.seed.json prisma/seed-grido-market.ts"
   },
   "dependencies": {
     "@gsap/react": "^2.1.1",
@@ -38,6 +38,7 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.19",
+    "dotenv": "^17.4.2",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.4",
     "postcss": "^8.4.38",
