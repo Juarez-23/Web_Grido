@@ -223,12 +223,12 @@ export default function HomePage() {
           }}
         />
 
-        {/* Overlay desktop — gradiente azul de izquierda a derecha, foto visible detrás */}
+        {/* Overlay desktop — azul sólido a la izquierda que se funde suavemente con la foto */}
         <div
           className="absolute inset-0 pointer-events-none hidden md:block"
           style={{
             background:
-              "linear-gradient(to right, rgba(8,18,90,0.97) 0%, rgba(8,18,90,0.90) 20%, rgba(8,18,80,0.72) 38%, rgba(8,18,80,0.35) 58%, rgba(8,18,80,0.08) 75%, transparent 88%)",
+              "linear-gradient(to right, #08125a 0%, #08125a 24%, rgba(8,18,90,0.92) 33%, rgba(8,18,85,0.65) 44%, rgba(8,18,80,0.35) 56%, rgba(8,18,80,0.12) 70%, transparent 84%)",
           }}
         />
 
