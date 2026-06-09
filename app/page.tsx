@@ -202,13 +202,13 @@ export default function HomePage() {
           decoding="async"
         />
 
-        {/* Imagen desktop — imagen32, anclada a la derecha sin estirar */}
+        {/* Imagen desktop — imagen32 anclada a la derecha, ocupa ~80% para estirar menos */}
         <img
           src="/imagen32.jpeg"
           alt=""
           aria-hidden
-          className="absolute inset-0 w-full h-full hidden md:block"
-          style={{ objectFit: "cover", objectPosition: "right center" }}
+          className="absolute top-0 right-0 h-full hidden md:block"
+          style={{ width: "80%", objectFit: "fill" }}
           draggable={false}
           fetchPriority="high"
           decoding="async"
