@@ -36,6 +36,20 @@ export function generateWhatsAppMessage(
     MERCADO_PAGO: "Mercado Pago",
   };
 
+  // Fecha y hora del momento (zona horaria Argentina)
+  const now = new Date();
+  const fecha = now.toLocaleDateString("es-AR", {
+    timeZone: "America/Argentina/Buenos_Aires",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+  const hora = now.toLocaleTimeString("es-AR", {
+    timeZone: "America/Argentina/Buenos_Aires",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
   // Detalle de productos con precio unitario y subtotal
   const productLines = items
     .map((item) => {
@@ -43,50 +57,43 @@ export function generateWhatsAppMessage(
       const unit = formatPrice(item.product.price);
       const flavors =
         item.selectedFlavors.length > 0
-          ? `\n   _Sabores: ${item.selectedFlavors.map((f) => f.name).join(", ")}_`
+          ? `\n   _${item.selectedFlavors.map((f) => f.name).join(", ")}_`
           : "";
-      return `• *${item.quantity}x* ${item.product.name}\n   ${item.quantity} × ${unit} = *${formatPrice(lineTotal)}*${flavors}`;
+      return `• ${item.quantity}x ${item.product.name} — *${formatPrice(lineTotal)}*\n   _${item.quantity} × ${unit}_${flavors}`;
     })
     .join("\n");
 
-  const line = "------------------------";
-
   // ── Encabezado ──
   let msg = `*GRIDO EL LIBERTADOR*\n`;
-  msg += `*Pedido N° ${orderNumber}*\n`;
-  msg += `${line}\n\n`;
+  msg += `Pedido N° ${orderNumber}  ·  ${fecha} ${hora} hs\n`;
+  msg += `\n`;
 
   // ── Cliente ──
-  msg += `*Cliente:* ${formData.customerName}\n`;
-  msg += `*Tel:* ${formData.customerPhone}\n`;
-  msg += `*Entrega:* ${deliveryLabel}\n`;
+  msg += `*Datos del cliente*\n`;
+  msg += `Nombre: ${formData.customerName}\n`;
+  msg += `Teléfono: ${formData.customerPhone}\n`;
+  msg += `Entrega: ${deliveryLabel}\n`;
   if (formData.deliveryType === "DELIVERY" && formData.address) {
-    msg += `*Dirección:* ${formData.address}\n`;
+    msg += `Dirección: ${formData.address}\n`;
   }
 
   // ── Productos ──
-  msg += `\n*DETALLE DEL PEDIDO*\n`;
-  msg += `${line}\n`;
+  msg += `\n*Pedido*\n`;
   msg += `${productLines}\n`;
-  msg += `${line}\n`;
 
   // ── Totales ──
-  msg += `\n*RESUMEN*\n`;
-  msg += `Subtotal: ${formatPrice(subtotal)}\n`;
+  msg += `\nSubtotal: ${formatPrice(subtotal)}\n`;
   if (formData.deliveryType === "DELIVERY") {
     msg += `Envío: ${formatPrice(deliveryCost)}\n`;
   }
-  msg += `*TOTAL A PAGAR: ${formatPrice(total)}*\n`;
+  msg += `*TOTAL: ${formatPrice(total)}*\n`;
 
   // ── Pago ──
   msg += `\n*Forma de pago:* ${paymentLabels[formData.paymentMethod] || formData.paymentMethod}\n`;
 
   if (formData.paymentMethod === "TRANSFERENCIA") {
-    if (transferAlias || transferCbu) {
-      msg += `\n*Datos para transferir:*\n`;
-      if (transferAlias) msg += `Alias: *${transferAlias}*\n`;
-      if (transferCbu) msg += `CBU: *${transferCbu}*\n`;
-    }
+    if (transferAlias) msg += `Alias: *${transferAlias}*\n`;
+    if (transferCbu) msg += `CBU: *${transferCbu}*\n`;
     msg += `_Recordá enviar el comprobante por este chat._\n`;
   }
 
@@ -95,8 +102,7 @@ export function generateWhatsAppMessage(
     msg += `\n*Notas:* ${formData.notes}\n`;
   }
 
-  msg += `\n${line}\n`;
-  msg += `_¡Gracias por tu compra!_`;
+  msg += `\n_¡Gracias por tu compra!_`;
 
   return msg;
 }
