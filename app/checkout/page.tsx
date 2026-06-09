@@ -18,7 +18,7 @@ export default function CheckoutPage() {
     customerPhone: "",
     address: "",
     deliveryType: "DELIVERY",
-    paymentMethod: "EFECTIVO",
+    paymentMethod: "TRANSFERENCIA",
     notes: "",
     cashAmount: "",
   });
@@ -38,7 +38,15 @@ export default function CheckoutPage() {
   const cashIsValid = cashAmountNum === 0 || cashAmountNum >= total;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setForm((prev) => {
+      const next = { ...prev, [name]: value };
+      // Con Delivery no se permite Efectivo: forzar Transferencia
+      if (name === "deliveryType" && value === "DELIVERY" && prev.paymentMethod === "EFECTIVO") {
+        next.paymentMethod = "TRANSFERENCIA";
+      }
+      return next;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -106,7 +114,7 @@ export default function CheckoutPage() {
 
   if (items.length === 0) return null;
 
-  const paymentMethods = [
+  const allPaymentMethods = [
     {
       value: "TRANSFERENCIA",
       icon: (
@@ -131,12 +139,18 @@ export default function CheckoutPage() {
         </svg>
       ),
       label: "Efectivo",
-      sub: "Pagás al momento de la entrega",
+      sub: "Pagás al retirar en la sucursal",
       color: "#16a34a",
       bgColor: "#f0fdf4",
       borderColor: "#16a34a",
     },
   ];
+
+  // Con Delivery solo se permite Transferencia; con Retiro, ambos
+  const paymentMethods =
+    form.deliveryType === "DELIVERY"
+      ? allPaymentMethods.filter((m) => m.value !== "EFECTIVO")
+      : allPaymentMethods;
 
   return (
     <div className="min-h-dvh bg-gray-50">
