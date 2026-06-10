@@ -66,7 +66,8 @@ export function generateWhatsAppMessage(
 
   // ── Encabezado ──
   let msg = `*GRIDO EL LIBERTADOR*\n`;
-  msg += `Pedido N° ${orderNumber}  ·  ${fecha} ${hora} hs\n`;
+  msg += `Pedido N° ${orderNumber}\n`;
+  msg += `${fecha} · ${hora} hs\n`;
   msg += `\n`;
 
   // ── Cliente ──
