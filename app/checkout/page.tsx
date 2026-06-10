@@ -106,10 +106,12 @@ export default function CheckoutPage() {
           subtotal, deliveryCost, total,
           items: items.map((item) => ({
             productId: item.product.id,
+            name: item.product.name,
             quantity: item.quantity,
             unitPrice: item.product.price,
             subtotal: item.product.price * item.quantity,
             flavors: item.selectedFlavors.map((f) => f.id),
+            flavorNames: item.selectedFlavors.map((f) => f.name),
           })),
         }),
       });

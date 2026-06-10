@@ -91,6 +91,11 @@ export async function POST(req: NextRequest) {
     const lastOrder = await prisma.order.findFirst({ orderBy: { orderNumber: "desc" } });
     const orderNumber = (lastOrder?.orderNumber ?? 0) + 1;
 
+    // Las promociones no son productos reales: se incluyen en el mensaje pero no se
+    // persisten como ítems (su productId "promo-..." no existe en la tabla Product).
+    const isPromo = (it: any) => String(it.productId || "").startsWith("promo-");
+    const realItems = items.filter((it: any) => !isPromo(it));
+
     // Crear pedido + pago en una sola operación (pago anidado)
     const order = await prisma.order.create({
       data: {
@@ -106,7 +111,7 @@ export async function POST(req: NextRequest) {
         total: parseFloat(total),
         status: "CREADO",
         items: {
-          create: items.map((item: any) => ({
+          create: realItems.map((item: any) => ({
             productId: item.productId,
             quantity: item.quantity,
             unitPrice: item.unitPrice,
@@ -125,25 +130,26 @@ export async function POST(req: NextRequest) {
           },
         },
       },
-      include: {
-        items: { include: { product: true, flavors: { include: { flavor: true } } } },
-      },
     });
 
-    // Armar el link de WhatsApp en la misma request (evita un segundo viaje a la DB)
+    // Armar el link de WhatsApp con TODOS los ítems del pedido (incluidas promos),
+    // usando los datos del payload (nombre y sabores) sin un segundo viaje a la DB.
     const formData: CheckoutFormData = {
-      customerName: order.customerName,
-      customerPhone: order.customerPhone,
-      address: order.address || undefined,
-      deliveryType: order.deliveryType as "DELIVERY" | "RETIRO",
-      paymentMethod: order.paymentMethod as any,
-      notes: order.notes || undefined,
+      customerName,
+      customerPhone,
+      address: address || undefined,
+      deliveryType,
+      paymentMethod,
+      notes: notes || undefined,
     };
-    const cartItems: CartItem[] = order.items.map((item) => ({
-      cartId: item.id,
-      product: item.product as any,
+    const cartItems: CartItem[] = items.map((item: any, i: number) => ({
+      cartId: String(i),
+      product: { name: item.name || "Producto", price: item.unitPrice } as any,
       quantity: item.quantity,
-      selectedFlavors: item.flavors.map((f) => ({ id: f.flavor.id, name: f.flavor.name })),
+      selectedFlavors: (item.flavorNames || []).map((name: string, j: number) => ({
+        id: String(j),
+        name,
+      })),
     }));
     const message = generateWhatsAppMessage(
       order.orderNumber,
