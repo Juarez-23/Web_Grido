@@ -6,12 +6,12 @@ import { formatPrice } from "@/lib/whatsapp";
 import toast from "react-hot-toast";
 
 // ─── Datos de la Promo del día ──────────────────────────────────────────────
-// Para cambiarla, reemplazá la imagen /public/promo.jpeg y estos valores.
+// Para cambiarla, reemplazá la imagen /public/promo2.webp y estos valores.
 const PROMO = {
   id: "promo-del-dia",
   name: "Promo Mundialista",
   price: 22100,
-  image: "/promo.jpeg",
+  image: "/promo2.webp",
 };
 
 export function PromoDelDia() {
@@ -68,32 +68,28 @@ export function PromoDelDia() {
           style={{ background: "radial-gradient(circle, rgba(59,130,246,0.25) 0%, transparent 70%)" }}
         />
 
-        <div className="relative p-4 sm:p-5 flex flex-col items-center">
-          {/* Flyer — se recorta la franja del precio (queda en el botón) */}
+        <div className="relative p-3 sm:p-4 flex flex-col">
+          {/* Flyer horizontal — banner compacto */}
           <button
             onClick={handleAdd}
             aria-label="Agregar la promo del día"
-            className="block w-full max-w-[300px] active:scale-[0.98] transition-transform"
+            className="block w-full active:scale-[0.98] transition-transform"
           >
-            <div
-              className="overflow-hidden rounded-2xl"
-              style={{ aspectRatio: "1086 / 1231", boxShadow: "0 10px 30px rgba(0,0,0,0.35)" }}
-            >
-              <img
-                src={PROMO.image}
-                alt={PROMO.name}
-                className="w-full h-full object-cover object-top"
-                draggable={false}
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
+            <img
+              src={PROMO.image}
+              alt={PROMO.name}
+              className="w-full h-auto rounded-2xl"
+              style={{ boxShadow: "0 10px 30px rgba(0,0,0,0.35)" }}
+              draggable={false}
+              loading="lazy"
+              decoding="async"
+            />
           </button>
 
           {/* CTA */}
           <button
             onClick={handleAdd}
-            className="mt-4 w-full max-w-[320px] flex items-center justify-center gap-2 rounded-2xl py-3.5 active:scale-95 transition-transform"
+            className="mt-3 w-full flex items-center justify-center gap-2 rounded-2xl py-3.5 active:scale-95 transition-transform"
             style={{
               background: "linear-gradient(180deg, #ffd25e 0%, #f7b731 100%)",
               color: "#0d2050",
