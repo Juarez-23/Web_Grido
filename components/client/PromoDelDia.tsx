@@ -6,12 +6,13 @@ import { formatPrice } from "@/lib/whatsapp";
 import toast from "react-hot-toast";
 
 // ─── Datos de la Promo del día ──────────────────────────────────────────────
-// Para cambiarla, reemplazá la imagen /public/promo2.webp y estos valores.
+// Para cambiarla, reemplazá la imagen /public/promo-productos.webp y estos valores.
 const PROMO = {
   id: "promo-del-dia",
   name: "Promo Mundialista",
+  detail: "Kilo + ½ Kilo + Empanadas",
   price: 22100,
-  image: "/promo2.webp",
+  image: "/promo-productos.webp",
 };
 
 export function PromoDelDia() {
@@ -50,63 +51,72 @@ export function PromoDelDia() {
         <span className="h-px flex-1" style={{ background: "linear-gradient(to right, rgba(247,183,49,0.5), transparent)" }} />
       </div>
 
-      {/* Card protagonista */}
-      <div
-        className="promo-dia-card relative overflow-hidden rounded-3xl"
+      {/* Card horizontal compacta */}
+      <button
+        onClick={handleAdd}
+        aria-label="Agregar la promo del día"
+        className="promo-dia-card relative w-full overflow-hidden rounded-3xl text-left active:scale-[0.985] transition-transform"
         style={{
-          background: "radial-gradient(120% 100% at 50% 0%, #11286e 0%, #0a1648 60%, #070f33 100%)",
-          boxShadow: "0 18px 50px rgba(8,18,80,0.35), 0 4px 16px rgba(8,18,80,0.25)",
+          background: "radial-gradient(120% 120% at 0% 0%, #11286e 0%, #0a1648 60%, #070f33 100%)",
+          boxShadow: "0 16px 44px rgba(8,18,80,0.32), 0 4px 14px rgba(8,18,80,0.22)",
         }}
       >
-        {/* Glow dorado decorativo */}
-        <div
-          className="pointer-events-none absolute -top-16 -right-16 w-48 h-48 rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(247,183,49,0.30) 0%, transparent 70%)" }}
-        />
-        <div
-          className="pointer-events-none absolute -bottom-20 -left-16 w-52 h-52 rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(59,130,246,0.25) 0%, transparent 70%)" }}
-        />
+        <div className="relative flex items-stretch min-h-[148px]">
+          {/* Izquierda: detalles + precio */}
+          <div className="flex flex-col justify-center gap-1.5 p-4 sm:p-5" style={{ flex: "1 1 56%" }}>
+            <h3
+              className="leading-none"
+              style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "clamp(1.25rem, 5.5vw, 1.6rem)", color: "#fff", letterSpacing: "-0.02em" }}
+            >
+              {PROMO.name}
+            </h3>
+            <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 600, fontSize: 12.5, color: "rgba(255,255,255,0.72)" }}>
+              {PROMO.detail}
+            </p>
 
-        <div className="relative p-3 sm:p-4 flex flex-col">
-          {/* Flyer horizontal — banner compacto */}
-          <button
-            onClick={handleAdd}
-            aria-label="Agregar la promo del día"
-            className="block w-full active:scale-[0.98] transition-transform"
-          >
+            <div className="flex items-baseline gap-2 mt-1">
+              <span style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "clamp(1.4rem, 6vw, 1.85rem)", color: "#f7b731", letterSpacing: "-0.02em" }}>
+                {formatPrice(PROMO.price)}
+              </span>
+            </div>
+
+            <span
+              className="mt-2 inline-flex items-center gap-1.5 self-start rounded-xl px-3.5 py-2"
+              style={{
+                background: "linear-gradient(180deg, #ffd25e 0%, #f7b731 100%)",
+                color: "#0d2050",
+                fontFamily: "'Nunito', sans-serif",
+                fontWeight: 800,
+                fontSize: 13,
+                boxShadow: "0 6px 16px rgba(247,183,49,0.32)",
+              }}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+              </svg>
+              Sumar al pedido
+            </span>
+          </div>
+
+          {/* Derecha: imagen de productos */}
+          <div className="relative self-stretch" style={{ flex: "1 1 44%" }}>
             <img
               src={PROMO.image}
               alt={PROMO.name}
-              className="w-full h-auto rounded-2xl"
-              style={{ boxShadow: "0 10px 30px rgba(0,0,0,0.35)" }}
+              className="absolute inset-0 w-full h-full object-cover"
               draggable={false}
               loading="lazy"
               decoding="async"
             />
-          </button>
-
-          {/* CTA */}
-          <button
-            onClick={handleAdd}
-            className="mt-3 w-full flex items-center justify-center gap-2 rounded-2xl py-3.5 active:scale-95 transition-transform"
-            style={{
-              background: "linear-gradient(180deg, #ffd25e 0%, #f7b731 100%)",
-              color: "#0d2050",
-              fontFamily: "'Nunito', sans-serif",
-              fontWeight: 800,
-              fontSize: 15,
-              boxShadow: "0 6px 18px rgba(247,183,49,0.35)",
-            }}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-            </svg>
-            Sumar al pedido · {formatPrice(PROMO.price)}
-          </button>
+            {/* Fade del borde izquierdo para fundir con el panel azul */}
+            <div
+              className="absolute inset-y-0 left-0 w-16 pointer-events-none"
+              style={{ background: "linear-gradient(to right, #0a1648 0%, transparent 100%)" }}
+            />
+          </div>
         </div>
-      </div>
+      </button>
     </section>
   );
 }
