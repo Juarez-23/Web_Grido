@@ -293,9 +293,9 @@ export default function HomePage() {
       </section>
 
       {/* ── Stats card — ancho completo bajo el hero ── */}
-      <div className="-mt-7 relative z-10 md:flex md:justify-center md:px-8">
+      <div className="-mt-7 relative z-10 px-4 md:flex md:justify-center md:px-8">
         <div
-          className="stats-card bg-white overflow-hidden grid grid-cols-3 divide-x divide-gray-100 md:rounded-2xl md:w-[480px]"
+          className="stats-card bg-white overflow-hidden grid grid-cols-3 divide-x divide-gray-100 rounded-2xl md:w-[480px]"
           style={{ boxShadow: "0 4px 32px rgba(26,13,140,0.14), 0 1px 6px rgba(26,13,140,0.07)" }}
         >
           <div className="flex flex-col items-center py-4 gap-1">
