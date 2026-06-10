@@ -343,7 +343,17 @@ export default function HomePage() {
         {/* Featured */}
         {!loading && featuredProducts.length > 0 && (
           <section className="mt-6">
-            <h2 style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 15, color: "#0d2050", letterSpacing: "-0.02em", marginBottom: 12 }}>Más pedidos</h2>
+            <div className="flex items-center justify-between mb-3">
+              <h2 style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 15, color: "#0d2050", letterSpacing: "-0.02em" }}>Más pedidos</h2>
+              <button
+                onClick={() => document.getElementById("menu-productos")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                className="flex items-center gap-0.5 text-grido-primary active:scale-95 transition-transform"
+                style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 13 }}
+              >
+                Ver más
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
+              </button>
+            </div>
             <div className="featured-scroll flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x">
               {featuredProducts.map((product) => (
                 <div key={product.id} className="featured-card snap-start flex-shrink-0 w-48">
@@ -362,7 +372,7 @@ export default function HomePage() {
         <PromoSection />
 
         {/* Categories */}
-        <section className="mt-7">
+        <section id="menu-productos" className="mt-7 scroll-mt-20">
           <div className="category-bar">
             <CategoryFilter
               categories={categories}

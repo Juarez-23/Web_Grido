@@ -23,6 +23,7 @@ const FALLBACK_GRADIENTS = [
 export function PromoSection() {
   const [promos, setPromos] = useState<Promotion[]>([]);
   const [selected, setSelected] = useState<Promotion | null>(null);
+  const [showAll, setShowAll] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -52,18 +53,27 @@ export function PromoSection() {
 
   return (
     <section className="mt-6">
-      <h2
-        className="mb-3"
-        style={{
-          fontFamily: "'Nunito', sans-serif",
-          fontWeight: 700,
-          fontSize: 15,
-          color: "#0d2050",
-          letterSpacing: "-0.02em",
-        }}
-      >
-        Promociones
-      </h2>
+      <div className="flex items-center justify-between mb-3">
+        <h2
+          style={{
+            fontFamily: "'Nunito', sans-serif",
+            fontWeight: 700,
+            fontSize: 15,
+            color: "#0d2050",
+            letterSpacing: "-0.02em",
+          }}
+        >
+          Promociones
+        </h2>
+        <button
+          onClick={() => setShowAll(true)}
+          className="flex items-center gap-0.5 text-grido-primary active:scale-95 transition-transform"
+          style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 13 }}
+        >
+          Ver todas
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
+        </button>
+      </div>
 
       <div
         ref={containerRef}
@@ -170,6 +180,74 @@ export function PromoSection() {
 
       {selected && (
         <PromoModal promo={selected} onClose={() => setSelected(null)} />
+      )}
+
+      {/* Vista "Ver todas" — grilla con todas las promociones */}
+      {showAll && (
+        <div className="fixed inset-0 z-50 bg-white flex flex-col animate-fade-in">
+          {/* Header */}
+          <div className="flex items-center gap-3 px-4 h-14 border-b border-gray-100 flex-shrink-0">
+            <button
+              onClick={() => setShowAll(false)}
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 active:scale-90 transition-transform"
+              aria-label="Volver"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+            </button>
+            <h2 style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: 17, color: "#0d2050" }}>
+              Todas las promociones
+            </h2>
+          </div>
+
+          {/* Grilla */}
+          <div className="flex-1 overflow-y-auto px-4 py-4" style={{ paddingBottom: "calc(2rem + env(safe-area-inset-bottom, 0px))" }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {promos.map((promo, i) => (
+                <button
+                  key={promo.id}
+                  onClick={() => { setSelected(promo); setShowAll(false); }}
+                  className="relative rounded-2xl overflow-hidden text-left h-40"
+                  style={{
+                    background: promo.image ? "#0d2050" : FALLBACK_GRADIENTS[i % FALLBACK_GRADIENTS.length],
+                    boxShadow: "0 4px 20px rgba(13,32,80,0.18)",
+                  }}
+                >
+                  {promo.image && (
+                    <Image src={promo.image} alt={promo.title} fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
+                  )}
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background: promo.image
+                        ? "linear-gradient(160deg, rgba(13,32,80,0.18) 0%, rgba(13,32,80,0.75) 55%, rgba(13,32,80,0.95) 100%)"
+                        : "none",
+                    }}
+                  />
+                  <div className="absolute inset-0 flex flex-col justify-between p-4">
+                    {promo.badge && (
+                      <span
+                        className="self-start px-2.5 py-1 rounded-full text-[11px] leading-none"
+                        style={{ background: "#f7b731", color: "#0d2050", fontFamily: "'Nunito', sans-serif", fontWeight: 800 }}
+                      >
+                        {promo.badge}
+                      </span>
+                    )}
+                    <div className={promo.badge ? "" : "mt-auto"}>
+                      <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: 17, color: "#fff", textShadow: promo.image ? "0 1px 6px rgba(0,0,0,0.4)" : "none" }}>
+                        {promo.title}
+                      </p>
+                      {promo.description && (
+                        <p className="mt-0.5 line-clamp-2" style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, color: "rgba(255,255,255,0.78)", textShadow: promo.image ? "0 1px 4px rgba(0,0,0,0.4)" : "none" }}>
+                          {promo.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
       )}
     </section>
   );
