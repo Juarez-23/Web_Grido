@@ -95,7 +95,7 @@ export function generateWhatsAppMessage(
   if (formData.paymentMethod === "TRANSFERENCIA") {
     if (transferAlias) msg += `Alias: *${transferAlias}*\n`;
     if (transferCbu) msg += `CBU: *${transferCbu}*\n`;
-    msg += `_Recordá enviar el comprobante por este chat._\n`;
+    msg += `⚠️ *Recordá enviar el comprobante por este chat.*\n`;
   }
 
   // ── Notas ──
