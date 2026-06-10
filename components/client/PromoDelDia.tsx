@@ -69,21 +69,25 @@ export function PromoDelDia() {
         />
 
         <div className="relative p-4 sm:p-5 flex flex-col items-center">
-          {/* Flyer */}
+          {/* Flyer — se recorta la franja del precio (queda en el botón) */}
           <button
             onClick={handleAdd}
             aria-label="Agregar la promo del día"
-            className="block w-full max-w-[320px] active:scale-[0.98] transition-transform"
+            className="block w-full max-w-[300px] active:scale-[0.98] transition-transform"
           >
-            <img
-              src={PROMO.image}
-              alt={PROMO.name}
-              className="w-full h-auto rounded-2xl"
-              style={{ boxShadow: "0 10px 30px rgba(0,0,0,0.35)" }}
-              draggable={false}
-              loading="lazy"
-              decoding="async"
-            />
+            <div
+              className="overflow-hidden rounded-2xl"
+              style={{ aspectRatio: "1086 / 1231", boxShadow: "0 10px 30px rgba(0,0,0,0.35)" }}
+            >
+              <img
+                src={PROMO.image}
+                alt={PROMO.name}
+                className="w-full h-full object-cover object-top"
+                draggable={false}
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
           </button>
 
           {/* CTA */}
