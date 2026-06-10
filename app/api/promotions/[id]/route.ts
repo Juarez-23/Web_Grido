@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
+async function requireAdmin() {
+  const session = await getServerSession(authOptions);
+  return !!session && (session.user as any)?.role === "ADMIN";
+}
+
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   try {
+    if (!(await requireAdmin())) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
     const body = await req.json();
 
     // Construir objeto de update solo con campos válidos
@@ -29,6 +39,9 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
 export async function DELETE(_: NextRequest, { params }: { params: { id: string } }) {
   try {
+    if (!(await requireAdmin())) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
     await prisma.promotion.delete({ where: { id: params.id } });
     return NextResponse.json({ ok: true });
   } catch (error) {

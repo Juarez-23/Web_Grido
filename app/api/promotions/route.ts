@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
+
+async function requireAdmin() {
+  const session = await getServerSession(authOptions);
+  return !!session && (session.user as any)?.role === "ADMIN";
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -24,6 +31,9 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    if (!(await requireAdmin())) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
     const body = await req.json();
     const promotion = await prisma.promotion.create({
       data: {

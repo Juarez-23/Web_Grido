@@ -12,13 +12,18 @@ declare module "next-auth/jwt" {
   interface JWT { role: string; id: string }
 }
 
-// Credenciales hardcodeadas del panel admin
-// Hash de "grido2026" generado con bcrypt (saltRounds=10)
+// Credenciales del panel admin.
+// Para producción, definir en variables de entorno:
+//   ADMIN_USERNAME       (ej: "admin")
+//   ADMIN_PASSWORD_HASH  (hash bcrypt de la contraseña — generar con bcrypt)
+// Si no están seteadas, usa el fallback de desarrollo (contraseña: "grido2026").
 const ADMIN_USERS = [
   {
     id: "admin-1",
-    username: "admin",
-    passwordHash: "$2a$10$A5x1sf87Bo2BxyaoPTsPgObB2PreWQTSDufSy3K78B.zmB4JbFmE6",
+    username: (process.env.ADMIN_USERNAME || "admin").toLowerCase().trim(),
+    passwordHash:
+      process.env.ADMIN_PASSWORD_HASH ||
+      "$2a$10$A5x1sf87Bo2BxyaoPTsPgObB2PreWQTSDufSy3K78B.zmB4JbFmE6",
     name: "Administrador",
     role: "ADMIN",
   },
