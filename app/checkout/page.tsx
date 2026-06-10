@@ -114,22 +114,23 @@ export default function CheckoutPage() {
         }),
       });
 
-      if (!orderRes.ok) throw new Error("Error al crear el pedido");
       const orderData = await orderRes.json();
-      const order = orderData.data;
+      if (!orderRes.ok) {
+        // Mostrar el motivo real (tienda cerrada, pedido mínimo, etc.)
+        toast.error(orderData.error || "No se pudo procesar el pedido. Intentá de nuevo.");
+        setLoading(false);
+        return;
+      }
 
-      // Generar mensaje de WhatsApp
-      const whatsappRes = await fetch("/api/orders/whatsapp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId: order.id }),
-      });
-      const whatsappData = await whatsappRes.json();
+      const order = orderData.data;
+      // El link de WhatsApp ya viene en la respuesta (sin segundo viaje a la DB)
       clearCart();
-      router.push(`/pedido-confirmado?order=${order.id}&wa=${encodeURIComponent(whatsappData.url || "")}&method=${form.paymentMethod}`);
+      router.push(
+        `/pedido-confirmado?order=${order.id}&wa=${encodeURIComponent(orderData.waUrl || "")}&method=${form.paymentMethod}`
+      );
     } catch (err) {
       console.error(err);
-      toast.error("Error al procesar el pedido. Intentá de nuevo.");
+      toast.error("Error de conexión. Revisá tu internet e intentá de nuevo.");
     } finally {
       setLoading(false);
     }

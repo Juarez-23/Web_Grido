@@ -74,3 +74,24 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     return NextResponse.json({ error: "Error al actualizar pedido" }, { status: 500 });
   }
 }
+
+// DELETE /api/orders/[id] — eliminar pedido (solo admin)
+export async function DELETE(_: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || (session.user as any)?.role !== "ADMIN") {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
+
+    // El pago no se borra en cascada: eliminarlo primero (los ítems sí cascadean)
+    await prisma.$transaction([
+      prisma.payment.deleteMany({ where: { orderId: params.id } }),
+      prisma.order.delete({ where: { id: params.id } }),
+    ]);
+
+    return NextResponse.json({ message: "Pedido eliminado" });
+  } catch (error) {
+    console.error("DELETE /api/orders/[id] error:", error);
+    return NextResponse.json({ error: "Error al eliminar pedido" }, { status: 500 });
+  }
+}

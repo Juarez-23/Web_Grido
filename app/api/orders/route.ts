@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { generateWhatsAppMessage, generateWhatsAppUrl } from "@/lib/whatsapp";
+import type { CheckoutFormData, CartItem } from "@/types";
 
 export const dynamic = "force-dynamic";
 
@@ -43,12 +45,6 @@ export async function GET(req: NextRequest) {
 // POST /api/orders (público — lo hace el cliente)
 export async function POST(req: NextRequest) {
   try {
-    // Verificar que la tienda esté abierta
-    const storeSetting = await prisma.setting.findUnique({ where: { key: "storeOpen" } });
-    if (storeSetting?.value === "false") {
-      return NextResponse.json({ error: "La tienda está cerrada" }, { status: 503 });
-    }
-
     const body = await req.json();
     const {
       customerName,
@@ -68,25 +64,34 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
     }
 
-    // Verificar monto mínimo
-    const settings = await prisma.setting.findMany({
-      where: { key: { in: ["minOrderAmount", "deliveryCost"] } },
+    // Una sola lectura de settings para todo lo que necesitamos
+    const settingsRows = await prisma.setting.findMany({
+      where: {
+        key: { in: ["storeOpen", "minOrderAmount", "whatsappNumber", "transferAlias", "transferCbu"] },
+      },
     });
-    const minOrder = parseFloat(
-      settings.find((s) => s.key === "minOrderAmount")?.value || "0"
-    );
+    const settings: Record<string, string> = {};
+    settingsRows.forEach((s) => (settings[s.key] = s.value));
+
+    // Tienda cerrada
+    if (settings.storeOpen === "false") {
+      return NextResponse.json({ error: "La tienda está cerrada en este momento." }, { status: 503 });
+    }
+
+    // Monto mínimo
+    const minOrder = parseFloat(settings.minOrderAmount || "0");
     if (subtotal < minOrder) {
       return NextResponse.json(
-        { error: `El pedido mínimo es ${minOrder}` },
+        { error: `El pedido mínimo es $${minOrder.toLocaleString("es-AR")}.` },
         { status: 400 }
       );
     }
 
-    // Generar número de orden secuencial
+    // Número de orden secuencial
     const lastOrder = await prisma.order.findFirst({ orderBy: { orderNumber: "desc" } });
     const orderNumber = (lastOrder?.orderNumber ?? 0) + 1;
 
-    // Crear pedido con items
+    // Crear pedido + pago en una sola operación (pago anidado)
     const order = await prisma.order.create({
       data: {
         orderNumber,
@@ -108,36 +113,51 @@ export async function POST(req: NextRequest) {
             subtotal: item.subtotal,
             flavors:
               item.flavors?.length > 0
-                ? {
-                    create: item.flavors.map((flavorId: string) => ({
-                      flavorId,
-                    })),
-                  }
+                ? { create: item.flavors.map((flavorId: string) => ({ flavorId })) }
                 : undefined,
           })),
         },
-      },
-      include: {
-        items: {
-          include: {
-            product: true,
-            flavors: { include: { flavor: true } },
+        payment: {
+          create: {
+            method: paymentMethod,
+            status: "PENDIENTE",
+            amount: parseFloat(total),
           },
         },
       },
-    });
-
-    // Crear registro de pago
-    await prisma.payment.create({
-      data: {
-        orderId: order.id,
-        method: paymentMethod,
-        status: "PENDIENTE",
-        amount: parseFloat(total),
+      include: {
+        items: { include: { product: true, flavors: { include: { flavor: true } } } },
       },
     });
 
-    return NextResponse.json({ data: order }, { status: 201 });
+    // Armar el link de WhatsApp en la misma request (evita un segundo viaje a la DB)
+    const formData: CheckoutFormData = {
+      customerName: order.customerName,
+      customerPhone: order.customerPhone,
+      address: order.address || undefined,
+      deliveryType: order.deliveryType as "DELIVERY" | "RETIRO",
+      paymentMethod: order.paymentMethod as any,
+      notes: order.notes || undefined,
+    };
+    const cartItems: CartItem[] = order.items.map((item) => ({
+      cartId: item.id,
+      product: item.product as any,
+      quantity: item.quantity,
+      selectedFlavors: item.flavors.map((f) => ({ id: f.flavor.id, name: f.flavor.name })),
+    }));
+    const message = generateWhatsAppMessage(
+      order.orderNumber,
+      formData,
+      cartItems,
+      order.subtotal,
+      order.deliveryCost,
+      order.total,
+      { transferAlias: settings.transferAlias || undefined, transferCbu: settings.transferCbu || undefined }
+    );
+    const whatsappNumber = settings.whatsappNumber || process.env.WHATSAPP_NUMBER || "5492604000000";
+    const waUrl = generateWhatsAppUrl(whatsappNumber, message);
+
+    return NextResponse.json({ data: order, waUrl }, { status: 201 });
   } catch (error) {
     console.error("POST /api/orders error:", error);
     return NextResponse.json({ error: "Error al crear pedido" }, { status: 500 });
