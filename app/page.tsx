@@ -8,6 +8,7 @@ import { ProductCard } from "@/components/client/ProductCard";
 import { ProductModal } from "@/components/client/ProductModal";
 import { CategoryFilter } from "@/components/client/CategoryFilter";
 import { PromoSection } from "@/components/client/PromoSection";
+import { PromoDelDia } from "@/components/client/PromoDelDia";
 import type { Product, Category, AppSettings } from "@/types";
 
 export default function HomePage() {
@@ -340,6 +341,9 @@ export default function HomePage() {
 
       {/* ── Content ── */}
       <main className="max-w-2xl mx-auto px-4" style={{ paddingBottom: "calc(8rem + env(safe-area-inset-bottom, 0px))" }}>
+        {/* Promo del día */}
+        <PromoDelDia />
+
         {/* Featured */}
         {!loading && featuredProducts.length > 0 && (
           <section className="mt-6">
