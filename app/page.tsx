@@ -310,8 +310,8 @@ export default function HomePage() {
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0d2050" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
             </svg>
-            <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 13, color: "#0d2050", lineHeight: 1, marginTop: 2 }}>15–20</p>
-            <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500, fontSize: 9, color: "#9ca3af", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 2 }}>min retiro</p>
+            <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 13, color: "#0d2050", lineHeight: 1, marginTop: 2 }}>Inmediato</p>
+            <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500, fontSize: 9, color: "#9ca3af", letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 2 }}>retiro</p>
           </div>
           <div className="flex flex-col items-center py-4 gap-1">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="#f59e0b" stroke="none">
