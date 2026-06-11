@@ -2,19 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { branchScopeFilter } from "@/lib/branch";
 
 export const dynamic = "force-dynamic";
 
-async function requireAdmin() {
+async function getAdminSession() {
   const session = await getServerSession(authOptions);
-  return !!session && (session.user as any)?.role === "ADMIN";
+  if (!session || (session.user as any)?.role !== "ADMIN") return null;
+  return session;
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    if (!(await requireAdmin())) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-    }
+    const session = await getAdminSession();
+    if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     const body = await req.json();
 
     // Construir objeto de update solo con campos válidos
@@ -25,6 +26,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     if (body.badge !== undefined)       data.badge       = body.badge || null;
     if (body.active !== undefined)      data.active      = body.active;
     if (body.order !== undefined)       data.order       = Number(body.order) ?? 0;
+
+    const scope = branchScopeFilter(session);
+    const existing = await prisma.promotion.findFirst({ where: { id: params.id, ...scope } });
+    if (!existing) return NextResponse.json({ error: "No encontrada" }, { status: 404 });
 
     const promotion = await prisma.promotion.update({
       where: { id: params.id },
@@ -39,9 +44,12 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
 export async function DELETE(_: NextRequest, { params }: { params: { id: string } }) {
   try {
-    if (!(await requireAdmin())) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-    }
+    const session = await getAdminSession();
+    if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    const scope = branchScopeFilter(session);
+    const existing = await prisma.promotion.findFirst({ where: { id: params.id, ...scope } });
+    if (!existing) return NextResponse.json({ error: "No encontrada" }, { status: 404 });
+
     await prisma.promotion.delete({ where: { id: params.id } });
     return NextResponse.json({ ok: true });
   } catch (error) {

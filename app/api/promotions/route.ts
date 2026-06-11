@@ -2,21 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { getPublicBranchId, getAdminBranchId } from "@/lib/branch";
 
 export const dynamic = "force-dynamic";
-
-async function requireAdmin() {
-  const session = await getServerSession(authOptions);
-  return !!session && (session.user as any)?.role === "ADMIN";
-}
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const all = searchParams.get("all") === "true";
 
+    const branchId = await getPublicBranchId(req);
+    if (!branchId) return NextResponse.json({ error: "Sucursal no especificada" }, { status: 400 });
+
     const promotions = await prisma.promotion.findMany({
-      where: all ? undefined : { active: true },
+      where: all ? { branchId } : { branchId, active: true },
       orderBy: { order: "asc" },
     });
     return NextResponse.json(
@@ -31,9 +30,13 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    if (!(await requireAdmin())) {
+    const session = await getServerSession(authOptions);
+    if (!session || (session.user as any)?.role !== "ADMIN") {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
+    const branchId = await getAdminBranchId(req, session);
+    if (!branchId) return NextResponse.json({ error: "Sucursal no especificada" }, { status: 400 });
+
     const body = await req.json();
     const promotion = await prisma.promotion.create({
       data: {
@@ -43,6 +46,7 @@ export async function POST(req: NextRequest) {
         badge: body.badge || null,
         active: body.active ?? true,
         order: Number(body.order) ?? 0,
+        branchId,
       },
     });
     return NextResponse.json({ data: promotion }, { status: 201 });

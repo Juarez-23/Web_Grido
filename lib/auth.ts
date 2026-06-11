@@ -5,27 +5,44 @@ import bcrypt from "bcryptjs";
 
 // Extender tipos de NextAuth
 declare module "next-auth" {
-  interface User { role: string }
-  interface Session { user: { name?: string | null; email?: string | null; role: string; id: string } }
+  interface User { role: string; branchId?: string | null }
+  interface Session { user: { name?: string | null; email?: string | null; role: string; id: string; branchId?: string | null } }
 }
 declare module "next-auth/jwt" {
-  interface JWT { role: string; id: string }
+  interface JWT { role: string; id: string; branchId?: string | null }
 }
 
-// Credenciales del panel admin.
-// Para producción, definir en variables de entorno:
-//   ADMIN_USERNAME       (ej: "admin")
-//   ADMIN_PASSWORD_HASH  (hash bcrypt de la contraseña — generar con bcrypt)
-// Si no están seteadas, usa el fallback de desarrollo (contraseña: "grido2026").
+// Credenciales del panel admin (multi-sucursal).
+// - Dueño: ve y administra TODAS las sucursales (branchId null).
+// - Admin de sucursal: solo su sucursal (branchId fijo).
+// Contraseña de desarrollo para todos: "grido2026".
+// En producción se pueden sobreescribir con variables de entorno por usuario.
+const DEFAULT_HASH = "$2a$10$A5x1sf87Bo2BxyaoPTsPgObB2PreWQTSDufSy3K78B.zmB4JbFmE6";
+
 const ADMIN_USERS = [
   {
-    id: "admin-1",
+    id: "owner",
     username: (process.env.ADMIN_USERNAME || "admin").toLowerCase().trim(),
-    passwordHash:
-      process.env.ADMIN_PASSWORD_HASH ||
-      "$2a$10$A5x1sf87Bo2BxyaoPTsPgObB2PreWQTSDufSy3K78B.zmB4JbFmE6",
-    name: "Administrador",
+    passwordHash: process.env.ADMIN_PASSWORD_HASH || DEFAULT_HASH,
+    name: "Dueño",
     role: "ADMIN",
+    branchId: null as string | null, // null = todas las sucursales
+  },
+  {
+    id: "admin-libertador",
+    username: (process.env.ADMIN_LIBERTADOR_USER || "libertador").toLowerCase().trim(),
+    passwordHash: process.env.ADMIN_LIBERTADOR_HASH || DEFAULT_HASH,
+    name: "Grido Libertador",
+    role: "ADMIN",
+    branchId: "branch_libertador",
+  },
+  {
+    id: "admin-salto",
+    username: (process.env.ADMIN_SALTO_USER || "salto").toLowerCase().trim(),
+    passwordHash: process.env.ADMIN_SALTO_HASH || DEFAULT_HASH,
+    name: "Grido Salto",
+    role: "ADMIN",
+    branchId: "branch_salto",
   },
 ];
 
@@ -71,6 +88,7 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           email: user.username,
           role: user.role,
+          branchId: user.branchId,
         };
       },
     }),
@@ -80,6 +98,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.role = user.role;
         token.id = user.id ?? "";
+        token.branchId = (user as any).branchId ?? null;
       }
       return token;
     },
@@ -87,6 +106,7 @@ export const authOptions: NextAuthOptions = {
       if (token && session.user) {
         session.user.role = token.role;
         session.user.id = token.id;
+        session.user.branchId = token.branchId ?? null;
       }
       return session;
     },

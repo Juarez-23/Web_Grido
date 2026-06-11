@@ -4,6 +4,7 @@ import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import { gsap } from "@/lib/gsap";
 import { PromoModal } from "@/components/client/PromoModal";
+import { withBranch } from "@/lib/clientBranch";
 
 interface Promotion {
   id: string;
@@ -27,7 +28,7 @@ export function PromoSection() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch("/api/promotions")
+    fetch(withBranch("/api/promotions"))
       .then((r) => r.json())
       .then((d) => setPromos(d.data || []));
   }, []);

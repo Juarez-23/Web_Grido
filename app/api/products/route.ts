@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { getPublicBranchId, getAdminBranchId } from "@/lib/branch";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,10 @@ export async function GET(req: NextRequest) {
     const categoryId = searchParams.get("categoryId");
     const featured = searchParams.get("featured");
 
-    const where: any = {};
+    const branchId = await getPublicBranchId(req);
+    if (!branchId) return NextResponse.json({ error: "Sucursal no especificada" }, { status: 400 });
+
+    const where: any = { branchId };
     if (active === "true") where.active = true;
     if (active === "false") where.active = false;
     if (categoryId) where.categoryId = categoryId;
@@ -43,12 +47,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
+    const branchId = await getAdminBranchId(req, session);
+    if (!branchId) return NextResponse.json({ error: "Sucursal no especificada" }, { status: 400 });
+
     const body = await req.json();
     const { name, description, price, image, maxFlavors, active, featured, categoryId } = body;
 
     if (!name || !price || !categoryId) {
       return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
     }
+
+    // La categoría debe pertenecer a la misma sucursal
+    const category = await prisma.category.findFirst({ where: { id: categoryId, branchId } });
+    if (!category) return NextResponse.json({ error: "Categoría inválida para esta sucursal" }, { status: 400 });
 
     const product = await prisma.product.create({
       data: {
@@ -60,6 +71,7 @@ export async function POST(req: NextRequest) {
         active: active !== false,
         featured: featured === true,
         categoryId,
+        branchId,
       },
       include: { category: true },
     });

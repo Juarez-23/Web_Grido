@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { generateWhatsAppMessage, generateWhatsAppUrl } from "@/lib/whatsapp";
+import { getAdminBranchId, resolveBranchId } from "@/lib/branch";
 import type { CheckoutFormData, CartItem } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -13,11 +14,14 @@ export async function GET(req: NextRequest) {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
+    const branchId = await getAdminBranchId(req, session);
+    if (!branchId) return NextResponse.json({ error: "Sucursal no especificada" }, { status: 400 });
+
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status");
     const limit = parseInt(searchParams.get("limit") || "50");
 
-    const where: any = {};
+    const where: any = { branchId };
     if (status) where.status = status;
 
     const orders = await prisma.order.findMany({
@@ -64,9 +68,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
     }
 
-    // Una sola lectura de settings para todo lo que necesitamos
+    // Sucursal del pedido (la envía el cliente)
+    const branchId = await resolveBranchId(body.branch);
+    if (!branchId) return NextResponse.json({ error: "Sucursal no especificada" }, { status: 400 });
+
+    // Una sola lectura de settings (de esta sucursal) para todo lo que necesitamos
     const settingsRows = await prisma.setting.findMany({
       where: {
+        branchId,
         key: { in: ["storeOpen", "minOrderAmount", "whatsappNumber", "transferAlias", "transferCbu"] },
       },
     });
@@ -87,8 +96,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Número de orden secuencial
-    const lastOrder = await prisma.order.findFirst({ orderBy: { orderNumber: "desc" } });
+    // Número de orden secuencial POR SUCURSAL
+    const lastOrder = await prisma.order.findFirst({
+      where: { branchId },
+      orderBy: { orderNumber: "desc" },
+    });
     const orderNumber = (lastOrder?.orderNumber ?? 0) + 1;
 
     // Las promociones no son productos reales: se incluyen en el mensaje pero no se
@@ -100,6 +112,7 @@ export async function POST(req: NextRequest) {
     const order = await prisma.order.create({
       data: {
         orderNumber,
+        branchId,
         customerName,
         customerPhone,
         address,

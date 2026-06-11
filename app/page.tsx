@@ -9,9 +9,13 @@ import { ProductModal } from "@/components/client/ProductModal";
 import { CategoryFilter } from "@/components/client/CategoryFilter";
 import { PromoSection } from "@/components/client/PromoSection";
 import { PromoDelDia } from "@/components/client/PromoDelDia";
+import { BranchSelector } from "@/components/client/BranchSelector";
+import { getBranchSlug, withBranch } from "@/lib/clientBranch";
 import type { Product, Category, AppSettings } from "@/types";
 
 export default function HomePage() {
+  const [branch, setBranch] = useState<string | null>(null);
+  const [branchChecked, setBranchChecked] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [settings, setSettings] = useState<AppSettings | null>(null);
@@ -24,14 +28,22 @@ export default function HomePage() {
   const heroRef = useRef<HTMLElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
-  // ─── Data Fetching ─────────────────────────────────────────────────────────
+  // ─── Sucursal elegida ───────────────────────────────────────────────────────
   useEffect(() => {
+    setBranch(getBranchSlug());
+    setBranchChecked(true);
+  }, []);
+
+  // ─── Data Fetching (depende de la sucursal) ─────────────────────────────────
+  useEffect(() => {
+    if (!branch) return;
+    setLoading(true);
     const fetchData = async () => {
       try {
         const [productsRes, categoriesRes, settingsRes] = await Promise.all([
-          fetch("/api/products?active=true"),
-          fetch("/api/categories?active=true"),
-          fetch("/api/settings"),
+          fetch(withBranch("/api/products?active=true")),
+          fetch(withBranch("/api/categories?active=true")),
+          fetch(withBranch("/api/settings")),
         ]);
         const [productsData, categoriesData, settingsData] = await Promise.all([
           productsRes.json(),
@@ -48,7 +60,7 @@ export default function HomePage() {
       }
     };
     fetchData();
-  }, []);
+  }, [branch]);
 
   // ─── Hero Timeline ──────────────────────────────────────────────────────────
   useGSAP(
@@ -193,9 +205,19 @@ export default function HomePage() {
     });
   };
 
+  // ─── Gate de sucursal ───────────────────────────────────────────────────────
+  // Mientras se chequea la cookie, no parpadear.
+  if (!branchChecked) {
+    return <div className="min-h-dvh bg-grido-gradient" />;
+  }
+  // Sin sucursal elegida: pantalla de selección.
+  if (!branch) {
+    return <BranchSelector onSelect={(slug) => setBranch(slug)} />;
+  }
+
   return (
     <div className="min-h-screen bg-white">
-      <Header />
+      <Header branchSlug={branch} />
       <CartDrawer />
 
       {/* ── Hero ── */}

@@ -5,13 +5,36 @@ import Link from "next/link";
 import { useCartStore } from "@/store/cartStore";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { GridoLogo } from "@/components/ui/GridoLogo";
+import { clearBranchSlug } from "@/lib/clientBranch";
 
-export function Header() {
+interface HeaderProps {
+  branchSlug?: string | null;
+}
+
+export function Header({ branchSlug }: HeaderProps) {
   const { getItemCount, toggleCart } = useCartStore();
   const count = getItemCount();
   const [mounted, setMounted] = useState(false);
+  const [branchName, setBranchName] = useState<string>("San Rafael");
 
   useEffect(() => setMounted(true), []);
+
+  // Nombre de la sucursal actual (para el switcher)
+  useEffect(() => {
+    if (!branchSlug) return;
+    fetch("/api/branches")
+      .then((r) => r.json())
+      .then((d) => {
+        const b = (d.data || []).find((x: any) => x.slug === branchSlug);
+        if (b?.name) setBranchName(b.name);
+      })
+      .catch(() => {});
+  }, [branchSlug]);
+
+  const changeBranch = () => {
+    clearBranchSlug();
+    window.location.assign("/");
+  };
 
   const headerRef = useRef<HTMLElement>(null);
   const badgeRef = useRef<HTMLSpanElement>(null);
@@ -54,9 +77,25 @@ export function Header() {
             <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "1.15rem", letterSpacing: "-0.03em", color: "#0d2050", lineHeight: 1 }}>
               grido
             </p>
-            <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#9ca3af", marginTop: 2, lineHeight: 1 }}>
-              San Rafael
-            </p>
+            {branchSlug ? (
+              <button
+                onClick={changeBranch}
+                className="flex items-center gap-1 mt-0.5 active:scale-95 transition-transform"
+                aria-label="Cambiar de sucursal"
+                style={{ lineHeight: 1 }}
+              >
+                <span style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 700, fontSize: 9, letterSpacing: "0.06em", textTransform: "uppercase", color: "#0d40e8" }}>
+                  {branchName}
+                </span>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d40e8" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+            ) : (
+              <p style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "#9ca3af", marginTop: 2, lineHeight: 1 }}>
+                San Rafael
+              </p>
+            )}
           </div>
         </div>
 

@@ -25,15 +25,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Pedido no encontrado" }, { status: 404 });
     }
 
-    // Obtener settings necesarios
-    const [whatsappSetting, aliasSetting, cbuSetting] = await Promise.all([
-      prisma.setting.findUnique({ where: { key: "whatsappNumber" } }),
-      prisma.setting.findUnique({ where: { key: "transferAlias" } }),
-      prisma.setting.findUnique({ where: { key: "transferCbu" } }),
-    ]);
-    const whatsappNumber = whatsappSetting?.value || process.env.WHATSAPP_NUMBER || "5492604000000";
-    const transferAlias = aliasSetting?.value || undefined;
-    const transferCbu = cbuSetting?.value || undefined;
+    // Obtener settings de la sucursal del pedido
+    const settingRows = await prisma.setting.findMany({
+      where: {
+        branchId: order.branchId,
+        key: { in: ["whatsappNumber", "transferAlias", "transferCbu"] },
+      },
+    });
+    const settingMap: Record<string, string> = {};
+    settingRows.forEach((s) => (settingMap[s.key] = s.value));
+    const whatsappNumber = settingMap.whatsappNumber || process.env.WHATSAPP_NUMBER || "5492604000000";
+    const transferAlias = settingMap.transferAlias || undefined;
+    const transferCbu = settingMap.transferCbu || undefined;
 
     // Construir datos para el mensaje
     const formData: CheckoutFormData = {

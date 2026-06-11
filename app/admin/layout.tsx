@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { AdminBranchProvider } from "@/components/admin/AdminBranchProvider";
 import { Toaster } from "react-hot-toast";
 import "@/app/globals.css";
 import type { Metadata } from "next";
@@ -35,7 +36,9 @@ export default async function AdminLayout({
         <div className="flex h-screen overflow-hidden">
           <AdminSidebar user={session.user as any} />
           <main className="flex-1 overflow-y-auto pt-14 md:pt-0">
-            {children}
+            <AdminBranchProvider ownBranchId={(session.user as any)?.branchId ?? null}>
+              {children}
+            </AdminBranchProvider>
           </main>
         </div>
         <Toaster position="top-right" />

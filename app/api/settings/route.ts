@@ -2,14 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { getPublicBranchId, getAdminBranchId } from "@/lib/branch";
 import type { AppSettings } from "@/types";
 
 export const dynamic = "force-dynamic";
 
 // GET /api/settings - público (para mostrar costo delivery al cliente)
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const settings = await prisma.setting.findMany();
+    const branchId = await getPublicBranchId(req);
+    if (!branchId) return NextResponse.json({ error: "Sucursal no especificada" }, { status: 400 });
+
+    const settings = await prisma.setting.findMany({ where: { branchId } });
     const map: Record<string, string> = {};
     settings.forEach((s) => (map[s.key] = s.value));
 
@@ -46,6 +50,9 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
+    const branchId = await getAdminBranchId(req, session);
+    if (!branchId) return NextResponse.json({ error: "Sucursal no especificada" }, { status: 400 });
+
     const body: Partial<AppSettings> = await req.json();
 
     const updates: Array<{ key: string; value: string }> = [];
@@ -75,13 +82,13 @@ export async function PUT(req: NextRequest) {
     if (body.deliveryZonePolygon !== undefined)
       updates.push({ key: "deliveryZonePolygon", value: body.deliveryZonePolygon });
 
-    // Upsert cada setting
+    // Upsert cada setting (por sucursal)
     await Promise.all(
       updates.map((u) =>
         prisma.setting.upsert({
-          where: { key: u.key },
+          where: { branchId_key: { branchId, key: u.key } },
           update: { value: u.value },
-          create: { key: u.key, value: u.value },
+          create: { key: u.key, value: u.value, branchId },
         })
       )
     );

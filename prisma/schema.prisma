@@ -11,8 +11,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ─── SUCURSALES ─────────────────────────────
+model Branch {
+  id         String      @id @default(cuid())
+  name       String
+  slug       String      @unique
+  active     Boolean     @default(true)
+  order      Int         @default(0)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  users      User[]
+  categories Category[]
+  products   Product[]
+  flavors    Flavor[]
+  orders     Order[]
+  settings   Setting[]
+  promotions Promotion[]
+
+  @@map("branches")
+}
+
 // ─── USUARIOS ───────────────────────────────
-// Role: "ADMIN" | "EMPLEADO"
+// Role: "ADMIN" (dueño, ve todas) | "EMPLEADO" (solo su sucursal)
 model User {
   id        String   @id @default(cuid())
   name      String
@@ -20,6 +40,8 @@ model User {
   password  String
   role      String   @default("EMPLEADO")
   active    Boolean  @default(true)
+  branchId  String?
+  branch    Branch?  @relation(fields: [branchId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -29,13 +51,17 @@ model User {
 // ─── CATEGORÍAS ─────────────────────────────
 model Category {
   id       String    @id @default(cuid())
-  name     String    @unique
-  slug     String    @unique
+  name     String
+  slug     String
   icon     String?
   order    Int       @default(0)
   active   Boolean   @default(true)
+  branchId String
+  branch   Branch    @relation(fields: [branchId], references: [id], onDelete: Cascade)
   products Product[]
 
+  @@unique([branchId, slug])
+  @@unique([branchId, name])
   @@map("categories")
 }
 
@@ -51,21 +77,27 @@ model Product {
   featured    Boolean     @default(false)
   categoryId  String
   category    Category    @relation(fields: [categoryId], references: [id])
+  branchId    String
+  branch      Branch      @relation(fields: [branchId], references: [id], onDelete: Cascade)
   orderItems  OrderItem[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
+  @@index([branchId])
   @@map("products")
 }
 
 // ─── SABORES ────────────────────────────────
 model Flavor {
   id         String            @id @default(cuid())
-  name       String            @unique
+  name       String
   available  Boolean           @default(true)
   order      Int               @default(0)
+  branchId   String
+  branch     Branch            @relation(fields: [branchId], references: [id], onDelete: Cascade)
   orderItems OrderItemFlavor[]
 
+  @@unique([branchId, name])
   @@map("flavors")
 }
 
@@ -75,7 +107,9 @@ model Flavor {
 // paymentMethod: "MERCADO_PAGO" | "TRANSFERENCIA" | "EFECTIVO"
 model Order {
   id            String      @id @default(cuid())
-  orderNumber   Int         @unique
+  orderNumber   Int
+  branchId      String
+  branch        Branch      @relation(fields: [branchId], references: [id])
   customerName  String
   customerPhone String
   address       String?
@@ -91,6 +125,8 @@ model Order {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
+  @@unique([branchId, orderNumber])
+  @@index([branchId])
   @@map("orders")
 }
 
@@ -140,10 +176,13 @@ model Payment {
 
 // ─── CONFIGURACIÓN ──────────────────────────
 model Setting {
-  id    String @id @default(cuid())
-  key   String @unique
-  value String
+  id       String @id @default(cuid())
+  key      String
+  value    String
+  branchId String
+  branch   Branch @relation(fields: [branchId], references: [id], onDelete: Cascade)
 
+  @@unique([branchId, key])
   @@map("settings")
 }
 
@@ -156,8 +195,11 @@ model Promotion {
   badge       String?
   active      Boolean  @default(true)
   order       Int      @default(0)
+  branchId    String
+  branch      Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  @@index([branchId])
   @@map("promotions")
 }

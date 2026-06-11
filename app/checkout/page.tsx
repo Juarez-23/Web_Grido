@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
 import { formatPrice } from "@/lib/whatsapp";
 import { checkDeliveryZone, OUT_OF_ZONE_MESSAGE } from "@/lib/geo";
+import { getBranchSlug, withBranch } from "@/lib/clientBranch";
 import toast from "react-hot-toast";
 import type { CheckoutFormData, AppSettings } from "@/types";
 
@@ -30,7 +31,8 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (items.length === 0) { router.replace("/"); return; }
-    fetch("/api/settings").then((r) => r.json()).then((d) => setSettings(d.data ?? null));
+    if (!getBranchSlug()) { router.replace("/"); return; }
+    fetch(withBranch("/api/settings")).then((r) => r.json()).then((d) => setSettings(d.data ?? null));
   }, []);
 
   const subtotal = getSubtotal();
@@ -125,6 +127,7 @@ export default function CheckoutPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          branch: getBranchSlug(),
           customerName: form.customerName,
           customerPhone: form.customerPhone,
           address: fullAddress,

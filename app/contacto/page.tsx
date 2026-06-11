@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { gsap } from "@/lib/gsap";
 import { useGSAP } from "@gsap/react";
 import { GridoLogo } from "@/components/ui/GridoLogo";
+import { withBranch } from "@/lib/clientBranch";
 
 const INSTAGRAM_URL = "https://www.instagram.com/grido_libertador?igsh=czh2OWo2dTBnNGwy";
 const FACEBOOK_URL = "https://www.facebook.com/share/1G3J8Q8BNy/?mibextid=wwXIfr";
@@ -19,7 +20,7 @@ export default function ContactoPage() {
   const [whatsappNumber, setWhatsappNumber] = useState(DEFAULT_PHONE);
 
   useEffect(() => {
-    fetch("/api/settings")
+    fetch(withBranch("/api/settings"))
       .then((r) => r.json())
       .then((d) => {
         if (d.data?.whatsappNumber) setWhatsappNumber(d.data.whatsappNumber);

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { getPublicBranchId, getAdminBranchId } from "@/lib/branch";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,10 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const active = searchParams.get("active");
 
-    const where: any = {};
+    const branchId = await getPublicBranchId(req);
+    if (!branchId) return NextResponse.json({ error: "Sucursal no especificada" }, { status: 400 });
+
+    const where: any = { branchId };
     if (active === "true") where.active = true;
 
     const categories = await prisma.category.findMany({
@@ -35,13 +39,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
+    const branchId = await getAdminBranchId(req, session);
+    if (!branchId) return NextResponse.json({ error: "Sucursal no especificada" }, { status: 400 });
+
     const { name, slug, icon, order } = await req.json();
     if (!name || !slug) {
       return NextResponse.json({ error: "Faltan campos" }, { status: 400 });
     }
 
     const category = await prisma.category.create({
-      data: { name, slug, icon, order: order || 0 },
+      data: { name, slug, icon, order: order || 0, branchId },
     });
 
     return NextResponse.json({ data: category }, { status: 201 });

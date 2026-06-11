@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { branchScopeFilter } from "@/lib/branch";
 
 export const dynamic = "force-dynamic";
 
@@ -11,8 +12,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
-    const order = await prisma.order.findUnique({
-      where: { id: params.id },
+    const scope = branchScopeFilter(session);
+    const order = await prisma.order.findFirst({
+      where: { id: params.id, ...scope },
       include: {
         items: {
           include: {
@@ -55,6 +57,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       return NextResponse.json({ error: "Estado inválido" }, { status: 400 });
     }
 
+    const scope = branchScopeFilter(session);
+    const existing = await prisma.order.findFirst({ where: { id: params.id, ...scope } });
+    if (!existing) return NextResponse.json({ error: "Pedido no encontrado" }, { status: 404 });
+
     const order = await prisma.order.update({
       where: { id: params.id },
       data: { status },
@@ -82,6 +88,10 @@ export async function DELETE(_: NextRequest, { params }: { params: { id: string 
     if (!session || (session.user as any)?.role !== "ADMIN") {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
+
+    const scope = branchScopeFilter(session);
+    const existing = await prisma.order.findFirst({ where: { id: params.id, ...scope } });
+    if (!existing) return NextResponse.json({ error: "Pedido no encontrado" }, { status: 404 });
 
     // El pago no se borra en cascada: eliminarlo primero (los ítems sí cascadean)
     await prisma.$transaction([

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { branchScopeFilter } from "@/lib/branch";
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +41,11 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     if (featured !== undefined) data.featured = featured;
     if (categoryId !== undefined) data.categoryId = categoryId;
 
+    // El empleado solo puede tocar productos de su sucursal
+    const scope = branchScopeFilter(session);
+    const existing = await prisma.product.findFirst({ where: { id: params.id, ...scope } });
+    if (!existing) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+
     const product = await prisma.product.update({
       where: { id: params.id },
       data,
@@ -59,6 +65,10 @@ export async function DELETE(_: NextRequest, { params }: { params: { id: string 
     if (!session || (session.user as any)?.role !== "ADMIN") {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
+
+    const scope = branchScopeFilter(session);
+    const existing = await prisma.product.findFirst({ where: { id: params.id, ...scope } });
+    if (!existing) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
 
     await prisma.product.delete({ where: { id: params.id } });
     return NextResponse.json({ message: "Producto eliminado" });

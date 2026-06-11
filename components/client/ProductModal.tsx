@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { useCartStore } from "@/store/cartStore";
 import { formatPrice } from "@/lib/whatsapp";
+import { withBranch } from "@/lib/clientBranch";
 import { gsap } from "@/lib/gsap";
 import toast from "react-hot-toast";
 import type { Product, Flavor, CartFlavor } from "@/types";
@@ -55,7 +56,7 @@ export function ProductModal({ product, onClose }: Props) {
   // ─── Flavors fetching ────────────────────────────────────────────────────────
   useEffect(() => {
     if (needsFlavors) {
-      fetch("/api/flavors")
+      fetch(withBranch("/api/flavors"))
         .then((r) => r.json())
         .then((d) => setFlavors(d.data || []))
         .finally(() => setLoadingFlavors(false));
