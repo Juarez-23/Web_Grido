@@ -40,7 +40,15 @@ UPDATE "orders"      SET "branchId" = 'branch_libertador' WHERE "branchId" IS NU
 UPDATE "settings"    SET "branchId" = 'branch_libertador' WHERE "branchId" IS NULL;
 UPDATE "promotions"  SET "branchId" = 'branch_libertador' WHERE "branchId" IS NULL;
 
--- 4) Duplicar catálogo para Salto (ids deterministas 'salto_' || id) -----
+-- 4) Quitar constraints únicas viejas (globales) ANTES de duplicar -------
+--    (si no, los nombres repetidos de Salto chocan con el unique global)
+ALTER TABLE "categories" DROP CONSTRAINT IF EXISTS "categories_name_key";
+ALTER TABLE "categories" DROP CONSTRAINT IF EXISTS "categories_slug_key";
+ALTER TABLE "flavors"    DROP CONSTRAINT IF EXISTS "flavors_name_key";
+ALTER TABLE "settings"   DROP CONSTRAINT IF EXISTS "settings_key_key";
+ALTER TABLE "orders"     DROP CONSTRAINT IF EXISTS "orders_orderNumber_key";
+
+-- 5) Duplicar catálogo para Salto (ids deterministas 'salto_' || id) -----
 --    Solo si Salto todavía no tiene categorías (evita duplicar dos veces).
 DO $$
 BEGIN
@@ -69,13 +77,6 @@ BEGIN
 
   END IF;
 END $$;
-
--- 5) Quitar constraints únicas viejas (globales) ------------------------
-ALTER TABLE "categories" DROP CONSTRAINT IF EXISTS "categories_name_key";
-ALTER TABLE "categories" DROP CONSTRAINT IF EXISTS "categories_slug_key";
-ALTER TABLE "flavors"    DROP CONSTRAINT IF EXISTS "flavors_name_key";
-ALTER TABLE "settings"   DROP CONSTRAINT IF EXISTS "settings_key_key";
-ALTER TABLE "orders"     DROP CONSTRAINT IF EXISTS "orders_orderNumber_key";
 
 -- 6) NOT NULL ahora que todo está backfilleado --------------------------
 ALTER TABLE "categories"  ALTER COLUMN "branchId" SET NOT NULL;
