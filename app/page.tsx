@@ -16,6 +16,7 @@ import type { Product, Category, AppSettings } from "@/types";
 export default function HomePage() {
   const [branch, setBranch] = useState<string | null>(null);
   const [branchChecked, setBranchChecked] = useState(false);
+  const [branchName, setBranchName] = useState<string>("Grido");
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [settings, setSettings] = useState<AppSettings | null>(null);
@@ -33,6 +34,18 @@ export default function HomePage() {
     setBranch(getBranchSlug());
     setBranchChecked(true);
   }, []);
+
+  // ─── Nombre de la sucursal (para el hero) ───────────────────────────────────
+  useEffect(() => {
+    if (!branch) return;
+    fetch("/api/branches")
+      .then((r) => r.json())
+      .then((d) => {
+        const b = (d.data || []).find((x: any) => x.slug === branch);
+        if (b?.name) setBranchName(b.name);
+      })
+      .catch(() => {});
+  }, [branch]);
 
   // ─── Data Fetching (depende de la sucursal) ─────────────────────────────────
   useEffect(() => {
@@ -296,7 +309,12 @@ export default function HomePage() {
             className="hero-title text-white mb-3"
             style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "clamp(2.2rem, 9vw, 3.2rem)", letterSpacing: "-0.03em", lineHeight: 0.93 }}
           >
-            Grido<br />El Libertador
+            {(() => {
+              const parts = branchName.trim().split(" ");
+              const first = parts.shift() || "Grido";
+              const rest = parts.join(" ");
+              return rest ? (<>{first}<br />{rest}</>) : first;
+            })()}
           </h1>
 
           {/* Dirección */}
