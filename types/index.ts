@@ -130,6 +130,17 @@ export interface AppSettings {
   transferCbu: string;
   storeOpen: boolean;
   storeClosedMessage: string;
+  // ─── Zona de delivery ───────────────────────
+  /** Latitud del local */
+  storeLat: number;
+  /** Longitud del local */
+  storeLng: number;
+  /** Radio de cobertura de delivery en km */
+  deliveryRadiusKm: number;
+  /** Tipo de zona activa: "RADIUS" (círculo) | "POLYGON" (futuro) */
+  deliveryZoneType: "RADIUS" | "POLYGON";
+  /** Vértices del polígono personalizado (futura versión), JSON */
+  deliveryZonePolygon: string;
 }
 
 // ─── API RESPONSES ──────────────────────────

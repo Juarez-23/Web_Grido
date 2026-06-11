@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
 import { formatPrice } from "@/lib/whatsapp";
+import { checkDeliveryZone, OUT_OF_ZONE_MESSAGE } from "@/lib/geo";
 import toast from "react-hot-toast";
 import type { CheckoutFormData, AppSettings } from "@/types";
 
@@ -14,6 +15,9 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [locationUrl, setLocationUrl] = useState<string | null>(null);
   const [gettingLocation, setGettingLocation] = useState(false);
+  // Validación de zona de cobertura
+  const [zoneStatus, setZoneStatus] = useState<"unknown" | "inside" | "outside">("unknown");
+  const [zoneDistance, setZoneDistance] = useState<number | null>(null);
 
   const [form, setForm] = useState<CheckoutFormData>({
     customerName: "",
@@ -56,9 +60,30 @@ export default function CheckoutPage() {
       (pos) => {
         const { latitude, longitude } = pos.coords;
         const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
-        setLocationUrl(url);
         setGettingLocation(false);
-        toast.success("📍 Ubicación obtenida");
+
+        // Validar contra la zona de cobertura configurada por el admin
+        if (settings) {
+          const result = checkDeliveryZone(
+            { lat: latitude, lng: longitude },
+            {
+              type: settings.deliveryZoneType || "RADIUS",
+              origin: { lat: settings.storeLat, lng: settings.storeLng },
+              radiusKm: settings.deliveryRadiusKm,
+            }
+          );
+          setZoneDistance(result.distanceKm);
+          if (!result.inside) {
+            setZoneStatus("outside");
+            setLocationUrl(null);
+            toast.error("Estás fuera de la zona de delivery");
+            return;
+          }
+          setZoneStatus("inside");
+        }
+
+        setLocationUrl(url);
+        toast.success("📍 Ubicación dentro de la zona de entrega");
       },
       (err) => {
         console.error("Geolocation error:", err);
@@ -80,6 +105,9 @@ export default function CheckoutPage() {
     }
     if (form.deliveryType === "DELIVERY" && !form.address?.trim()) {
       toast.error("Ingresá la dirección de entrega"); return;
+    }
+    if (form.deliveryType === "DELIVERY" && zoneStatus === "outside") {
+      toast.error("Tu ubicación está fuera de la zona de delivery"); return;
     }
     if (settings && settings.storeOpen === false) {
       toast.error("La tienda está cerrada en este momento"); return;
@@ -324,6 +352,32 @@ export default function CheckoutPage() {
                   )}
                 </button>
               )}
+              {/* Fuera de zona de cobertura */}
+              {zoneStatus === "outside" && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-3.5 flex gap-3 items-start">
+                  <span className="text-lg flex-shrink-0">🚫</span>
+                  <div className="flex-1">
+                    <p className="font-bold text-red-800 text-sm">Fuera de la zona de reparto</p>
+                    <p className="text-red-600 text-xs mt-0.5 leading-relaxed">{OUT_OF_ZONE_MESSAGE}</p>
+                    {zoneDistance !== null && (
+                      <p className="text-red-400 text-[11px] mt-1">
+                        Estás a {zoneDistance.toFixed(1)} km del local.
+                      </p>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setForm((p) => ({ ...p, deliveryType: "RETIRO" }));
+                        setZoneStatus("unknown");
+                      }}
+                      className="mt-2 text-xs font-semibold text-grido-primary underline"
+                    >
+                      Cambiar a retiro en sucursal →
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <p className="text-[11px] text-gray-400 text-center">
                 Compartí tu ubicación para que el repartidor te encuentre más rápido 🛵
               </p>
@@ -425,7 +479,7 @@ export default function CheckoutPage() {
 
           <button
             onClick={handleSubmit}
-            disabled={loading || (settings !== null && !settings?.storeOpen)}
+            disabled={loading || (settings !== null && !settings?.storeOpen) || (form.deliveryType === "DELIVERY" && zoneStatus === "outside")}
             className="w-full btn-primary h-14 text-base flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (

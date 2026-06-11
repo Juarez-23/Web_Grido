@@ -15,6 +15,7 @@ const navItems = [
   { href: "/admin/products", icon: "🍦", label: "Productos" },
   { href: "/admin/promotions", icon: "🏷️", label: "Promociones" },
   { href: "/admin/flavors", icon: "🎨", label: "Sabores" },
+  { href: "/admin/delivery-zone", icon: "📍", label: "Zona de Delivery" },
   { href: "/admin/settings", icon: "⚙️", label: "Configuración" },
 ];
 

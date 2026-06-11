@@ -21,6 +21,7 @@
     "@prisma/client": "^5.10.2",
     "bcryptjs": "^2.4.3",
     "gsap": "^3.12.5",
+    "leaflet": "^1.9.4",
     "mercadopago": "^2.0.8",
     "next": "^14.2.4",
     "next-auth": "^4.24.7",
@@ -34,6 +35,7 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
+    "@types/leaflet": "^1.9.21",
     "@types/node": "^20.14.2",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",

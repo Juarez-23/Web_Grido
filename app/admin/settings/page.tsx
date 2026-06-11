@@ -13,6 +13,11 @@ export default function AdminSettingsPage() {
     transferCbu: "",
     storeOpen: true,
     storeClosedMessage: "Estamos cerrados. ¡Volvemos pronto!",
+    storeLat: -34.617594,
+    storeLng: -68.330336,
+    deliveryRadiusKm: 5,
+    deliveryZoneType: "RADIUS",
+    deliveryZonePolygon: "",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

@@ -21,6 +21,12 @@ export async function GET() {
       transferCbu: map.transferCbu || "",
       storeOpen: map.storeOpen !== "false",
       storeClosedMessage: map.storeClosedMessage || "Estamos cerrados por el momento.",
+      // Zona de delivery — default: local Grido Av. El Libertador 962, San Rafael
+      storeLat: parseFloat(map.storeLat || "-34.617594"),
+      storeLng: parseFloat(map.storeLng || "-68.330336"),
+      deliveryRadiusKm: parseFloat(map.deliveryRadiusKm || "5"),
+      deliveryZoneType: (map.deliveryZoneType === "POLYGON" ? "POLYGON" : "RADIUS"),
+      deliveryZonePolygon: map.deliveryZonePolygon || "",
     };
 
     return NextResponse.json(
@@ -58,6 +64,16 @@ export async function PUT(req: NextRequest) {
       updates.push({ key: "storeOpen", value: String(body.storeOpen) });
     if (body.storeClosedMessage !== undefined)
       updates.push({ key: "storeClosedMessage", value: body.storeClosedMessage });
+    if (body.storeLat !== undefined)
+      updates.push({ key: "storeLat", value: String(body.storeLat) });
+    if (body.storeLng !== undefined)
+      updates.push({ key: "storeLng", value: String(body.storeLng) });
+    if (body.deliveryRadiusKm !== undefined)
+      updates.push({ key: "deliveryRadiusKm", value: String(body.deliveryRadiusKm) });
+    if (body.deliveryZoneType !== undefined)
+      updates.push({ key: "deliveryZoneType", value: body.deliveryZoneType });
+    if (body.deliveryZonePolygon !== undefined)
+      updates.push({ key: "deliveryZonePolygon", value: body.deliveryZonePolygon });
 
     // Upsert cada setting
     await Promise.all(
