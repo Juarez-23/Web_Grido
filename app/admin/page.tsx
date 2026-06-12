@@ -57,7 +57,7 @@ async function getDashboardData(branchId: string | null) {
       prodMap.set(name, (prodMap.get(name) || 0) + it.quantity);
     }
   }
-  const topProducts = [...prodMap.entries()]
+  const topProducts = Array.from(prodMap.entries())
     .map(([name, qty]) => ({ name, qty }))
     .sort((a, b) => b.qty - a.qty)
     .slice(0, 5);
