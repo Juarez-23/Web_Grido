@@ -72,10 +72,7 @@ export function BranchSelector({ onSelect }: Props) {
                 style={{ boxShadow: "0 6px 24px rgba(13,32,80,0.18)" }}
               >
                 <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0d40e8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                    <polyline points="9 22 9 12 15 12 15 22" />
-                  </svg>
+                  <GridoLogo size={30} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-gray-900 text-base leading-tight" style={{ fontFamily: "'Nunito', sans-serif" }}>

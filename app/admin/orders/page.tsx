@@ -179,6 +179,7 @@ export default function AdminOrdersPage() {
                           minute: "2-digit",
                         })}
                       </p>
+                      <p className="text-[11px] text-gray-300 mt-0.5 font-mono select-all">ID: {order.id}</p>
                     </div>
                   </div>
                   <div className="text-right flex flex-col items-end gap-1">

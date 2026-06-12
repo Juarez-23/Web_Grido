@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
       order.subtotal,
       order.deliveryCost,
       order.total,
-      { transferAlias, transferCbu, transferHolder, branchName: order.branch?.name }
+      { transferAlias, transferCbu, transferHolder, branchName: order.branch?.name, orderId: order.id }
     );
 
     const url = generateWhatsAppUrl(whatsappNumber, message);

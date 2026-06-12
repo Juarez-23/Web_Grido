@@ -15,6 +15,7 @@ interface WhatsAppOptions {
   transferCbu?: string;
   transferHolder?: string;
   branchName?: string;
+  orderId?: string;
 }
 
 // Genera el mensaje de WhatsApp con el pedido completo
@@ -27,7 +28,7 @@ export function generateWhatsAppMessage(
   total: number,
   options: WhatsAppOptions = {}
 ): string {
-  const { transferAlias, transferCbu, transferHolder, branchName } = options;
+  const { transferAlias, transferCbu, transferHolder, branchName, orderId } = options;
 
   const deliveryLabel =
     formData.deliveryType === "DELIVERY" ? "Delivery" : "Retiro en sucursal";
@@ -70,6 +71,7 @@ export function generateWhatsAppMessage(
   const headerName = (branchName || "Grido San Rafael").toUpperCase();
   let msg = `*${headerName}*\n`;
   msg += `Pedido N° ${orderNumber}\n`;
+  if (orderId) msg += `ID: ${orderId}\n`;
   msg += `${fecha} · ${hora} hs\n`;
   msg += `\n`;
 

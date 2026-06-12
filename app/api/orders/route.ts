@@ -177,7 +177,7 @@ export async function POST(req: NextRequest) {
       order.subtotal,
       order.deliveryCost,
       order.total,
-      { transferAlias: settings.transferAlias || undefined, transferCbu: settings.transferCbu || undefined, transferHolder: settings.transferHolder || undefined, branchName: branch?.name }
+      { transferAlias: settings.transferAlias || undefined, transferCbu: settings.transferCbu || undefined, transferHolder: settings.transferHolder || undefined, branchName: branch?.name, orderId: order.id }
     );
     const whatsappNumber = settings.whatsappNumber || process.env.WHATSAPP_NUMBER || "5492604000000";
     const waUrl = generateWhatsAppUrl(whatsappNumber, message);
