@@ -32,7 +32,14 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (items.length === 0) { router.replace("/"); return; }
     if (!getBranchSlug()) { router.replace("/"); return; }
-    fetch(withBranch("/api/settings")).then((r) => r.json()).then((d) => setSettings(d.data ?? null));
+    fetch(withBranch("/api/settings")).then((r) => r.json()).then((d) => {
+      const s = d.data ?? null;
+      setSettings(s);
+      // Si el delivery está desactivado, forzar retiro
+      if (s && s.deliveryEnabled === false) {
+        setForm((prev) => ({ ...prev, deliveryType: "RETIRO" }));
+      }
+    });
   }, []);
 
   const subtotal = getSubtotal();
@@ -287,9 +294,15 @@ export default function CheckoutPage() {
         {/* Tipo de entrega */}
         <section className="bg-white rounded-2xl p-4 shadow-card">
           <h2 className="font-bold mb-4 text-sm uppercase tracking-wide text-gray-500">Tipo de entrega</h2>
-          <div className="grid grid-cols-2 gap-2">
+          {settings?.deliveryEnabled === false && (
+            <div className="mb-3 bg-amber-50 border border-amber-200 rounded-xl px-3.5 py-2.5 flex items-center gap-2">
+              <span className="text-base">🏪</span>
+              <p className="text-amber-800 text-xs font-medium">Por ahora solo retiro en el local (delivery no disponible)</p>
+            </div>
+          )}
+          <div className={`grid gap-2 ${settings?.deliveryEnabled === false ? "grid-cols-1" : "grid-cols-2"}`}>
             {[
-              { value: "DELIVERY", label: "Delivery", icon: "🛵", sub: `+${formatPrice(settings?.deliveryCost ?? 1500)}` },
+              ...(settings?.deliveryEnabled === false ? [] : [{ value: "DELIVERY", label: "Delivery", icon: "🛵", sub: `+${formatPrice(settings?.deliveryCost ?? 1500)}` }]),
               { value: "RETIRO", label: "Retiro", icon: "🏪", sub: "Sin costo" },
             ].map((opt) => (
               <label

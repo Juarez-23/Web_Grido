@@ -6,6 +6,7 @@ import type { AppSettings } from "@/types";
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<AppSettings>({
+    deliveryEnabled: true,
     deliveryCost: 1500,
     minOrderAmount: 5000,
     whatsappNumber: "5492604000000",
@@ -174,7 +175,33 @@ export default function AdminSettingsPage() {
 
         {/* Delivery */}
         <div className="bg-white rounded-2xl p-5 shadow-card">
-          <h2 className="font-bold text-gray-900 mb-4">Delivery</h2>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="font-bold text-gray-900">Delivery</h2>
+              <p className="text-sm text-gray-500 mt-0.5">
+                {settings.deliveryEnabled ? "Habilitado — el cliente puede elegir envío" : "Desactivado — solo retiro (take away)"}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSettings((s) => ({ ...s, deliveryEnabled: !s.deliveryEnabled }))}
+              aria-label="Habilitar delivery"
+              style={{
+                position: "relative", flexShrink: 0, width: 52, height: 30,
+                borderRadius: 999, border: "none", cursor: "pointer", padding: 0,
+                background: settings.deliveryEnabled ? "#22c55e" : "#d1d5db",
+                transition: "background 220ms cubic-bezier(0.25,1,0.5,1)",
+              }}
+            >
+              <span style={{
+                position: "absolute", top: 3, left: settings.deliveryEnabled ? 25 : 3,
+                width: 24, height: 24, background: "white", borderRadius: "50%",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.22)",
+                transition: "left 220ms cubic-bezier(0.25,1,0.5,1)", display: "block",
+              }} />
+            </button>
+          </div>
+          {settings.deliveryEnabled && (
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-gray-600 mb-1 block">Costo de envío (ARS)</label>
@@ -185,6 +212,7 @@ export default function AdminSettingsPage() {
               <input name="minOrderAmount" type="number" value={settings.minOrderAmount} onChange={handleChange} className="input-field" placeholder="5000" />
             </div>
           </div>
+          )}
         </div>
 
         {/* Contacto / Sucursal */}

@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
     const settingsRows = await prisma.setting.findMany({
       where: {
         branchId,
-        key: { in: ["storeOpen", "minOrderAmount", "whatsappNumber", "transferAlias", "transferCbu", "transferHolder"] },
+        key: { in: ["storeOpen", "deliveryEnabled", "minOrderAmount", "whatsappNumber", "transferAlias", "transferCbu", "transferHolder"] },
       },
     });
     const settings: Record<string, string> = {};
@@ -85,6 +85,11 @@ export async function POST(req: NextRequest) {
     // Tienda cerrada
     if (settings.storeOpen === "false") {
       return NextResponse.json({ error: "La tienda está cerrada en este momento." }, { status: 503 });
+    }
+
+    // Delivery desactivado: solo retiro
+    if (settings.deliveryEnabled === "false" && deliveryType === "DELIVERY") {
+      return NextResponse.json({ error: "El delivery no está disponible. Elegí retiro en el local." }, { status: 400 });
     }
 
     // Monto mínimo

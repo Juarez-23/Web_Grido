@@ -18,6 +18,7 @@ export async function GET(req: NextRequest) {
     settings.forEach((s) => (map[s.key] = s.value));
 
     const appSettings: AppSettings = {
+      deliveryEnabled: map.deliveryEnabled !== "false",
       deliveryCost: parseFloat(map.deliveryCost || "1500"),
       minOrderAmount: parseFloat(map.minOrderAmount || "5000"),
       whatsappNumber: map.whatsappNumber || "5492604000000",
@@ -70,6 +71,8 @@ export async function PUT(req: NextRequest) {
 
     const updates: Array<{ key: string; value: string }> = [];
 
+    if (body.deliveryEnabled !== undefined)
+      updates.push({ key: "deliveryEnabled", value: String(body.deliveryEnabled) });
     if (body.deliveryCost !== undefined)
       updates.push({ key: "deliveryCost", value: String(body.deliveryCost) });
     if (body.minOrderAmount !== undefined)

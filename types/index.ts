@@ -123,6 +123,8 @@ export interface CheckoutFormData {
 
 // ─── SETTINGS ───────────────────────────────
 export interface AppSettings {
+  /** Si el delivery está habilitado. Si es false, el local solo hace take away */
+  deliveryEnabled: boolean;
   deliveryCost: number;
   minOrderAmount: number;
   whatsappNumber: string;
