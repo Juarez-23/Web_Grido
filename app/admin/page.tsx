@@ -8,7 +8,7 @@ import type { OrderStatus } from "@/types";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-const MONTHS_BACK = 6;
+const MONTHS_BACK = 1;
 
 async function getDashboardData(branchId: string | null) {
   const branchFilter = branchId ? { branchId } : {};
@@ -73,8 +73,6 @@ export default async function AdminDashboard() {
   const { todayOrders, todayRevenue, totalOrders, pendingOrders, monthly } =
     await getDashboardData(branchId);
 
-  const maxMonth = Math.max(1, ...monthly.map((m) => m.total));
-
   const stats = [
     { label: "Pedidos hoy", value: todayOrders.length, icon: "📦", color: "bg-blue-50 text-blue-700" },
     { label: "Ventas hoy", value: `$${todayRevenue.toLocaleString("es-AR")}`, icon: "💰", color: "bg-green-50 text-green-700" },
@@ -110,31 +108,24 @@ export default async function AdminDashboard() {
         ))}
       </div>
 
-      {/* Ventas mensuales */}
-      <div className="bg-white rounded-2xl shadow-card mb-6">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h2 className="font-bold text-gray-900">Ventas mensuales</h2>
-          <span className="text-xs text-gray-400">Pedidos entregados · últimos {MONTHS_BACK} meses</span>
+      {/* Ventas del mes */}
+      <div className="bg-white rounded-2xl shadow-card mb-6 p-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-bold text-gray-900">Ventas del mes</h2>
+          <span className="text-xs text-gray-400 capitalize">{monthly[0]?.label}</span>
         </div>
-        <div className="divide-y divide-gray-50">
-          {monthly.map((m) => (
-            <div key={m.label} className="px-6 py-3.5 flex items-center gap-4">
-              <div className="w-28 flex-shrink-0">
-                <p className="text-sm font-semibold text-gray-800 capitalize">{m.label}</p>
-                <p className="text-xs text-gray-400">{m.count} pedido{m.count !== 1 ? "s" : ""}</p>
-              </div>
-              {/* Barra */}
-              <div className="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full"
-                  style={{ width: `${Math.round((m.total / maxMonth) * 100)}%`, background: "#0d40e8" }}
-                />
-              </div>
-              <p className="w-28 text-right font-bold text-gray-900 text-sm">
-                ${m.total.toLocaleString("es-AR")}
-              </p>
-            </div>
-          ))}
+        <div className="flex items-end justify-between">
+          <div>
+            <p className="text-3xl font-black text-gray-900">
+              ${(monthly[0]?.total ?? 0).toLocaleString("es-AR")}
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              {monthly[0]?.count ?? 0} pedido{(monthly[0]?.count ?? 0) !== 1 ? "s" : ""} entregado{(monthly[0]?.count ?? 0) !== 1 ? "s" : ""}
+            </p>
+          </div>
+          <div className="w-12 h-12 rounded-2xl bg-green-50 text-green-700 flex items-center justify-center text-2xl">
+            💰
+          </div>
         </div>
       </div>
 
