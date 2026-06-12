@@ -2,7 +2,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminBranchProvider } from "@/components/admin/AdminBranchProvider";
-import { Toaster } from "react-hot-toast";
 import "@/app/globals.css";
 import type { Metadata } from "next";
 
@@ -24,7 +23,6 @@ export default async function AdminLayout({
       <html lang="es-AR">
         <body className="bg-gray-950 min-h-screen">
           {children}
-          <Toaster position="top-right" />
         </body>
       </html>
     );
@@ -41,7 +39,6 @@ export default async function AdminLayout({
             </AdminBranchProvider>
           </main>
         </div>
-        <Toaster position="top-right" />
       </body>
     </html>
   );
