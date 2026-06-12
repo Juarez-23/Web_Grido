@@ -169,6 +169,7 @@ export async function POST(req: NextRequest) {
         name,
       })),
     }));
+    const branch = await prisma.branch.findUnique({ where: { id: branchId }, select: { name: true } });
     const message = generateWhatsAppMessage(
       order.orderNumber,
       formData,
@@ -176,7 +177,7 @@ export async function POST(req: NextRequest) {
       order.subtotal,
       order.deliveryCost,
       order.total,
-      { transferAlias: settings.transferAlias || undefined, transferCbu: settings.transferCbu || undefined, transferHolder: settings.transferHolder || undefined }
+      { transferAlias: settings.transferAlias || undefined, transferCbu: settings.transferCbu || undefined, transferHolder: settings.transferHolder || undefined, branchName: branch?.name }
     );
     const whatsappNumber = settings.whatsappNumber || process.env.WHATSAPP_NUMBER || "5492604000000";
     const waUrl = generateWhatsAppUrl(whatsappNumber, message);

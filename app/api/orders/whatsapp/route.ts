@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
     const order = await prisma.order.findUnique({
       where: { id: orderId },
       include: {
+        branch: { select: { name: true } },
         items: {
           include: {
             product: { include: { category: true } },
@@ -66,7 +67,7 @@ export async function POST(req: NextRequest) {
       order.subtotal,
       order.deliveryCost,
       order.total,
-      { transferAlias, transferCbu, transferHolder }
+      { transferAlias, transferCbu, transferHolder, branchName: order.branch?.name }
     );
 
     const url = generateWhatsAppUrl(whatsappNumber, message);
