@@ -33,11 +33,69 @@ export default function AdminPromotionsPage() {
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // ─── Promo del día (guardada en settings, por sucursal) ────────────────────
+  const [pd, setPd] = useState({ active: false, name: "", detail: "", price: 0, image: "" });
+  const [pdSaving, setPdSaving] = useState(false);
+  const [pdUploading, setPdUploading] = useState(false);
+  const pdFileRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     fetch("/api/promotions?all=true")
       .then((r) => r.json())
       .then((d) => { setPromos(d.data || []); setLoading(false); });
+
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.data) setPd({
+          active: !!d.data.promoDelDiaActive,
+          name: d.data.promoDelDiaName || "",
+          detail: d.data.promoDelDiaDetail || "",
+          price: d.data.promoDelDiaPrice || 0,
+          image: d.data.promoDelDiaImage || "",
+        });
+      });
   }, []);
+
+  const uploadPdImage = async (file: File) => {
+    setPdUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok || !data.url) throw new Error();
+      setPd((p) => ({ ...p, image: data.url }));
+      toast.success("Imagen subida");
+    } catch {
+      toast.error("Error al subir la imagen");
+    } finally {
+      setPdUploading(false);
+    }
+  };
+
+  const savePd = async () => {
+    setPdSaving(true);
+    try {
+      const res = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          promoDelDiaActive: pd.active,
+          promoDelDiaName: pd.name,
+          promoDelDiaDetail: pd.detail,
+          promoDelDiaPrice: Number(pd.price) || 0,
+          promoDelDiaImage: pd.image,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Promo del día guardada");
+    } catch {
+      toast.error("No se pudo guardar la promo del día");
+    } finally {
+      setPdSaving(false);
+    }
+  };
 
   const openCreate = () => { setEditing(null); setForm(EMPTY); setShowForm(true); };
   const openEdit = (p: Promotion) => {
@@ -116,6 +174,72 @@ export default function AdminPromotionsPage() {
         </div>
         <button onClick={openCreate} className="btn-primary flex items-center gap-2">
           <span>+</span> Nueva promo
+        </button>
+      </div>
+
+      {/* ── Promo del día (destacada) ── */}
+      <div className="bg-white rounded-2xl shadow-card p-5 mb-6 border-2 border-amber-100">
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">🔥</span>
+            <h2 className="font-bold text-gray-900">Promo del día</h2>
+          </div>
+          <button
+            type="button"
+            onClick={() => setPd((p) => ({ ...p, active: !p.active }))}
+            aria-label="Activar promo del día"
+            style={{
+              position: "relative", flexShrink: 0, width: 52, height: 30,
+              borderRadius: 999, border: "none", cursor: "pointer", padding: 0,
+              background: pd.active ? "#22c55e" : "#d1d5db",
+              transition: "background 220ms cubic-bezier(0.25,1,0.5,1)",
+            }}
+          >
+            <span style={{
+              position: "absolute", top: 3, left: pd.active ? 25 : 3,
+              width: 24, height: 24, background: "white", borderRadius: "50%",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.22)",
+              transition: "left 220ms cubic-bezier(0.25,1,0.5,1)", display: "block",
+            }} />
+          </button>
+        </div>
+        <p className="text-sm text-gray-500 mb-4">Se muestra destacada en grande en la página principal</p>
+
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-3">
+            <div>
+              <label className="text-sm font-medium text-gray-600 mb-1 block">Título</label>
+              <input value={pd.name} onChange={(e) => setPd({ ...pd, name: e.target.value })} className="input-field" placeholder="Promo Mundialista" />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-600 mb-1 block">Detalle</label>
+              <input value={pd.detail} onChange={(e) => setPd({ ...pd, detail: e.target.value })} className="input-field" placeholder="Kilo + ½ Kilo + Empanadas" />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-600 mb-1 block">Precio (ARS)</label>
+              <input type="number" value={pd.price} onChange={(e) => setPd({ ...pd, price: Number(e.target.value) })} className="input-field" placeholder="22100" />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-gray-600 mb-1.5 block">Imagen</label>
+            <div className="relative w-full h-36 rounded-xl overflow-hidden bg-gray-50 mb-2 flex items-center justify-center">
+              {pd.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={pd.image} alt="Promo del día" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-gray-300 text-3xl">🖼️</span>
+              )}
+            </div>
+            <input ref={pdFileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadPdImage(f); e.target.value = ""; }} />
+            <button type="button" onClick={() => pdFileRef.current?.click()} disabled={pdUploading} className="w-full border-2 border-grido-primary text-grido-primary font-semibold rounded-xl py-2.5 text-sm active:scale-95 transition-transform disabled:opacity-50">
+              {pdUploading ? "Subiendo..." : pd.image ? "Cambiar imagen" : "Subir imagen"}
+            </button>
+          </div>
+        </div>
+
+        <button onClick={savePd} disabled={pdSaving} className="w-full btn-primary h-11 mt-4">
+          {pdSaving ? "Guardando..." : "Guardar promo del día"}
         </button>
       </div>
 
