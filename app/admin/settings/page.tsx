@@ -18,10 +18,16 @@ export default function AdminSettingsPage() {
     deliveryRadiusKm: 5,
     deliveryZoneType: "RADIUS",
     deliveryZonePolygon: "",
+    promoDelDiaActive: false,
+    promoDelDiaName: "",
+    promoDelDiaDetail: "",
+    promoDelDiaPrice: 0,
+    promoDelDiaImage: "",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [togglingStore, setTogglingStore] = useState(false);
+  const [uploadingPromo, setUploadingPromo] = useState(false);
 
   useEffect(() => {
     fetch("/api/settings")
@@ -62,6 +68,25 @@ export default function AdminSettingsPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setSettings((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handlePromoImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingPromo(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok || !data.url) throw new Error();
+      setSettings((prev) => ({ ...prev, promoDelDiaImage: data.url }));
+      toast.success("Imagen subida");
+    } catch {
+      toast.error("No se pudo subir la imagen");
+    } finally {
+      setUploadingPromo(false);
+    }
   };
 
   const handleSave = async () => {
@@ -174,6 +199,68 @@ export default function AdminSettingsPage() {
               <input name="minOrderAmount" type="number" value={settings.minOrderAmount} onChange={handleChange} className="input-field" placeholder="5000" />
             </div>
           </div>
+        </div>
+
+        {/* Promo del día */}
+        <div className="bg-white rounded-2xl p-5 shadow-card">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="font-bold text-gray-900">Promo del día</h2>
+              <p className="text-sm text-gray-500 mt-0.5">Se muestra destacada en la página principal</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSettings((s) => ({ ...s, promoDelDiaActive: !s.promoDelDiaActive }))}
+              aria-label="Activar promo del día"
+              style={{
+                position: "relative", flexShrink: 0, width: 52, height: 30,
+                borderRadius: 999, border: "none", cursor: "pointer", padding: 0,
+                background: settings.promoDelDiaActive ? "#22c55e" : "#d1d5db",
+                transition: "background 220ms cubic-bezier(0.25,1,0.5,1)",
+              }}
+            >
+              <span style={{
+                position: "absolute", top: 3, left: settings.promoDelDiaActive ? 25 : 3,
+                width: 24, height: 24, background: "white", borderRadius: "50%",
+                boxShadow: "0 1px 4px rgba(0,0,0,0.22)",
+                transition: "left 220ms cubic-bezier(0.25,1,0.5,1)", display: "block",
+              }} />
+            </button>
+          </div>
+
+          {settings.promoDelDiaActive && (
+            <div className="space-y-3 pt-1">
+              <div>
+                <label className="text-sm font-medium text-gray-600 mb-1 block">Título</label>
+                <input name="promoDelDiaName" value={settings.promoDelDiaName} onChange={handleChange} className="input-field" placeholder="Promo Mundialista" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600 mb-1 block">Detalle</label>
+                <input name="promoDelDiaDetail" value={settings.promoDelDiaDetail} onChange={handleChange} className="input-field" placeholder="Kilo + ½ Kilo + Empanadas" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600 mb-1 block">Precio (ARS)</label>
+                <input name="promoDelDiaPrice" type="number" value={settings.promoDelDiaPrice} onChange={handleChange} className="input-field" placeholder="22100" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600 mb-1.5 block">Imagen</label>
+                <div className="flex items-center gap-3">
+                  <div className="w-20 h-20 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                    {settings.promoDelDiaImage ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={settings.promoDelDiaImage} alt="Promo" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-gray-300 text-2xl">🖼️</span>
+                    )}
+                  </div>
+                  <label className="cursor-pointer inline-flex items-center gap-2 border-2 border-grido-primary text-grido-primary font-semibold rounded-xl px-4 py-2 text-sm active:scale-95 transition-transform">
+                    {uploadingPromo ? "Subiendo..." : "Subir imagen"}
+                    <input type="file" accept="image/*" onChange={handlePromoImage} className="hidden" disabled={uploadingPromo} />
+                  </label>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* WhatsApp */}

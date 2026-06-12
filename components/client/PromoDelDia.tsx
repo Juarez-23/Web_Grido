@@ -1,22 +1,29 @@
 "use client";
 
 import { useCartStore } from "@/store/cartStore";
-import type { Product } from "@/types";
+import type { Product, AppSettings } from "@/types";
 import { formatPrice } from "@/lib/whatsapp";
 import toast from "react-hot-toast";
 
-// ─── Datos de la Promo del día ──────────────────────────────────────────────
-// Para cambiarla, reemplazá la imagen /public/promo-productos.webp y estos valores.
-const PROMO = {
-  id: "promo-del-dia",
-  name: "Promo Mundialista",
-  detail: "Kilo + ½ Kilo + Empanadas",
-  price: 22100,
-  image: "/promo-productos.webp",
-};
+interface Props {
+  settings: AppSettings | null;
+}
 
-export function PromoDelDia() {
+export function PromoDelDia({ settings }: Props) {
   const { addItem, openCart } = useCartStore();
+
+  // No mostrar si está desactivada o sin datos cargados
+  if (!settings || !settings.promoDelDiaActive || !settings.promoDelDiaName) {
+    return null;
+  }
+
+  const PROMO = {
+    id: "promo-del-dia",
+    name: settings.promoDelDiaName,
+    detail: settings.promoDelDiaDetail,
+    price: settings.promoDelDiaPrice,
+    image: settings.promoDelDiaImage || "/promo-productos.webp",
+  };
 
   const handleAdd = () => {
     const virtualProduct: Product = {

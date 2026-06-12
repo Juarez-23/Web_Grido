@@ -31,6 +31,12 @@ export async function GET(req: NextRequest) {
       deliveryRadiusKm: parseFloat(map.deliveryRadiusKm || "5"),
       deliveryZoneType: (map.deliveryZoneType === "POLYGON" ? "POLYGON" : "RADIUS"),
       deliveryZonePolygon: map.deliveryZonePolygon || "",
+      // Promo del día
+      promoDelDiaActive: map.promoDelDiaActive === "true",
+      promoDelDiaName: map.promoDelDiaName || "",
+      promoDelDiaDetail: map.promoDelDiaDetail || "",
+      promoDelDiaPrice: parseFloat(map.promoDelDiaPrice || "0"),
+      promoDelDiaImage: map.promoDelDiaImage || "",
     };
 
     return NextResponse.json(
@@ -81,6 +87,16 @@ export async function PUT(req: NextRequest) {
       updates.push({ key: "deliveryZoneType", value: body.deliveryZoneType });
     if (body.deliveryZonePolygon !== undefined)
       updates.push({ key: "deliveryZonePolygon", value: body.deliveryZonePolygon });
+    if (body.promoDelDiaActive !== undefined)
+      updates.push({ key: "promoDelDiaActive", value: String(body.promoDelDiaActive) });
+    if (body.promoDelDiaName !== undefined)
+      updates.push({ key: "promoDelDiaName", value: body.promoDelDiaName });
+    if (body.promoDelDiaDetail !== undefined)
+      updates.push({ key: "promoDelDiaDetail", value: body.promoDelDiaDetail });
+    if (body.promoDelDiaPrice !== undefined)
+      updates.push({ key: "promoDelDiaPrice", value: String(body.promoDelDiaPrice) });
+    if (body.promoDelDiaImage !== undefined)
+      updates.push({ key: "promoDelDiaImage", value: body.promoDelDiaImage });
 
     // Upsert cada setting (por sucursal)
     await Promise.all(

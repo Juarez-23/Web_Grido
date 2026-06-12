@@ -141,6 +141,17 @@ export interface AppSettings {
   deliveryZoneType: "RADIUS" | "POLYGON";
   /** Vértices del polígono personalizado (futura versión), JSON */
   deliveryZonePolygon: string;
+  // ─── Promo del día ──────────────────────────
+  /** Mostrar la promo del día en la home */
+  promoDelDiaActive: boolean;
+  /** Título de la promo del día */
+  promoDelDiaName: string;
+  /** Detalle/descripción corta */
+  promoDelDiaDetail: string;
+  /** Precio */
+  promoDelDiaPrice: number;
+  /** URL de la imagen */
+  promoDelDiaImage: string;
 }
 
 // ─── API RESPONSES ──────────────────────────
