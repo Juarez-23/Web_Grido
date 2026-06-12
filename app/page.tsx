@@ -24,6 +24,7 @@ export default function HomePage() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [isChangingCat, setIsChangingCat] = useState(false);
+  const [showClosedModal, setShowClosedModal] = useState(false);
 
   // Refs para animaciones
   const heroRef = useRef<HTMLElement>(null);
@@ -66,6 +67,10 @@ export default function HomePage() {
         setProducts(productsData.data || []);
         setCategories(categoriesData.data || []);
         setSettings(settingsData.data ?? null);
+        // Si la tienda está cerrada, mostrar el aviso al entrar
+        if (settingsData.data && settingsData.data.storeOpen === false) {
+          setShowClosedModal(true);
+        }
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
@@ -464,6 +469,44 @@ export default function HomePage() {
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
         />
+      )}
+
+      {/* Aviso de tienda cerrada al entrar */}
+      {showClosedModal && settings && !settings.storeOpen && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center p-5"
+          style={{ background: "rgba(8,18,80,0.55)", backdropFilter: "blur(3px)" }}
+          onClick={() => setShowClosedModal(false)}
+        >
+          <div
+            className="bg-white rounded-3xl w-full max-w-sm overflow-hidden"
+            style={{ boxShadow: "0 20px 60px rgba(8,18,80,0.4)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex flex-col items-center text-center px-6 pt-8 pb-6">
+              <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-4">
+                <span className="text-3xl">🔴</span>
+              </div>
+              <h2
+                className="text-gray-900 mb-2"
+                style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "1.4rem" }}
+              >
+                No estamos tomando pedidos
+              </h2>
+              <p className="text-gray-500 text-sm leading-relaxed">
+                {settings.storeClosedMessage || "Estamos cerrados por el momento. ¡Volvemos pronto!"}
+              </p>
+            </div>
+            <div className="px-6 pb-6">
+              <button
+                onClick={() => setShowClosedModal(false)}
+                className="w-full btn-primary h-12"
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
