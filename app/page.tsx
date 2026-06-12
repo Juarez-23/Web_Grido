@@ -289,8 +289,8 @@ export default function HomePage() {
         <div
           className="hero-content relative h-full flex flex-col justify-center px-5 pb-8 max-w-xs md:max-w-[44%] md:px-8"
         >
-          {/* Badge */}
-          <div className="mb-4">
+          {/* Badge — fijo arriba del bloque */}
+          <div className="absolute top-3 left-5 md:left-8">
             {settings === null || settings.storeOpen ? (
               <span className="hero-badge inline-flex items-center gap-1.5 bg-white/[0.15] text-white text-[11px] font-semibold px-3 py-1.5 rounded-full border border-white/[0.20]">
                 <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
@@ -323,7 +323,7 @@ export default function HomePage() {
               <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
             </svg>
             <p className="text-white/70 text-sm" style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 500 }}>
-              Av. Libertador · San Rafael, Mendoza
+              {settings?.address || "San Rafael, Mendoza"}
             </p>
           </div>
           <p className="hero-sub2 text-white/40 text-xs mb-6" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400 }}>

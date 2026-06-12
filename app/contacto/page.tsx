@@ -6,27 +6,33 @@ import { gsap } from "@/lib/gsap";
 import { useGSAP } from "@gsap/react";
 import { GridoLogo } from "@/components/ui/GridoLogo";
 import { withBranch } from "@/lib/clientBranch";
+import type { AppSettings } from "@/types";
 
-const INSTAGRAM_URL = "https://www.instagram.com/grido_libertador?igsh=czh2OWo2dTBnNGwy";
-const FACEBOOK_URL = "https://www.facebook.com/share/1G3J8Q8BNy/?mibextid=wwXIfr";
-const ADDRESS = "Av. El Libertador 962, San Rafael, Mendoza";
-const MAPS_EMBED =
-  "https://maps.google.com/maps?q=Grido+Heladeria+Av+El+Libertador+962+San+Rafael+Mendoza+Argentina&output=embed&z=17";
 const DEFAULT_PHONE = "5492604000000";
+const DEFAULT_ADDRESS = "Av. El Libertador 962, San Rafael, Mendoza";
+const DEFAULT_MAPS_QUERY = "Grido Heladeria Av El Libertador 962 San Rafael Mendoza";
 
 export default function ContactoPage() {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
-  const [whatsappNumber, setWhatsappNumber] = useState(DEFAULT_PHONE);
+  const [settings, setSettings] = useState<AppSettings | null>(null);
 
   useEffect(() => {
     fetch(withBranch("/api/settings"))
       .then((r) => r.json())
-      .then((d) => {
-        if (d.data?.whatsappNumber) setWhatsappNumber(d.data.whatsappNumber);
-      })
+      .then((d) => setSettings(d.data ?? null))
       .catch(() => {});
   }, []);
+
+  const whatsappNumber = settings?.whatsappNumber || DEFAULT_PHONE;
+  const address = settings?.address || DEFAULT_ADDRESS;
+  const instagramUrl = settings?.instagramUrl || "https://www.instagram.com/";
+  const facebookUrl = settings?.facebookUrl || "https://www.facebook.com/";
+  const mapsQuery = settings?.mapsQuery || DEFAULT_MAPS_QUERY;
+  const mapsEmbed = `https://maps.google.com/maps?q=${encodeURIComponent(mapsQuery)}&output=embed&z=16`;
+  const mapsLink = `https://maps.google.com/?q=${encodeURIComponent(mapsQuery)}`;
+  const hoursLines = (settings?.hours || "Lunes a viernes: 12:00 a 22:30\nSábados: 11:00 a 23:00\nDomingos: 12:00 a 22:00")
+    .split("\n").map((l) => l.trim()).filter(Boolean);
 
   useGSAP(
     () => {
@@ -185,7 +191,7 @@ export default function ContactoPage() {
 
           {/* Dirección */}
           <a
-            href={`https://maps.google.com/?q=Grido+San+Rafael+Mendoza`}
+            href={mapsLink}
             target="_blank"
             rel="noopener noreferrer"
             className="info-card block"
@@ -213,7 +219,7 @@ export default function ContactoPage() {
                   Ubicación
                 </p>
                 <p style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: "0.8rem", color: "#6b7280", marginTop: 2 }}>
-                  {ADDRESS}
+                  {address}
                 </p>
               </div>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
@@ -278,20 +284,25 @@ export default function ContactoPage() {
                   Horario
                 </p>
                 <div className="mt-2 space-y-1">
-                  {[
-                    { days: "Lunes a viernes", hours: "12:00 – 22:30" },
-                    { days: "Sábados", hours: "11:00 – 23:00" },
-                    { days: "Domingos", hours: "12:00 – 22:00" },
-                  ].map((h) => (
-                    <div key={h.days} className="flex justify-between gap-4">
-                      <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: "0.78rem", color: "#6b7280" }}>
-                        {h.days}
-                      </span>
-                      <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: "0.78rem", color: "#374151" }}>
-                        {h.hours}
-                      </span>
-                    </div>
-                  ))}
+                  {hoursLines.map((line, i) => {
+                    // Si la línea tiene "Días: horario", separar en dos columnas
+                    const idx = line.indexOf(":");
+                    const hasColon = idx > 0 && idx < line.length - 1;
+                    const days = hasColon ? line.slice(0, idx).trim() : line;
+                    const hrs = hasColon ? line.slice(idx + 1).trim() : "";
+                    return (
+                      <div key={i} className="flex justify-between gap-4">
+                        <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: "0.78rem", color: "#6b7280" }}>
+                          {days}
+                        </span>
+                        {hrs && (
+                          <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 500, fontSize: "0.78rem", color: "#374151" }}>
+                            {hrs}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -317,7 +328,7 @@ export default function ContactoPage() {
               style={{ border: 0, display: "block" }}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              src={MAPS_EMBED}
+              src={mapsEmbed}
               allowFullScreen
             />
           </div>
@@ -335,7 +346,7 @@ export default function ContactoPage() {
 
             {/* Instagram */}
             <a
-              href={INSTAGRAM_URL}
+              href={instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="social-card block"
@@ -369,7 +380,7 @@ export default function ContactoPage() {
 
             {/* Facebook */}
             <a
-              href={FACEBOOK_URL}
+              href={facebookUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="social-card block"

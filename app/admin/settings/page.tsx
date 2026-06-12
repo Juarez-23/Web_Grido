@@ -23,6 +23,11 @@ export default function AdminSettingsPage() {
     promoDelDiaDetail: "",
     promoDelDiaPrice: 0,
     promoDelDiaImage: "",
+    address: "",
+    hours: "",
+    instagramUrl: "",
+    facebookUrl: "",
+    mapsQuery: "",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -197,6 +202,36 @@ export default function AdminSettingsPage() {
             <div>
               <label className="text-sm font-medium text-gray-600 mb-1 block">Pedido mínimo (ARS)</label>
               <input name="minOrderAmount" type="number" value={settings.minOrderAmount} onChange={handleChange} className="input-field" placeholder="5000" />
+            </div>
+          </div>
+        </div>
+
+        {/* Contacto / Sucursal */}
+        <div className="bg-white rounded-2xl p-5 shadow-card">
+          <h2 className="font-bold text-gray-900 mb-1">Contacto y ubicación</h2>
+          <p className="text-sm text-gray-500 mb-4">Se muestra en la página de Contacto y en el inicio</p>
+          <div className="space-y-3">
+            <div>
+              <label className="text-sm font-medium text-gray-600 mb-1 block">Dirección</label>
+              <input name="address" value={settings.address} onChange={handleChange} className="input-field" placeholder="Salto de las Rosas, San Rafael, Mendoza" />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-600 mb-1 block">Horarios (una línea por rango)</label>
+              <textarea name="hours" value={settings.hours} onChange={handleChange} rows={3} className="input-field resize-none" placeholder={"Lunes a jueves: 12:00 a 22:00\nViernes a domingos: 12:00 a 23:00"} />
+              <p className="text-xs text-gray-400 mt-1">Formato sugerido: <strong>Días: horario</strong> (ej. "Lunes a jueves: 12:00 a 22:00")</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-600 mb-1 block">Búsqueda en Google Maps</label>
+              <input name="mapsQuery" value={settings.mapsQuery} onChange={handleChange} className="input-field" placeholder="Grido Salto de las Rosas San Rafael Mendoza" />
+              <p className="text-xs text-gray-400 mt-1">El nombre/dirección que se busca en el mapa (sin link, solo texto)</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-600 mb-1 block">Instagram (URL)</label>
+              <input name="instagramUrl" value={settings.instagramUrl} onChange={handleChange} className="input-field" placeholder="https://www.instagram.com/grido.salto" />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-600 mb-1 block">Facebook (URL)</label>
+              <input name="facebookUrl" value={settings.facebookUrl} onChange={handleChange} className="input-field" placeholder="https://www.facebook.com/..." />
             </div>
           </div>
         </div>

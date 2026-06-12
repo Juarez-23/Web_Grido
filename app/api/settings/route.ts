@@ -37,6 +37,12 @@ export async function GET(req: NextRequest) {
       promoDelDiaDetail: map.promoDelDiaDetail || "",
       promoDelDiaPrice: parseFloat(map.promoDelDiaPrice || "0"),
       promoDelDiaImage: map.promoDelDiaImage || "",
+      // Contacto / sucursal
+      address: map.address || "Av. El Libertador 962, San Rafael, Mendoza",
+      hours: map.hours || "Lunes a viernes: 12:00 a 22:30\nSábados: 11:00 a 23:00\nDomingos: 12:00 a 22:00",
+      instagramUrl: map.instagramUrl || "https://www.instagram.com/grido_libertador",
+      facebookUrl: map.facebookUrl || "https://www.facebook.com/",
+      mapsQuery: map.mapsQuery || "Grido Heladeria Av El Libertador 962 San Rafael Mendoza",
     };
 
     return NextResponse.json(
@@ -97,6 +103,16 @@ export async function PUT(req: NextRequest) {
       updates.push({ key: "promoDelDiaPrice", value: String(body.promoDelDiaPrice) });
     if (body.promoDelDiaImage !== undefined)
       updates.push({ key: "promoDelDiaImage", value: body.promoDelDiaImage });
+    if (body.address !== undefined)
+      updates.push({ key: "address", value: body.address });
+    if (body.hours !== undefined)
+      updates.push({ key: "hours", value: body.hours });
+    if (body.instagramUrl !== undefined)
+      updates.push({ key: "instagramUrl", value: body.instagramUrl });
+    if (body.facebookUrl !== undefined)
+      updates.push({ key: "facebookUrl", value: body.facebookUrl });
+    if (body.mapsQuery !== undefined)
+      updates.push({ key: "mapsQuery", value: body.mapsQuery });
 
     // Upsert cada setting (por sucursal)
     await Promise.all(

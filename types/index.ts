@@ -152,6 +152,17 @@ export interface AppSettings {
   promoDelDiaPrice: number;
   /** URL de la imagen */
   promoDelDiaImage: string;
+  // ─── Contacto / Sucursal ────────────────────
+  /** Dirección del local */
+  address: string;
+  /** Horarios (texto multilínea, una línea por rango) */
+  hours: string;
+  /** URL de Instagram */
+  instagramUrl: string;
+  /** URL de Facebook */
+  facebookUrl: string;
+  /** Texto de búsqueda para el mapa de Google (sin API key) */
+  mapsQuery: string;
 }
 
 // ─── API RESPONSES ──────────────────────────
