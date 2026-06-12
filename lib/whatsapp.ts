@@ -13,6 +13,7 @@ export function formatPrice(amount: number): string {
 interface WhatsAppOptions {
   transferAlias?: string;
   transferCbu?: string;
+  transferHolder?: string;
 }
 
 // Genera el mensaje de WhatsApp con el pedido completo
@@ -25,7 +26,7 @@ export function generateWhatsAppMessage(
   total: number,
   options: WhatsAppOptions = {}
 ): string {
-  const { transferAlias, transferCbu } = options;
+  const { transferAlias, transferCbu, transferHolder } = options;
 
   const deliveryLabel =
     formData.deliveryType === "DELIVERY" ? "Delivery" : "Retiro en sucursal";
@@ -96,6 +97,7 @@ export function generateWhatsAppMessage(
   if (formData.paymentMethod === "TRANSFERENCIA") {
     if (transferAlias) msg += `Alias: *${transferAlias}*\n`;
     if (transferCbu) msg += `CBU: *${transferCbu}*\n`;
+    if (transferHolder) msg += `Titular: *${transferHolder}*\n`;
     msg += `⚠️ *Recordá enviar el comprobante por este chat.*\n`;
   }
 

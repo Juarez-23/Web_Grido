@@ -23,6 +23,7 @@ export async function GET(req: NextRequest) {
       whatsappNumber: map.whatsappNumber || "5492604000000",
       transferAlias: map.transferAlias || "",
       transferCbu: map.transferCbu || "",
+      transferHolder: map.transferHolder || "",
       storeOpen: map.storeOpen !== "false",
       storeClosedMessage: map.storeClosedMessage || "Estamos cerrados por el momento.",
       // Zona de delivery — default: local Grido Av. El Libertador 962, San Rafael
@@ -79,6 +80,8 @@ export async function PUT(req: NextRequest) {
       updates.push({ key: "transferAlias", value: body.transferAlias });
     if (body.transferCbu !== undefined)
       updates.push({ key: "transferCbu", value: body.transferCbu });
+    if (body.transferHolder !== undefined)
+      updates.push({ key: "transferHolder", value: body.transferHolder });
     if (body.storeOpen !== undefined)
       updates.push({ key: "storeOpen", value: String(body.storeOpen) });
     if (body.storeClosedMessage !== undefined)

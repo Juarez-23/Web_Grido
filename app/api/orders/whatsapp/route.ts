@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     const settingRows = await prisma.setting.findMany({
       where: {
         branchId: order.branchId,
-        key: { in: ["whatsappNumber", "transferAlias", "transferCbu"] },
+        key: { in: ["whatsappNumber", "transferAlias", "transferCbu", "transferHolder"] },
       },
     });
     const settingMap: Record<string, string> = {};
@@ -37,6 +37,7 @@ export async function POST(req: NextRequest) {
     const whatsappNumber = settingMap.whatsappNumber || process.env.WHATSAPP_NUMBER || "5492604000000";
     const transferAlias = settingMap.transferAlias || undefined;
     const transferCbu = settingMap.transferCbu || undefined;
+    const transferHolder = settingMap.transferHolder || undefined;
 
     // Construir datos para el mensaje
     const formData: CheckoutFormData = {
@@ -65,7 +66,7 @@ export async function POST(req: NextRequest) {
       order.subtotal,
       order.deliveryCost,
       order.total,
-      { transferAlias, transferCbu }
+      { transferAlias, transferCbu, transferHolder }
     );
 
     const url = generateWhatsAppUrl(whatsappNumber, message);

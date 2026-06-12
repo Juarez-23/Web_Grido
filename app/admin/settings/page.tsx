@@ -11,6 +11,7 @@ export default function AdminSettingsPage() {
     whatsappNumber: "5492604000000",
     transferAlias: "",
     transferCbu: "",
+    transferHolder: "",
     storeOpen: true,
     storeClosedMessage: "Estamos cerrados. ¡Volvemos pronto!",
     storeLat: -34.617594,
@@ -228,6 +229,11 @@ export default function AdminSettingsPage() {
         <div className="bg-white rounded-2xl p-5 shadow-card">
           <h2 className="font-bold text-gray-900 mb-4">Transferencia bancaria</h2>
           <div className="space-y-3">
+            <div>
+              <label className="text-sm font-medium text-gray-600 mb-1 block">Titular de la cuenta</label>
+              <input name="transferHolder" value={settings.transferHolder} onChange={handleChange} className="input-field" placeholder="Juan Pérez" />
+              <p className="text-xs text-gray-400 mt-1">El nombre que verá el cliente para saber a quién transferir</p>
+            </div>
             <div>
               <label className="text-sm font-medium text-gray-600 mb-1 block">Alias</label>
               <input name="transferAlias" value={settings.transferAlias} onChange={handleChange} className="input-field" placeholder="grido.sanrafael.mp" />

@@ -128,6 +128,8 @@ export interface AppSettings {
   whatsappNumber: string;
   transferAlias: string;
   transferCbu: string;
+  /** Nombre del titular de la cuenta (para transferencias) */
+  transferHolder: string;
   storeOpen: boolean;
   storeClosedMessage: string;
   // ─── Zona de delivery ───────────────────────

@@ -429,6 +429,7 @@ export default function CheckoutPage() {
                           <>
                             🏦 Alias: <strong>{settings.transferAlias}</strong>
                             {settings.transferCbu && <><br />CBU: <strong>{settings.transferCbu}</strong></>}
+                            {settings.transferHolder && <><br />Titular: <strong>{settings.transferHolder}</strong></>}
                             <br />Enviá el comprobante por WhatsApp.
                           </>
                         ) : (
