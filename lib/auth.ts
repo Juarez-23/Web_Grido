@@ -13,25 +13,17 @@ declare module "next-auth/jwt" {
 }
 
 // Credenciales del panel admin (multi-sucursal).
-// - Dueño: ve y administra TODAS las sucursales (branchId null).
-// - Admin de sucursal: solo su sucursal (branchId fijo).
-// Contraseña de desarrollo para todos: "grido2026".
-// En producción se pueden sobreescribir con variables de entorno por usuario.
-const DEFAULT_HASH = "$2a$10$A5x1sf87Bo2BxyaoPTsPgObB2PreWQTSDufSy3K78B.zmB4JbFmE6";
-
+// Un usuario por sucursal — cada uno solo ve/administra la suya.
+//   libertador / libertador2026
+//   salto      / salto2026
+// En producción se pueden sobreescribir con variables de entorno.
 const ADMIN_USERS = [
-  {
-    id: "owner",
-    username: (process.env.ADMIN_USERNAME || "admin").toLowerCase().trim(),
-    passwordHash: process.env.ADMIN_PASSWORD_HASH || DEFAULT_HASH,
-    name: "Dueño",
-    role: "ADMIN",
-    branchId: null as string | null, // null = todas las sucursales
-  },
   {
     id: "admin-libertador",
     username: (process.env.ADMIN_LIBERTADOR_USER || "libertador").toLowerCase().trim(),
-    passwordHash: process.env.ADMIN_LIBERTADOR_HASH || DEFAULT_HASH,
+    passwordHash:
+      process.env.ADMIN_LIBERTADOR_HASH ||
+      "$2a$10$JMXtgh.LbFwC3l6TjXT6dOE7hyDaTDqJrO85knwv7od2PjhPWnSiu", // libertador2026
     name: "Grido Libertador",
     role: "ADMIN",
     branchId: "branch_libertador",
@@ -39,7 +31,9 @@ const ADMIN_USERS = [
   {
     id: "admin-salto",
     username: (process.env.ADMIN_SALTO_USER || "salto").toLowerCase().trim(),
-    passwordHash: process.env.ADMIN_SALTO_HASH || DEFAULT_HASH,
+    passwordHash:
+      process.env.ADMIN_SALTO_HASH ||
+      "$2a$10$lAwaVBjv.zKSgbV1PWU4Ou4QyWsUjB2pp5f5lkeMSp.QJYNZW6hZq", // salto2026
     name: "Grido Salto",
     role: "ADMIN",
     branchId: "branch_salto",
