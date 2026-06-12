@@ -66,12 +66,19 @@ export default function CheckoutPage() {
 
         // Validar contra la zona de cobertura configurada por el admin
         if (settings) {
+          let polygon: { lat: number; lng: number }[] = [];
+          try {
+            const parsed = JSON.parse(settings.deliveryZonePolygon || "[]");
+            if (Array.isArray(parsed)) polygon = parsed;
+          } catch { /* ignore */ }
+
           const result = checkDeliveryZone(
             { lat: latitude, lng: longitude },
             {
               type: settings.deliveryZoneType || "RADIUS",
               origin: { lat: settings.storeLat, lng: settings.storeLng },
               radiusKm: settings.deliveryRadiusKm,
+              polygon,
             }
           );
           setZoneDistance(result.distanceKm);
