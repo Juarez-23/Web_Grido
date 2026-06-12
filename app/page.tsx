@@ -25,6 +25,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [isChangingCat, setIsChangingCat] = useState(false);
   const [showClosedModal, setShowClosedModal] = useState(false);
+  const [showDeliveryOffModal, setShowDeliveryOffModal] = useState(false);
 
   // Refs para animaciones
   const heroRef = useRef<HTMLElement>(null);
@@ -67,9 +68,11 @@ export default function HomePage() {
         setProducts(productsData.data || []);
         setCategories(categoriesData.data || []);
         setSettings(settingsData.data ?? null);
-        // Si la tienda está cerrada, mostrar el aviso al entrar
+        // Avisos al entrar: tienda cerrada tiene prioridad sobre delivery off
         if (settingsData.data && settingsData.data.storeOpen === false) {
           setShowClosedModal(true);
+        } else if (settingsData.data && settingsData.data.deliveryEnabled === false) {
+          setShowDeliveryOffModal(true);
         }
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -500,6 +503,44 @@ export default function HomePage() {
             <div className="px-6 pb-6">
               <button
                 onClick={() => setShowClosedModal(false)}
+                className="w-full btn-primary h-12"
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Aviso de delivery desactivado (tienda abierta) */}
+      {showDeliveryOffModal && settings?.storeOpen && settings?.deliveryEnabled === false && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center p-5"
+          style={{ background: "rgba(8,18,80,0.55)", backdropFilter: "blur(3px)" }}
+          onClick={() => setShowDeliveryOffModal(false)}
+        >
+          <div
+            className="bg-white rounded-3xl w-full max-w-sm overflow-hidden"
+            style={{ boxShadow: "0 20px 60px rgba(8,18,80,0.4)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex flex-col items-center text-center px-6 pt-8 pb-6">
+              <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mb-4">
+                <span className="text-3xl">🏪</span>
+              </div>
+              <h2
+                className="text-gray-900 mb-2"
+                style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "1.4rem" }}
+              >
+                Solo retiro en el local
+              </h2>
+              <p className="text-gray-500 text-sm leading-relaxed">
+                Por ahora no estamos haciendo delivery. Podés hacer tu pedido y retirarlo en el local. 🍦
+              </p>
+            </div>
+            <div className="px-6 pb-6">
+              <button
+                onClick={() => setShowDeliveryOffModal(false)}
                 className="w-full btn-primary h-12"
               >
                 Entendido
