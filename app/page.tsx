@@ -238,7 +238,7 @@ export default function HomePage() {
 
   // Imagen del hero según la sucursal
   const HERO_IMG: Record<string, { mobile: string; desktop: string }> = {
-    libertador: { mobile: "/Gridolocal2.jpeg", desktop: "/imagen32.jpeg" },
+    libertador: { mobile: "/gridolocal2.webp", desktop: "/imagen32.webp" },
     salto: { mobile: "/gridosalto.webp", desktop: "/gridosalto.webp" },
   };
   const heroImg = HERO_IMG[branch] ?? HERO_IMG.libertador;
