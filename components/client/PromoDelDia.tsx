@@ -22,7 +22,7 @@ export function PromoDelDia({ settings }: Props) {
     name: settings.promoDelDiaName,
     detail: settings.promoDelDiaDetail,
     price: settings.promoDelDiaPrice,
-    image: settings.promoDelDiaImage || "/promo-productos.webp",
+    image: settings.promoDelDiaImage || "/gridoancha.png",
   };
 
   const handleAdd = () => {
@@ -68,7 +68,7 @@ export function PromoDelDia({ settings }: Props) {
           boxShadow: "0 16px 44px rgba(8,18,80,0.32), 0 4px 14px rgba(8,18,80,0.22)",
         }}
       >
-        <div className="relative flex items-stretch min-h-[180px]">
+        <div className="relative flex items-stretch min-h-[150px]">
           {/* Izquierda: detalles + precio */}
           <div className="flex flex-col justify-center gap-1.5 p-4 sm:p-5" style={{ flex: "0 0 40%" }}>
             <h3
@@ -106,13 +106,12 @@ export function PromoDelDia({ settings }: Props) {
             </span>
           </div>
 
-          {/* Derecha: imagen del flyer, a sangre (llena todo el lado derecho) */}
-          <div className="relative self-stretch" style={{ flex: "1 1 60%" }}>
+          {/* Derecha: imagen del flyer completa (sin recorte) */}
+          <div className="flex items-center justify-center" style={{ flex: "1 1 60%" }}>
             <img
               src={PROMO.image}
               alt={PROMO.name}
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{ objectPosition: "center" }}
+              className="w-full h-auto object-contain block"
               draggable={false}
               loading="lazy"
               decoding="async"
