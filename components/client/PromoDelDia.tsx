@@ -48,9 +48,26 @@ export function PromoDelDia({ settings }: Props) {
           boxShadow: "0 16px 44px rgba(8,18,80,0.32), 0 4px 14px rgba(8,18,80,0.22)",
         }}
       >
-        <div className="relative flex items-stretch min-h-[148px]">
-          {/* Izquierda: detalles + precio */}
-          <div className="flex flex-col justify-center gap-1.5 p-4 sm:p-5" style={{ flex: "0 0 35%" }}>
+        <div className="relative min-h-[148px]">
+          {/* Imagen de fondo — desde el 20% hasta el 100% de la card */}
+          <div className="absolute inset-y-0 pointer-events-none" style={{ left: "20%", right: 0 }}>
+            <img
+              src={PROMO.image}
+              alt={PROMO.name}
+              className="absolute inset-0 w-full h-full object-cover"
+              draggable={false}
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          {/* Fade — de 20% a 35% de la card (funde la imagen con el panel azul) */}
+          <div
+            className="absolute inset-y-0 pointer-events-none"
+            style={{ left: "20%", width: "15%", background: "linear-gradient(to right, #0a1648 0%, transparent 100%)" }}
+          />
+
+          {/* Izquierda: detalles + precio (encima, 35%) */}
+          <div className="relative z-10 flex flex-col justify-center gap-1.5 p-4 sm:p-5" style={{ width: "35%" }}>
             <h3
               className="leading-none"
               style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "clamp(1.25rem, 5.5vw, 1.6rem)", color: "#fff", letterSpacing: "-0.02em" }}
@@ -84,23 +101,6 @@ export function PromoDelDia({ settings }: Props) {
               </svg>
               Ver promo
             </span>
-          </div>
-
-          {/* Derecha: imagen de productos */}
-          <div className="relative self-stretch" style={{ flex: "0 0 65%" }}>
-            <img
-              src={PROMO.image}
-              alt={PROMO.name}
-              className="absolute inset-0 w-full h-full object-cover"
-              draggable={false}
-              loading="lazy"
-              decoding="async"
-            />
-            {/* Fade del borde izquierdo para fundir con el panel azul */}
-            <div
-              className="absolute inset-y-0 left-0 w-16 pointer-events-none"
-              style={{ background: "linear-gradient(to right, #0a1648 0%, transparent 100%)" }}
-            />
           </div>
         </div>
       </button>
