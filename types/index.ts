@@ -119,6 +119,7 @@ export interface CheckoutFormData {
   deliveryType: DeliveryType;
   paymentMethod: PaymentMethod;
   notes?: string;
+  dni?: string; // DNI para sumar puntos del Club Grido (opcional)
 }
 
 // ─── SETTINGS ───────────────────────────────

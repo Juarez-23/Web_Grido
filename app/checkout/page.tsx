@@ -27,7 +27,9 @@ export default function CheckoutPage() {
     deliveryType: "DELIVERY",
     paymentMethod: "TRANSFERENCIA",
     notes: "",
+    dni: "",
   });
+  const [clubGrido, setClubGrido] = useState(false);
 
   useEffect(() => {
     if (items.length === 0) { router.replace("/"); return; }
@@ -148,6 +150,7 @@ export default function CheckoutPage() {
           deliveryType: form.deliveryType,
           paymentMethod: form.paymentMethod,
           notes: form.notes,
+          dni: clubGrido ? form.dni : undefined,
           subtotal, deliveryCost, total,
           items: items.map((item) => ({
             productId: item.product.id,
@@ -463,6 +466,34 @@ export default function CheckoutPage() {
               );
             })}
           </div>
+        </section>
+
+        {/* Club Grido */}
+        <section className="bg-white rounded-2xl p-4 shadow-card">
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={clubGrido}
+              onChange={(e) => setClubGrido(e.target.checked)}
+              className="w-5 h-5 rounded accent-grido-primary flex-shrink-0"
+            />
+            <span className="flex-1">
+              <span className="block text-sm font-bold text-gray-800">🎟️ Soy socio del Club Grido</span>
+              <span className="block text-xs text-gray-400 mt-0.5">Cargá tu DNI para sumar puntos</span>
+            </span>
+          </label>
+          {clubGrido && (
+            <div className="mt-3">
+              <input
+                name="dni"
+                value={form.dni}
+                onChange={handleChange}
+                inputMode="numeric"
+                placeholder="DNI (sin puntos)"
+                className="input-field"
+              />
+            </div>
+          )}
         </section>
 
         {/* Notas */}

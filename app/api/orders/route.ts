@@ -57,6 +57,7 @@ export async function POST(req: NextRequest) {
       deliveryType,
       paymentMethod,
       notes,
+      dni,
       subtotal,
       deliveryCost,
       total,
@@ -159,6 +160,7 @@ export async function POST(req: NextRequest) {
       deliveryType,
       paymentMethod,
       notes: notes || undefined,
+      dni: dni || undefined,
     };
     const cartItems: CartItem[] = items.map((item: any, i: number) => ({
       cartId: String(i),

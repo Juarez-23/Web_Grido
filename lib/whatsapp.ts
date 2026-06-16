@@ -84,6 +84,9 @@ export function generateWhatsAppMessage(
   if (formData.deliveryType === "DELIVERY" && formData.address) {
     msg += `Dirección: ${formData.address}\n`;
   }
+  if (formData.dni?.trim()) {
+    msg += `🎟️ Club Grido — DNI: *${formData.dni.trim()}* (sumar puntos)\n`;
+  }
 
   // ── Productos ──
   msg += `\n*Pedido*\n`;
