@@ -120,8 +120,7 @@ export function PromoDelDia({ settings }: Props) {
               <img
                 src={PROMO.image}
                 alt={PROMO.name}
-                className="w-full h-full object-contain"
-                style={{ padding: 8 }}
+                className="w-full h-full object-cover"
                 draggable={false}
                 loading="lazy"
                 decoding="async"
