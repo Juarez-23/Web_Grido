@@ -154,12 +154,8 @@ export interface AppSettings {
   promoDelDiaDetail: string;
   /** Precio */
   promoDelDiaPrice: number;
-  /** URL de la imagen (genérica / compatibilidad) */
+  /** URL de la imagen */
   promoDelDiaImage: string;
-  /** URL de la imagen para mobile (vertical) */
-  promoDelDiaImageMobile: string;
-  /** URL de la imagen para desktop (banner horizontal) */
-  promoDelDiaImageDesktop: string;
   // ─── Contacto / Sucursal ────────────────────
   /** Dirección del local */
   address: string;

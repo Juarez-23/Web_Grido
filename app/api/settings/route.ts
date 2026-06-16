@@ -39,8 +39,6 @@ export async function GET(req: NextRequest) {
       promoDelDiaDetail: map.promoDelDiaDetail || "",
       promoDelDiaPrice: parseFloat(map.promoDelDiaPrice || "0"),
       promoDelDiaImage: map.promoDelDiaImage || "",
-      promoDelDiaImageMobile: map.promoDelDiaImageMobile || map.promoDelDiaImage || "/promo_mundialista_mobile.png",
-      promoDelDiaImageDesktop: map.promoDelDiaImageDesktop || map.promoDelDiaImage || "/promo_mundialista_desktop.png",
       // Contacto / sucursal
       address: map.address || "Av. El Libertador 962, San Rafael, Mendoza",
       hours: map.hours || "Lunes a viernes: 12:00 a 22:30\nSábados: 11:00 a 23:00\nDomingos: 12:00 a 22:00",
@@ -111,10 +109,6 @@ export async function PUT(req: NextRequest) {
       updates.push({ key: "promoDelDiaPrice", value: String(body.promoDelDiaPrice) });
     if (body.promoDelDiaImage !== undefined)
       updates.push({ key: "promoDelDiaImage", value: body.promoDelDiaImage });
-    if (body.promoDelDiaImageMobile !== undefined)
-      updates.push({ key: "promoDelDiaImageMobile", value: body.promoDelDiaImageMobile });
-    if (body.promoDelDiaImageDesktop !== undefined)
-      updates.push({ key: "promoDelDiaImageDesktop", value: body.promoDelDiaImageDesktop });
     if (body.address !== undefined)
       updates.push({ key: "address", value: body.address });
     if (body.hours !== undefined)

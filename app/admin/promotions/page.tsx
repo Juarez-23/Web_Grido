@@ -34,9 +34,10 @@ export default function AdminPromotionsPage() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   // ─── Promo del día (guardada en settings, por sucursal) ────────────────────
-  const [pd, setPd] = useState({ active: false, name: "", detail: "", price: 0, imageMobile: "", imageDesktop: "" });
+  const [pd, setPd] = useState({ active: false, name: "", detail: "", price: 0, image: "" });
   const [pdSaving, setPdSaving] = useState(false);
-  const [pdUploading, setPdUploading] = useState<"mobile" | "desktop" | null>(null);
+  const [pdUploading, setPdUploading] = useState(false);
+  const pdFileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetch("/api/promotions?all=true")
@@ -51,26 +52,25 @@ export default function AdminPromotionsPage() {
           name: d.data.promoDelDiaName || "",
           detail: d.data.promoDelDiaDetail || "",
           price: d.data.promoDelDiaPrice || 0,
-          imageMobile: d.data.promoDelDiaImageMobile || "",
-          imageDesktop: d.data.promoDelDiaImageDesktop || "",
+          image: d.data.promoDelDiaImage || "",
         });
       });
   }, []);
 
-  const uploadPdImage = async (file: File, which: "mobile" | "desktop") => {
-    setPdUploading(which);
+  const uploadPdImage = async (file: File) => {
+    setPdUploading(true);
     try {
       const fd = new FormData();
       fd.append("file", file);
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       const data = await res.json();
       if (!res.ok || !data.url) throw new Error();
-      setPd((p) => ({ ...p, [which === "mobile" ? "imageMobile" : "imageDesktop"]: data.url }));
+      setPd((p) => ({ ...p, image: data.url }));
       toast.success("Imagen subida");
     } catch {
       toast.error("Error al subir la imagen");
     } finally {
-      setPdUploading(null);
+      setPdUploading(false);
     }
   };
 
@@ -85,8 +85,7 @@ export default function AdminPromotionsPage() {
           promoDelDiaName: pd.name,
           promoDelDiaDetail: pd.detail,
           promoDelDiaPrice: Number(pd.price) || 0,
-          promoDelDiaImageMobile: pd.imageMobile,
-          promoDelDiaImageDesktop: pd.imageDesktop,
+          promoDelDiaImage: pd.image,
         }),
       });
       if (!res.ok) throw new Error();
@@ -222,40 +221,20 @@ export default function AdminPromotionsPage() {
             </div>
           </div>
 
-          <div className="space-y-3">
-            {/* Imagen mobile */}
-            <div>
-              <label className="text-sm font-medium text-gray-600 mb-1.5 block">📱 Imagen mobile <span className="text-gray-400 font-normal">(vertical)</span></label>
-              <div className="flex items-center gap-3">
-                <div className="relative w-16 h-20 rounded-xl overflow-hidden bg-gray-50 flex-shrink-0 flex items-center justify-center">
-                  {pd.imageMobile ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={pd.imageMobile} alt="Mobile" className="w-full h-full object-contain" />
-                  ) : <span className="text-gray-300 text-xl">🖼️</span>}
-                </div>
-                <label className="cursor-pointer flex-1 text-center border-2 border-grido-primary text-grido-primary font-semibold rounded-xl py-2.5 text-sm active:scale-95 transition-transform">
-                  {pdUploading === "mobile" ? "Subiendo..." : pd.imageMobile ? "Cambiar" : "Subir imagen"}
-                  <input type="file" accept="image/*" className="hidden" disabled={!!pdUploading} onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadPdImage(f, "mobile"); e.target.value = ""; }} />
-                </label>
-              </div>
+          <div>
+            <label className="text-sm font-medium text-gray-600 mb-1.5 block">Imagen</label>
+            <div className="relative w-full h-36 rounded-xl overflow-hidden bg-gray-50 mb-2 flex items-center justify-center">
+              {pd.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={pd.image} alt="Promo del día" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-gray-300 text-3xl">🖼️</span>
+              )}
             </div>
-            {/* Imagen desktop */}
-            <div>
-              <label className="text-sm font-medium text-gray-600 mb-1.5 block">🖥️ Imagen desktop <span className="text-gray-400 font-normal">(banner horizontal)</span></label>
-              <div className="flex items-center gap-3">
-                <div className="relative w-24 h-16 rounded-xl overflow-hidden bg-gray-50 flex-shrink-0 flex items-center justify-center">
-                  {pd.imageDesktop ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={pd.imageDesktop} alt="Desktop" className="w-full h-full object-contain" />
-                  ) : <span className="text-gray-300 text-xl">🖼️</span>}
-                </div>
-                <label className="cursor-pointer flex-1 text-center border-2 border-grido-primary text-grido-primary font-semibold rounded-xl py-2.5 text-sm active:scale-95 transition-transform">
-                  {pdUploading === "desktop" ? "Subiendo..." : pd.imageDesktop ? "Cambiar" : "Subir imagen"}
-                  <input type="file" accept="image/*" className="hidden" disabled={!!pdUploading} onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadPdImage(f, "desktop"); e.target.value = ""; }} />
-                </label>
-              </div>
-            </div>
-            <p className="text-xs text-gray-400">Si dejás una vacía, se usa la imagen por defecto.</p>
+            <input ref={pdFileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadPdImage(f); e.target.value = ""; }} />
+            <button type="button" onClick={() => pdFileRef.current?.click()} disabled={pdUploading} className="w-full border-2 border-grido-primary text-grido-primary font-semibold rounded-xl py-2.5 text-sm active:scale-95 transition-transform disabled:opacity-50">
+              {pdUploading ? "Subiendo..." : pd.image ? "Cambiar imagen" : "Subir imagen"}
+            </button>
           </div>
         </div>
 
