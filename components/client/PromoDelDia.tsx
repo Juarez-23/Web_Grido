@@ -49,8 +49,8 @@ export function PromoDelDia({ settings }: Props) {
         }}
       >
         <div className="relative min-h-[148px]">
-          {/* Imagen de fondo — arranca en 25%; se funde con el azul Grido (fade 25%→35%) */}
-          <div className="absolute inset-y-0 pointer-events-none" style={{ left: "25%", right: 0 }}>
+          {/* Imagen de fondo — mobile arranca en 30% (fade 30%→40%), desktop en 25% */}
+          <div className="absolute inset-y-0 right-0 left-[30%] md:left-[25%] pointer-events-none">
             <img
               src={PROMO.image}
               alt={PROMO.name}
@@ -62,7 +62,7 @@ export function PromoDelDia({ settings }: Props) {
           </div>
 
           {/* Izquierda: detalles + precio (encima, 35%) */}
-          <div className="relative z-10 flex flex-col justify-center gap-1.5 p-4 sm:p-5" style={{ width: "35%" }}>
+          <div className="relative z-10 flex flex-col justify-center gap-1.5 p-4 sm:p-5 w-[40%] md:w-[35%]">
             <h3
               className="leading-none"
               style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "clamp(1.25rem, 5.5vw, 1.6rem)", color: "#fff", letterSpacing: "-0.02em" }}

@@ -242,10 +242,14 @@ body {
 .min-h-dvh { min-height: 100dvh; }
 .h-dvh     { height: 100dvh; }
 
-/* Promo del día — fade de la imagen: arranca en 25% de la card y se desvanece
-   hasta ~35% (el contenedor empieza en 25%, por eso el mask termina en ~13%). */
+/* Promo del día — fade de la imagen.
+   Mobile: contenedor desde 30% → fade 30%→40% (mask termina en ~14%).
+   Desktop: contenedor desde 25% → fade 25%→35% (mask termina en ~13%). */
 .promo-fade-img {
-  --promo-fade: 13%;
+  --promo-fade: 14%;
   -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 var(--promo-fade));
           mask-image: linear-gradient(to right, transparent 0%, #000 var(--promo-fade));
+}
+@media (min-width: 768px) {
+  .promo-fade-img { --promo-fade: 13%; }
 }
