@@ -111,15 +111,10 @@ export function PromoDelDia({ settings }: Props) {
             <img
               src={PROMO.image}
               alt={PROMO.name}
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-contain p-2"
               draggable={false}
               loading="lazy"
               decoding="async"
-            />
-            {/* Fade del borde izquierdo para fundir con el panel azul */}
-            <div
-              className="absolute inset-y-0 left-0 w-16 pointer-events-none"
-              style={{ background: "linear-gradient(to right, #0a1648 0%, transparent 100%)" }}
             />
           </div>
         </div>
