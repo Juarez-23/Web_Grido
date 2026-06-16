@@ -44,13 +44,13 @@ export function PromoDelDia({ settings }: Props) {
         aria-label="Ver la promo del día"
         className="promo-dia-card relative w-full overflow-hidden rounded-3xl text-left active:scale-[0.985] transition-transform"
         style={{
-          background: "linear-gradient(125deg, #1e57f5 0%, #1640d8 50%, #0f30ad 100%)",
-          boxShadow: "0 16px 44px rgba(15,48,173,0.34), 0 4px 14px rgba(15,48,173,0.24)",
+          background: "linear-gradient(125deg, #11286e 0%, #0d2050 55%, #0a1a45 100%)",
+          boxShadow: "0 16px 44px rgba(13,32,80,0.34), 0 4px 14px rgba(13,32,80,0.24)",
         }}
       >
         <div className="relative min-h-[148px]">
-          {/* Imagen de fondo — desde el 30%; se funde con el gradient (máscara que arranca en el 30%) */}
-          <div className="absolute inset-y-0 pointer-events-none" style={{ left: "30%", right: 0 }}>
+          {/* Imagen de fondo — arranca en 25%; se funde con el azul Grido (fade 25%→35%) */}
+          <div className="absolute inset-y-0 pointer-events-none" style={{ left: "25%", right: 0 }}>
             <img
               src={PROMO.image}
               alt={PROMO.name}
