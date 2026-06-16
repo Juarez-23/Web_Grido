@@ -103,10 +103,10 @@ export function PromoModal({ promo, price, onClose }: Props) {
             {/* Image */}
             <div
               className="relative mx-4 rounded-2xl overflow-hidden"
-              style={{ height: 160, background: "#f8f9fb" }}
+              style={{ height: 240, background: "#f8f9fb" }}
             >
               {promo.image ? (
-                <Image src={promo.image} alt={promo.title} fill className="object-contain p-3" sizes="100vw" priority />
+                <Image src={promo.image} alt={promo.title} fill className="object-contain p-2" sizes="100vw" priority />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#d4a574" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
