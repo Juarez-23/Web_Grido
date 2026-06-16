@@ -236,6 +236,13 @@ export default function HomePage() {
     return <BranchSelector onSelect={(slug) => setBranch(slug)} />;
   }
 
+  // Imagen del hero según la sucursal
+  const HERO_IMG: Record<string, { mobile: string; desktop: string }> = {
+    libertador: { mobile: "/Gridolocal2.jpeg", desktop: "/imagen32.jpeg" },
+    salto: { mobile: "/gridosalto.webp", desktop: "/gridosalto.webp" },
+  };
+  const heroImg = HERO_IMG[branch] ?? HERO_IMG.libertador;
+
   return (
     <div className="min-h-screen bg-white">
       <Header branchSlug={branch} />
@@ -253,7 +260,7 @@ export default function HomePage() {
       >
         {/* Imagen mobile — estirada para cubrir el ancho sin zoom */}
         <img
-          src="/Gridolocal2.jpeg"
+          src={heroImg.mobile}
           alt=""
           aria-hidden
           className="hero-img absolute inset-0 w-full h-full md:hidden"
@@ -263,9 +270,9 @@ export default function HomePage() {
           decoding="async"
         />
 
-        {/* Imagen desktop — imagen32 anclada a la derecha, ocupa ~70% para estirar menos */}
+        {/* Imagen desktop — anclada a la derecha, ocupa ~60% para estirar menos */}
         <img
-          src="/imagen32.jpeg"
+          src={heroImg.desktop}
           alt=""
           aria-hidden
           className="hero-img absolute top-0 right-0 h-full hidden md:block"

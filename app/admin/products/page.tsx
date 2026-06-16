@@ -218,7 +218,7 @@ export default function AdminProductsPage() {
                 >
                   <span
                     className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
-                      product.active ? "translate-x-4.5" : "translate-x-0.5"
+                      product.active ? "translate-x-[18px]" : "translate-x-[2px]"
                     }`}
                   />
                 </button>

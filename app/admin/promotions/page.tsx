@@ -278,7 +278,7 @@ export default function AdminPromotionsPage() {
                   onClick={() => toggleActive(p)}
                   className={`w-10 h-6 rounded-full relative transition-colors ${p.active ? "bg-green-500" : "bg-gray-200"}`}
                 >
-                  <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${p.active ? "translate-x-4.5" : "translate-x-0.5"}`} />
+                  <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${p.active ? "translate-x-[18px]" : "translate-x-[2px]"}`} />
                 </button>
                 <button onClick={() => openEdit(p)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 text-sm hover:bg-blue-100">✏️</button>
                 <button onClick={() => handleDelete(p.id)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-500 text-sm hover:bg-red-100">🗑️</button>

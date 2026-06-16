@@ -42,7 +42,14 @@ export function BranchSelector({ onSelect }: Props) {
         {/* Logo + título */}
         <div className="flex flex-col items-center text-center mb-9">
           <div className="mb-5">
-            <GridoLogo />
+            <img
+              src="/grido-inicio.webp"
+              alt="Grido"
+              width={92}
+              height={92}
+              className="rounded-2xl shadow-lg"
+              style={{ boxShadow: "0 10px 30px rgba(0,0,0,0.25)" }}
+            />
           </div>
           <h1
             className="text-white leading-tight"

@@ -41,7 +41,7 @@ export function AdminSidebar({ user }: Props) {
           </div>
           <div>
             <p className="text-white font-black text-sm leading-none">GRIDO</p>
-            <p className="text-gray-500 text-xs">El Libertador</p>
+            <p className="text-gray-500 text-xs">Panel admin</p>
           </div>
         </div>
       </div>
