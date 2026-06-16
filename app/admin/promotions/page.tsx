@@ -276,9 +276,19 @@ export default function AdminPromotionsPage() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => toggleActive(p)}
-                  className={`w-10 h-6 rounded-full relative transition-colors ${p.active ? "bg-green-500" : "bg-gray-200"}`}
+                  style={{
+                    position: "relative", flexShrink: 0, width: 44, height: 26,
+                    borderRadius: 999, border: "none", cursor: "pointer", padding: 0,
+                    background: p.active ? "#22c55e" : "#d1d5db",
+                    transition: "background 220ms cubic-bezier(0.25,1,0.5,1)",
+                  }}
                 >
-                  <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${p.active ? "translate-x-[18px]" : "translate-x-[2px]"}`} />
+                  <span style={{
+                    position: "absolute", top: 3, left: p.active ? 21 : 3,
+                    width: 20, height: 20, background: "white", borderRadius: "50%",
+                    boxShadow: "0 1px 4px rgba(0,0,0,0.22)",
+                    transition: "left 220ms cubic-bezier(0.25,1,0.5,1)", display: "block",
+                  }} />
                 </button>
                 <button onClick={() => openEdit(p)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 text-sm hover:bg-blue-100">✏️</button>
                 <button onClick={() => handleDelete(p.id)} className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-500 text-sm hover:bg-red-100">🗑️</button>

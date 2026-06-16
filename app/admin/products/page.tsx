@@ -211,16 +211,20 @@ export default function AdminProductsPage() {
                 {/* Active toggle */}
                 <button
                   onClick={() => toggleActive(product)}
-                  className={`w-10 h-6 rounded-full transition-colors relative ${
-                    product.active ? "bg-green-500" : "bg-gray-200"
-                  }`}
                   title={product.active ? "Activo - clic para desactivar" : "Inactivo - clic para activar"}
+                  style={{
+                    position: "relative", flexShrink: 0, width: 44, height: 26,
+                    borderRadius: 999, border: "none", cursor: "pointer", padding: 0,
+                    background: product.active ? "#22c55e" : "#d1d5db",
+                    transition: "background 220ms cubic-bezier(0.25,1,0.5,1)",
+                  }}
                 >
-                  <span
-                    className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
-                      product.active ? "translate-x-[18px]" : "translate-x-[2px]"
-                    }`}
-                  />
+                  <span style={{
+                    position: "absolute", top: 3, left: product.active ? 21 : 3,
+                    width: 20, height: 20, background: "white", borderRadius: "50%",
+                    boxShadow: "0 1px 4px rgba(0,0,0,0.22)",
+                    transition: "left 220ms cubic-bezier(0.25,1,0.5,1)", display: "block",
+                  }} />
                 </button>
 
                 <button

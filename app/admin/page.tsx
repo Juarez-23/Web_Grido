@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from "@/types";
 import Link from "next/link";
+import { DashboardPending } from "@/components/admin/DashboardPending";
 import type { OrderStatus } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -26,7 +26,7 @@ async function getData(branchId: string | null) {
     prisma.order.findMany({ where: { ...bf, createdAt: { gte: startOfToday } }, select: { total: true, status: true } }),
     prisma.order.findMany({
       where: { ...bf, status: { in: ACTIVE_STATUSES } },
-      orderBy: { createdAt: "asc" },
+      orderBy: { createdAt: "desc" },
       take: 8,
     }),
     prisma.order.aggregate({
@@ -48,13 +48,6 @@ async function getData(branchId: string | null) {
     activeOrders,
     monthTotal,
   };
-}
-
-function waited(date: Date) {
-  const m = Math.floor((Date.now() - new Date(date).getTime()) / 60000);
-  if (m < 1) return "recién";
-  if (m < 60) return `${m} min`;
-  return `${Math.floor(m / 60)} h`;
 }
 
 export default async function AdminDashboard() {
@@ -97,31 +90,16 @@ export default async function AdminDashboard() {
         <Link href="/admin/orders" className="text-sm text-grido-primary font-semibold">Ver todos →</Link>
       </div>
 
-      {d.activeOrders.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-card py-16 text-center text-gray-400">
-          <p className="text-4xl mb-2">✅</p>
-          <p className="font-medium text-gray-500">No hay pedidos pendientes</p>
-        </div>
-      ) : (
-        <div className="bg-white rounded-2xl shadow-card divide-y divide-gray-50 overflow-hidden">
-          {d.activeOrders.map((o) => (
-            <Link key={o.id} href="/admin/orders" className="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition-colors">
-              <div className="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center font-bold text-gray-500 text-sm flex-shrink-0">
-                #{o.orderNumber}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900 text-sm truncate">{o.customerName}</p>
-                <p className="text-gray-400 text-xs">
-                  {o.deliveryType === "DELIVERY" ? "Delivery" : "Retiro"} · hace {waited(o.createdAt)}
-                </p>
-              </div>
-              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${ORDER_STATUS_COLORS[o.status as OrderStatus]}`}>
-                {ORDER_STATUS_LABELS[o.status as OrderStatus]}
-              </span>
-            </Link>
-          ))}
-        </div>
-      )}
+      <DashboardPending
+        orders={d.activeOrders.map((o) => ({
+          id: o.id,
+          orderNumber: o.orderNumber,
+          customerName: o.customerName,
+          deliveryType: o.deliveryType,
+          status: o.status,
+          createdAt: o.createdAt.toISOString(),
+        }))}
+      />
     </div>
   );
 }
