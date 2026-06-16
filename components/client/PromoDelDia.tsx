@@ -44,8 +44,8 @@ export function PromoDelDia({ settings }: Props) {
         aria-label="Ver la promo del día"
         className="promo-dia-card relative w-full overflow-hidden rounded-3xl text-left active:scale-[0.985] transition-transform"
         style={{
-          background: "linear-gradient(125deg, #3b73e8 0%, #1f54cf 48%, #143fb0 100%)",
-          boxShadow: "0 16px 44px rgba(20,63,176,0.30), 0 4px 14px rgba(20,63,176,0.22)",
+          background: "linear-gradient(125deg, #1747cc 0%, #0f349f 50%, #0a2578 100%)",
+          boxShadow: "0 16px 44px rgba(10,37,120,0.32), 0 4px 14px rgba(10,37,120,0.22)",
         }}
       >
         <div className="relative min-h-[148px]">
@@ -56,8 +56,8 @@ export function PromoDelDia({ settings }: Props) {
               alt={PROMO.name}
               className="absolute inset-0 w-full h-full object-cover"
               style={{
-                WebkitMaskImage: "linear-gradient(to right, transparent 0%, #000 22%)",
-                maskImage: "linear-gradient(to right, transparent 0%, #000 22%)",
+                WebkitMaskImage: "linear-gradient(to right, transparent 0%, #000 7%)",
+                maskImage: "linear-gradient(to right, transparent 0%, #000 7%)",
               }}
               draggable={false}
               loading="lazy"
