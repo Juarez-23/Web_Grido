@@ -68,9 +68,9 @@ export function PromoDelDia({ settings }: Props) {
           boxShadow: "0 16px 44px rgba(8,18,80,0.32), 0 4px 14px rgba(8,18,80,0.22)",
         }}
       >
-        <div className="relative flex items-stretch min-h-[148px]">
+        <div className="relative flex items-stretch min-h-[168px]">
           {/* Izquierda: detalles + precio */}
-          <div className="flex flex-col justify-center gap-1.5 p-4 sm:p-5" style={{ flex: "1 1 56%" }}>
+          <div className="flex flex-col justify-center gap-1.5 p-4 sm:p-5" style={{ flex: "1 1 52%" }}>
             <h3
               className="leading-none"
               style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "clamp(1.25rem, 5.5vw, 1.6rem)", color: "#fff", letterSpacing: "-0.02em" }}
@@ -107,11 +107,12 @@ export function PromoDelDia({ settings }: Props) {
           </div>
 
           {/* Derecha: imagen de productos */}
-          <div className="relative self-stretch" style={{ flex: "1 1 44%" }}>
+          <div className="relative self-stretch" style={{ flex: "1 1 48%" }}>
             <img
               src={PROMO.image}
               alt={PROMO.name}
-              className="absolute inset-0 w-full h-full object-contain p-2"
+              className="absolute inset-0 w-full h-full object-contain"
+              style={{ padding: 2, objectPosition: "center" }}
               draggable={false}
               loading="lazy"
               decoding="async"
