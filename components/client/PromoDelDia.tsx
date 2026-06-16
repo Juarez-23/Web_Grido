@@ -106,12 +106,12 @@ export function PromoDelDia({ settings }: Props) {
             </span>
           </div>
 
-          {/* Derecha: imagen full-bleed, pegada a los bordes (sin espacio blanco) */}
+          {/* Derecha: imagen completa (adaptada), sin recorte */}
           <div className="relative self-stretch flex-[1_1_60%]">
             <img
               src={PROMO.image}
               alt={PROMO.name}
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-contain"
               style={{ objectPosition: "center" }}
               draggable={false}
               loading="lazy"
