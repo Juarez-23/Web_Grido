@@ -68,9 +68,9 @@ export function PromoDelDia({ settings }: Props) {
           boxShadow: "0 16px 44px rgba(8,18,80,0.32), 0 4px 14px rgba(8,18,80,0.22)",
         }}
       >
-        <div className="relative flex items-stretch md:min-h-[185px]">
-          {/* Izquierda: detalles + precio — mobile se adapta a la imagen; desktop como antes */}
-          <div className="flex flex-col justify-center gap-1.5 p-3.5 md:p-5 flex-[1_1_36%] md:flex-[0_0_42%]">
+        <div className="relative flex items-stretch min-h-[150px] md:min-h-[185px]">
+          {/* Izquierda: detalles + precio */}
+          <div className="flex flex-col justify-center gap-1.5 p-3.5 md:p-5 flex-[0_0_40%]">
             <h3
               className="leading-none"
               style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "clamp(1.25rem, 5.5vw, 1.6rem)", color: "#fff", letterSpacing: "-0.02em" }}
@@ -106,12 +106,13 @@ export function PromoDelDia({ settings }: Props) {
             </span>
           </div>
 
-          {/* Derecha: mobile imagen completa (la imagen manda) · desktop full-bleed */}
-          <div className="relative flex items-center md:block flex-[0_0_64%] md:flex-[1_1_58%]">
+          {/* Derecha: imagen full-bleed, pegada a los bordes (sin espacio blanco) */}
+          <div className="relative self-stretch flex-[1_1_60%]">
             <img
               src={PROMO.image}
               alt={PROMO.name}
-              className="block w-full h-auto object-contain md:absolute md:inset-0 md:h-full md:object-cover"
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: "center" }}
               draggable={false}
               loading="lazy"
               decoding="async"
