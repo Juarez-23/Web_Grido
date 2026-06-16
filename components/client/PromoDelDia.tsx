@@ -17,12 +17,16 @@ export function PromoDelDia({ settings }: Props) {
     return null;
   }
 
+  // Imágenes de apoyo (solo visual, sin texto). Swap por breakpoint.
+  const IMG_MOBILE = "/promo_mundialista_mobile.png";
+  const IMG_DESKTOP = "/promo_mundialista_desktop.png";
+
   const PROMO = {
     id: "promo-del-dia",
     name: settings.promoDelDiaName,
     detail: settings.promoDelDiaDetail,
     price: settings.promoDelDiaPrice,
-    image: settings.promoDelDiaImage || "/gridoancha.webp",
+    image: IMG_DESKTOP, // miniatura para el carrito
   };
 
   const handleAdd = () => {
@@ -68,9 +72,9 @@ export function PromoDelDia({ settings }: Props) {
           boxShadow: "0 16px 44px rgba(8,18,80,0.32), 0 4px 14px rgba(8,18,80,0.22)",
         }}
       >
-        <div className="relative flex items-stretch min-h-[150px] md:min-h-[185px]">
+        <div className="relative flex items-stretch min-h-[210px] md:min-h-[200px]">
           {/* Izquierda: detalles + precio */}
-          <div className="flex flex-col justify-center gap-1.5 p-3.5 md:p-5 flex-[0_0_40%]">
+          <div className="flex flex-col justify-center gap-1.5 p-3.5 md:p-5 flex-[0_0_38%] md:flex-[0_0_40%]">
             <h3
               className="leading-none"
               style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "clamp(1.25rem, 5.5vw, 1.6rem)", color: "#fff", letterSpacing: "-0.02em" }}
@@ -106,12 +110,23 @@ export function PromoDelDia({ settings }: Props) {
             </span>
           </div>
 
-          {/* Derecha: imagen completa (adaptada), sin recorte */}
-          <div className="relative self-stretch flex-[1_1_60%]">
+          {/* Derecha: imagen de apoyo — versión mobile y desktop (swap responsive) */}
+          <div className="relative self-stretch flex-[1_1_62%] md:flex-[1_1_60%]">
+            {/* Mobile: imagen vertical/compacta */}
             <img
-              src={PROMO.image}
+              src={IMG_MOBILE}
               alt={PROMO.name}
-              className="absolute inset-0 w-full h-full object-contain"
+              className="absolute inset-0 w-full h-full object-contain md:hidden"
+              style={{ objectPosition: "center" }}
+              draggable={false}
+              loading="lazy"
+              decoding="async"
+            />
+            {/* Desktop: banner horizontal ancho */}
+            <img
+              src={IMG_DESKTOP}
+              alt={PROMO.name}
+              className="absolute inset-0 w-full h-full object-contain hidden md:block"
               style={{ objectPosition: "center" }}
               draggable={false}
               loading="lazy"
