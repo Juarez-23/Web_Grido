@@ -22,7 +22,7 @@ export function PromoDelDia({ settings }: Props) {
     name: settings.promoDelDiaName,
     detail: settings.promoDelDiaDetail,
     price: settings.promoDelDiaPrice,
-    image: settings.promoDelDiaImage || "/gridoancha.png",
+    image: settings.promoDelDiaImage || "/gridoancha.webp",
   };
 
   const handleAdd = () => {
