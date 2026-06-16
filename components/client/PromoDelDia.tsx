@@ -54,11 +54,7 @@ export function PromoDelDia({ settings }: Props) {
             <img
               src={PROMO.image}
               alt={PROMO.name}
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{
-                WebkitMaskImage: "linear-gradient(to right, transparent 0%, #000 7%)",
-                maskImage: "linear-gradient(to right, transparent 0%, #000 7%)",
-              }}
+              className="promo-fade-img absolute inset-0 w-full h-full object-cover"
               draggable={false}
               loading="lazy"
               decoding="async"

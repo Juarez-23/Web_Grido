@@ -241,3 +241,13 @@ body {
 /* Utilitarios dvh para mobile browsers */
 .min-h-dvh { min-height: 100dvh; }
 .h-dvh     { height: 100dvh; }
+
+/* Promo del día — fade de la imagen: mobile 30%→45%, desktop 30%→35% */
+.promo-fade-img {
+  --promo-fade: 21%; /* mobile: banda más larga */
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 var(--promo-fade));
+          mask-image: linear-gradient(to right, transparent 0%, #000 var(--promo-fade));
+}
+@media (min-width: 768px) {
+  .promo-fade-img { --promo-fade: 7%; } /* desktop: 30%→35% */
+}
