@@ -106,17 +106,27 @@ export function PromoDelDia({ settings }: Props) {
             </span>
           </div>
 
-          {/* Derecha: imagen de productos */}
-          <div className="relative self-stretch" style={{ flex: "1 1 48%" }}>
-            <img
-              src={PROMO.image}
-              alt={PROMO.name}
-              className="absolute inset-0 w-full h-full object-contain"
-              style={{ padding: 2, objectPosition: "center" }}
-              draggable={false}
-              loading="lazy"
-              decoding="async"
-            />
+          {/* Derecha: imagen de productos en ficha blanca */}
+          <div className="flex items-center justify-center p-3" style={{ flex: "1 1 46%" }}>
+            <div
+              className="w-full overflow-hidden flex items-center justify-center"
+              style={{
+                aspectRatio: "1 / 1",
+                background: "#ffffff",
+                borderRadius: 18,
+                boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.04)",
+              }}
+            >
+              <img
+                src={PROMO.image}
+                alt={PROMO.name}
+                className="w-full h-full object-contain"
+                style={{ padding: 8 }}
+                draggable={false}
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
           </div>
         </div>
       </button>
