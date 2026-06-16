@@ -44,27 +44,26 @@ export function PromoDelDia({ settings }: Props) {
         aria-label="Ver la promo del día"
         className="promo-dia-card relative w-full overflow-hidden rounded-3xl text-left active:scale-[0.985] transition-transform"
         style={{
-          background: "linear-gradient(120deg, #0f2470 0%, #08125a 55%, #0a1648 100%)",
-          boxShadow: "0 16px 44px rgba(8,18,80,0.32), 0 4px 14px rgba(8,18,80,0.22)",
+          background: "linear-gradient(125deg, #3b73e8 0%, #1f54cf 48%, #143fb0 100%)",
+          boxShadow: "0 16px 44px rgba(20,63,176,0.30), 0 4px 14px rgba(20,63,176,0.22)",
         }}
       >
         <div className="relative min-h-[148px]">
-          {/* Imagen de fondo — desde el 20% hasta el 100% de la card */}
-          <div className="absolute inset-y-0 pointer-events-none" style={{ left: "20%", right: 0 }}>
+          {/* Imagen de fondo — desde el 30%; se funde con el gradient (máscara que arranca en el 30%) */}
+          <div className="absolute inset-y-0 pointer-events-none" style={{ left: "30%", right: 0 }}>
             <img
               src={PROMO.image}
               alt={PROMO.name}
               className="absolute inset-0 w-full h-full object-cover"
+              style={{
+                WebkitMaskImage: "linear-gradient(to right, transparent 0%, #000 22%)",
+                maskImage: "linear-gradient(to right, transparent 0%, #000 22%)",
+              }}
               draggable={false}
               loading="lazy"
               decoding="async"
             />
           </div>
-          {/* Fade — de 20% a 35% de la card (funde la imagen con el panel azul) */}
-          <div
-            className="absolute inset-y-0 pointer-events-none"
-            style={{ left: "20%", width: "15%", background: "linear-gradient(to right, #0a1648 0%, transparent 100%)" }}
-          />
 
           {/* Izquierda: detalles + precio (encima, 35%) */}
           <div className="relative z-10 flex flex-col justify-center gap-1.5 p-4 sm:p-5" style={{ width: "35%" }}>
