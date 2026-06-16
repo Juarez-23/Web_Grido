@@ -12,6 +12,7 @@ interface Promotion {
   description: string | null;
   image: string | null;
   badge: string | null;
+  price?: number;
 }
 
 // Gradientes de fallback cuando no hay imagen
@@ -180,7 +181,7 @@ export function PromoSection() {
       </div>
 
       {selected && (
-        <PromoModal promo={selected} onClose={() => setSelected(null)} />
+        <PromoModal promo={selected} price={selected.price} onClose={() => setSelected(null)} />
       )}
 
       {/* Vista "Ver todas" — grilla con todas las promociones */}
