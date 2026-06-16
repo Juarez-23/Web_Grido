@@ -285,11 +285,15 @@ export default function ContactoPage() {
                 </p>
                 <div className="mt-2 space-y-1">
                   {hoursLines.map((line, i) => {
-                    // Si la línea tiene "Días: horario", separar en dos columnas
-                    const idx = line.indexOf(":");
-                    const hasColon = idx > 0 && idx < line.length - 1;
-                    const days = hasColon ? line.slice(0, idx).trim() : line;
-                    const hrs = hasColon ? line.slice(idx + 1).trim() : "";
+                    // Separar "Días / horario" detectando la primera hora (12:00, 9.30, etc.)
+                    // Funciona con o sin ":" separador → "Lunes a jueves: 12:00" y "Lunes a jueves 12:00".
+                    const m = line.match(/\d{1,2}[:.]\d{2}/);
+                    let days = line;
+                    let hrs = "";
+                    if (m && m.index !== undefined && m.index > 0) {
+                      days = line.slice(0, m.index).replace(/[:\-–—]\s*$/, "").trim();
+                      hrs = line.slice(m.index).trim();
+                    }
                     return (
                       <div key={i} className="flex justify-between gap-4">
                         <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 400, fontSize: "0.78rem", color: "#6b7280" }}>
