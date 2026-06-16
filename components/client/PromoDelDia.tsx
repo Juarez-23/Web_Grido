@@ -64,7 +64,7 @@ export function PromoDelDia({ settings }: Props) {
         aria-label="Agregar la promo del día"
         className="promo-dia-card relative w-full overflow-hidden rounded-3xl text-left active:scale-[0.985] transition-transform"
         style={{
-          background: "radial-gradient(120% 120% at 0% 0%, #11286e 0%, #0a1648 60%, #070f33 100%)",
+          background: "linear-gradient(120deg, #0f2470 0%, #08125a 55%, #0a1648 100%)",
           boxShadow: "0 16px 44px rgba(8,18,80,0.32), 0 4px 14px rgba(8,18,80,0.22)",
         }}
       >
