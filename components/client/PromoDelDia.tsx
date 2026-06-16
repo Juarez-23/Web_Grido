@@ -68,9 +68,9 @@ export function PromoDelDia({ settings }: Props) {
           boxShadow: "0 16px 44px rgba(8,18,80,0.32), 0 4px 14px rgba(8,18,80,0.22)",
         }}
       >
-        <div className="relative flex items-stretch min-h-[185px]">
-          {/* Izquierda: detalles + precio */}
-          <div className="flex flex-col justify-center gap-1.5 p-4 sm:p-5" style={{ flex: "0 0 42%" }}>
+        <div className="relative flex items-stretch">
+          {/* Izquierda: detalles + precio — se adapta a la altura de la imagen */}
+          <div className="flex flex-col justify-center gap-1.5 p-3.5 sm:p-4" style={{ flex: "1 1 36%" }}>
             <h3
               className="leading-none"
               style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "clamp(1.25rem, 5.5vw, 1.6rem)", color: "#fff", letterSpacing: "-0.02em" }}
@@ -106,13 +106,12 @@ export function PromoDelDia({ settings }: Props) {
             </span>
           </div>
 
-          {/* Derecha: imagen full-bleed (llena todo el panel, estilo banner) */}
-          <div className="relative self-stretch" style={{ flex: "1 1 58%" }}>
+          {/* Derecha: la imagen manda — se muestra completa y define la altura */}
+          <div className="flex items-center" style={{ flex: "0 0 64%" }}>
             <img
               src={PROMO.image}
               alt={PROMO.name}
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{ objectPosition: "center" }}
+              className="block w-full h-auto object-contain"
               draggable={false}
               loading="lazy"
               decoding="async"
