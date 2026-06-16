@@ -68,9 +68,9 @@ export function PromoDelDia({ settings }: Props) {
           boxShadow: "0 16px 44px rgba(8,18,80,0.32), 0 4px 14px rgba(8,18,80,0.22)",
         }}
       >
-        <div className="relative flex items-stretch min-h-[168px]">
+        <div className="relative flex items-stretch min-h-[180px]">
           {/* Izquierda: detalles + precio */}
-          <div className="flex flex-col justify-center gap-1.5 p-4 sm:p-5" style={{ flex: "1 1 52%" }}>
+          <div className="flex flex-col justify-center gap-1.5 p-4 sm:p-5" style={{ flex: "0 0 40%" }}>
             <h3
               className="leading-none"
               style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "clamp(1.25rem, 5.5vw, 1.6rem)", color: "#fff", letterSpacing: "-0.02em" }}
@@ -106,26 +106,17 @@ export function PromoDelDia({ settings }: Props) {
             </span>
           </div>
 
-          {/* Derecha: imagen de productos en ficha blanca */}
-          <div className="flex items-center justify-center p-3" style={{ flex: "1 1 46%" }}>
-            <div
-              className="w-full overflow-hidden flex items-center justify-center"
-              style={{
-                aspectRatio: "1 / 1",
-                background: "#ffffff",
-                borderRadius: 18,
-                boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.04)",
-              }}
-            >
-              <img
-                src={PROMO.image}
-                alt={PROMO.name}
-                className="w-full h-full object-cover"
-                draggable={false}
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
+          {/* Derecha: imagen del flyer, a sangre (llena todo el lado derecho) */}
+          <div className="relative self-stretch" style={{ flex: "1 1 60%" }}>
+            <img
+              src={PROMO.image}
+              alt={PROMO.name}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: "center" }}
+              draggable={false}
+              loading="lazy"
+              decoding="async"
+            />
           </div>
         </div>
       </button>
