@@ -50,7 +50,7 @@ export function PromoDelDia({ settings }: Props) {
       >
         <div className="relative flex items-stretch min-h-[148px]">
           {/* Izquierda: detalles + precio */}
-          <div className="flex flex-col justify-center gap-1.5 p-4 sm:p-5" style={{ flex: "1 1 56%" }}>
+          <div className="flex flex-col justify-center gap-1.5 p-4 sm:p-5" style={{ flex: "0 0 35%" }}>
             <h3
               className="leading-none"
               style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: "clamp(1.25rem, 5.5vw, 1.6rem)", color: "#fff", letterSpacing: "-0.02em" }}
@@ -87,7 +87,7 @@ export function PromoDelDia({ settings }: Props) {
           </div>
 
           {/* Derecha: imagen de productos */}
-          <div className="relative self-stretch" style={{ flex: "1 1 44%" }}>
+          <div className="relative self-stretch" style={{ flex: "0 0 65%" }}>
             <img
               src={PROMO.image}
               alt={PROMO.name}
