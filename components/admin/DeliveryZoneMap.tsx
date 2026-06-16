@@ -32,6 +32,7 @@ export function DeliveryZoneMap({ mode, lat, lng, radiusKm, onChange, polygon, o
   const circleRef = useRef<Circle | null>(null);
   const polygonRef = useRef<Polygon | null>(null);
   const vertexLayerRef = useRef<LayerGroup | null>(null);
+  const roRef = useRef<ResizeObserver | null>(null);
 
   // Refs vivas para los handlers (evitan closures viejos)
   const modeRef = useRef(mode);
@@ -142,13 +143,24 @@ export function DeliveryZoneMap({ mode, lat, lng, radiusKm, onChange, polygon, o
 
       // Estado inicial
       circle.setStyle({ opacity: mode === "RADIUS" ? 1 : 0, fillOpacity: mode === "RADIUS" ? 0.12 : 0 });
+      marker.setOpacity(mode === "RADIUS" ? 1 : 0);
       drawPolygon(L, map, polygonStateRef.current);
 
-      setTimeout(() => map.invalidateSize(), 100);
+      // Recalcular tamaño varias veces y ante cambios de layout, para que los
+      // clics caigan en las coordenadas correctas (bug clásico de Leaflet).
+      const invalidate = () => map.invalidateSize();
+      setTimeout(invalidate, 100);
+      setTimeout(invalidate, 350);
+      setTimeout(invalidate, 700);
+      if (containerRef.current && "ResizeObserver" in window) {
+        roRef.current = new ResizeObserver(() => map.invalidateSize());
+        roRef.current.observe(containerRef.current);
+      }
     })();
 
     return () => {
       cancelled = true;
+      if (roRef.current) { roRef.current.disconnect(); roRef.current = null; }
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
@@ -163,7 +175,13 @@ export function DeliveryZoneMap({ mode, lat, lng, radiusKm, onChange, polygon, o
 
   // Sincronizar marcador + círculo
   useEffect(() => {
-    if (markerRef.current) markerRef.current.setLatLng([lat, lng]);
+    if (markerRef.current) {
+      markerRef.current.setLatLng([lat, lng]);
+      // En modo polígono ocultamos y desactivamos el marcador del local
+      markerRef.current.setOpacity(mode === "RADIUS" ? 1 : 0);
+      const drag = (markerRef.current as any).dragging;
+      if (drag) { mode === "RADIUS" ? drag.enable() : drag.disable(); }
+    }
     if (circleRef.current) {
       circleRef.current.setLatLng([lat, lng]);
       circleRef.current.setRadius(radiusKm * 1000);
