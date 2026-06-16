@@ -195,7 +195,7 @@ export default function AdminOrdersPage() {
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600 mb-2">
                     <span>📦 {DELIVERY_TYPE_LABELS[order.deliveryType]}</span>
                     <span>💳 {PAYMENT_METHOD_LABELS[order.paymentMethod]}</span>
-                    {order.address && <span>📍 {order.address}</span>}
+                    {order.address && <span className="basis-full break-words">📍 {order.address}</span>}
                   </div>
 
                   {/* Items */}
