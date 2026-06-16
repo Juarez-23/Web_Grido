@@ -1,16 +1,16 @@
 "use client";
 
-import { useCartStore } from "@/store/cartStore";
-import type { Product, AppSettings } from "@/types";
+import { useState } from "react";
+import type { AppSettings } from "@/types";
 import { formatPrice } from "@/lib/whatsapp";
-import toast from "react-hot-toast";
+import { PromoModal } from "@/components/client/PromoModal";
 
 interface Props {
   settings: AppSettings | null;
 }
 
 export function PromoDelDia({ settings }: Props) {
-  const { addItem, openCart } = useCartStore();
+  const [open, setOpen] = useState(false);
 
   // No mostrar si está desactivada o sin datos cargados
   if (!settings || !settings.promoDelDiaActive || !settings.promoDelDiaName) {
@@ -23,26 +23,6 @@ export function PromoDelDia({ settings }: Props) {
     detail: settings.promoDelDiaDetail,
     price: settings.promoDelDiaPrice,
     image: settings.promoDelDiaImage || "/promo-productos.webp",
-  };
-
-  const handleAdd = () => {
-    const virtualProduct: Product = {
-      id: PROMO.id,
-      name: PROMO.name,
-      description: undefined,
-      price: PROMO.price,
-      image: PROMO.image,
-      maxFlavors: 0,
-      active: true,
-      featured: false,
-      categoryId: "promo",
-      category: { id: "promo", name: "Promoción", slug: "promo", icon: "", order: 0, active: true },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    addItem(virtualProduct, []);
-    toast.success("¡Promo del día agregada! 🎉");
-    openCart();
   };
 
   return (
@@ -58,10 +38,10 @@ export function PromoDelDia({ settings }: Props) {
         <span className="h-px flex-1" style={{ background: "linear-gradient(to right, rgba(247,183,49,0.5), transparent)" }} />
       </div>
 
-      {/* Card horizontal compacta */}
+      {/* Card horizontal compacta — abre el detalle */}
       <button
-        onClick={handleAdd}
-        aria-label="Agregar la promo del día"
+        onClick={() => setOpen(true)}
+        aria-label="Ver la promo del día"
         className="promo-dia-card relative w-full overflow-hidden rounded-3xl text-left active:scale-[0.985] transition-transform"
         style={{
           background: "linear-gradient(120deg, #0f2470 0%, #08125a 55%, #0a1648 100%)",
@@ -102,7 +82,7 @@ export function PromoDelDia({ settings }: Props) {
                 <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
               </svg>
-              Sumar al pedido
+              Ver promo
             </span>
           </div>
 
@@ -124,6 +104,21 @@ export function PromoDelDia({ settings }: Props) {
           </div>
         </div>
       </button>
+
+      {/* Detalle de la promo */}
+      {open && (
+        <PromoModal
+          promo={{
+            id: PROMO.id,
+            title: PROMO.name,
+            description: PROMO.detail || null,
+            image: PROMO.image || null,
+            badge: null,
+          }}
+          price={PROMO.price}
+          onClose={() => setOpen(false)}
+        />
+      )}
     </section>
   );
 }

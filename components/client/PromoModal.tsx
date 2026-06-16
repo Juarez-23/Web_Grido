@@ -4,6 +4,7 @@ import { useRef, useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { gsap } from "@/lib/gsap";
 import { useCartStore } from "@/store/cartStore";
+import { formatPrice } from "@/lib/whatsapp";
 import toast from "react-hot-toast";
 import type { Product } from "@/types";
 
@@ -17,10 +18,12 @@ interface Promotion {
 
 interface Props {
   promo: Promotion;
+  /** Precio opcional (para la promo del día). Si se omite, se usa 0. */
+  price?: number;
   onClose: () => void;
 }
 
-export function PromoModal({ promo, onClose }: Props) {
+export function PromoModal({ promo, price, onClose }: Props) {
   const { addItem } = useCartStore();
   const [quantity, setQuantity] = useState(1);
   const backdropRef = useRef<HTMLDivElement>(null);
@@ -56,7 +59,7 @@ export function PromoModal({ promo, onClose }: Props) {
       id: `promo-${promo.id}`,
       name: promo.title,
       description: promo.description || undefined,
-      price: 0,
+      price: price ?? 0,
       image: promo.image || undefined,
       maxFlavors: 0,
       active: true,
@@ -137,6 +140,15 @@ export function PromoModal({ promo, onClose }: Props) {
               {promo.description && (
                 <p className="text-gray-500 text-sm mt-3 leading-relaxed">
                   {promo.description}
+                </p>
+              )}
+
+              {price !== undefined && price > 0 && (
+                <p
+                  className="mt-3"
+                  style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: 26, color: "#0d40e8", letterSpacing: "-0.02em" }}
+                >
+                  {formatPrice(price)}
                 </p>
               )}
             </div>
