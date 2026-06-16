@@ -28,7 +28,7 @@ export function generateWhatsAppMessage(
   total: number,
   options: WhatsAppOptions = {}
 ): string {
-  const { transferAlias, transferCbu, transferHolder, branchName, orderId } = options;
+  const { transferAlias, transferCbu, transferHolder, branchName } = options;
 
   const deliveryLabel =
     formData.deliveryType === "DELIVERY" ? "Delivery" : "Retiro en sucursal";
@@ -63,7 +63,9 @@ export function generateWhatsAppMessage(
         item.selectedFlavors.length > 0
           ? `\n   _${item.selectedFlavors.map((f) => f.name).join(", ")}_`
           : "";
-      return `• ${item.quantity}x ${item.product.name} — *${formatPrice(lineTotal)}*\n   _${item.quantity} × ${unit}_${flavors}`;
+      // Mostrar el desglose "cantidad × precio" solo si hay más de una unidad
+      const breakdown = item.quantity > 1 ? `\n   _${item.quantity} × ${unit}_` : "";
+      return `• ${item.quantity}x ${item.product.name} — *${formatPrice(lineTotal)}*${breakdown}${flavors}`;
     })
     .join("\n");
 
@@ -71,7 +73,6 @@ export function generateWhatsAppMessage(
   const headerName = (branchName || "Grido San Rafael").toUpperCase();
   let msg = `*${headerName}*\n`;
   msg += `Pedido N° ${orderNumber}\n`;
-  if (orderId) msg += `ID: ${orderId}\n`;
   msg += `${fecha} · ${hora} hs\n`;
   msg += `\n`;
 
