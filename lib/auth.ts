@@ -2,6 +2,7 @@ import { NextAuthOptions, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { prisma } from "@/lib/prisma";
 
 // Extender tipos de NextAuth
 declare module "next-auth" {
@@ -40,6 +41,48 @@ const ADMIN_USERS = [
   },
 ];
 
+export interface AdminUser {
+  id: string;
+  username: string;
+  passwordHash: string;
+  name: string;
+  role: string;
+  branchId: string;
+}
+
+/**
+ * Usuarios admin efectivos: parte de los defaults y aplica los overrides
+ * guardados en la tabla settings (claves adminUser / adminHash por sucursal).
+ * Si la DB falla, devuelve los defaults (el login nunca se rompe del todo).
+ */
+export async function getEffectiveAdminUsers(): Promise<AdminUser[]> {
+  const users: AdminUser[] = ADMIN_USERS.map((u) => ({ ...u }));
+  try {
+    const rows = await prisma.setting.findMany({
+      where: { key: { in: ["adminUser", "adminHash"] } },
+      select: { branchId: true, key: true, value: true },
+    });
+    const byBranch: Record<string, { adminUser?: string; adminHash?: string }> = {};
+    for (const r of rows) {
+      (byBranch[r.branchId] ??= {})[r.key as "adminUser" | "adminHash"] = r.value;
+    }
+    for (const u of users) {
+      const o = byBranch[u.branchId];
+      if (o?.adminUser) u.username = o.adminUser.toLowerCase().trim();
+      if (o?.adminHash) u.passwordHash = o.adminHash;
+    }
+  } catch (e) {
+    console.error("getEffectiveAdminUsers error:", e);
+  }
+  return users;
+}
+
+/** Admin efectivo de una sucursal puntual (por branchId). */
+export async function getBranchAdmin(branchId: string): Promise<AdminUser | null> {
+  const users = await getEffectiveAdminUsers();
+  return users.find((u) => u.branchId === branchId) ?? null;
+}
+
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
@@ -60,7 +103,8 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Credenciales inválidas");
         }
 
-        const user = ADMIN_USERS.find(
+        const users = await getEffectiveAdminUsers();
+        const user = users.find(
           (u) => u.username === credentials.username.toLowerCase().trim()
         );
 

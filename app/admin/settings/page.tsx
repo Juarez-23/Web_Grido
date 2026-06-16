@@ -35,6 +35,43 @@ export default function AdminSettingsPage() {
   const [saving, setSaving] = useState(false);
   const [togglingStore, setTogglingStore] = useState(false);
 
+  // ─── Credenciales del admin ───────────────────────────────
+  const [cred, setCred] = useState({ currentPassword: "", newUsername: "", newPassword: "", confirmPassword: "" });
+  const [savingCred, setSavingCred] = useState(false);
+
+  const handleCredChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setCred((c) => ({ ...c, [name]: value }));
+  };
+
+  const handleSaveCred = async () => {
+    if (!cred.currentPassword) { toast.error("Ingresá tu contraseña actual"); return; }
+    if (!cred.newUsername && !cred.newPassword) { toast.error("Cambiá el usuario o la contraseña"); return; }
+    if (cred.newPassword && cred.newPassword !== cred.confirmPassword) {
+      toast.error("Las contraseñas nuevas no coinciden"); return;
+    }
+    setSavingCred(true);
+    try {
+      const res = await fetch("/api/admin/credentials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          currentPassword: cred.currentPassword,
+          newUsername: cred.newUsername || undefined,
+          newPassword: cred.newPassword || undefined,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Error");
+      toast.success("✅ Credenciales actualizadas. Usalas en el próximo ingreso.");
+      setCred({ currentPassword: "", newUsername: "", newPassword: "", confirmPassword: "" });
+    } catch (err: any) {
+      toast.error(err.message || "No se pudieron actualizar");
+    } finally {
+      setSavingCred(false);
+    }
+  };
+
   useEffect(() => {
     fetch("/api/settings")
       .then((r) => r.json())
@@ -277,6 +314,35 @@ export default function AdminSettingsPage() {
       <div className="mt-6">
         <button onClick={handleSave} disabled={saving} className="w-full btn-primary h-12 text-base">
           {saving ? "Guardando..." : "Guardar configuración"}
+        </button>
+      </div>
+
+      {/* Credenciales del admin — guardado aparte */}
+      <div className="bg-white rounded-2xl p-5 shadow-card mt-4">
+        <h2 className="font-bold text-gray-900 mb-1">Usuario y contraseña</h2>
+        <p className="text-sm text-gray-500 mb-4">Cambiá el acceso al panel de esta sucursal</p>
+        <div className="space-y-3">
+          <div>
+            <label className="text-sm font-medium text-gray-600 mb-1 block">Contraseña actual *</label>
+            <input name="currentPassword" type="password" value={cred.currentPassword} onChange={handleCredChange} className="input-field" placeholder="••••••••" autoComplete="current-password" />
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-600 mb-1 block">Nuevo usuario <span className="font-normal text-gray-400">(opcional)</span></label>
+            <input name="newUsername" value={cred.newUsername} onChange={handleCredChange} className="input-field" placeholder="Dejar vacío para no cambiar" autoComplete="off" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-sm font-medium text-gray-600 mb-1 block">Nueva contraseña</label>
+              <input name="newPassword" type="password" value={cred.newPassword} onChange={handleCredChange} className="input-field" placeholder="Mín. 6 caracteres" autoComplete="new-password" />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-600 mb-1 block">Repetir contraseña</label>
+              <input name="confirmPassword" type="password" value={cred.confirmPassword} onChange={handleCredChange} className="input-field" placeholder="Repetir" autoComplete="new-password" />
+            </div>
+          </div>
+        </div>
+        <button onClick={handleSaveCred} disabled={savingCred} className="w-full btn-primary h-11 text-sm mt-4">
+          {savingCred ? "Guardando..." : "Actualizar credenciales"}
         </button>
       </div>
     </div>
