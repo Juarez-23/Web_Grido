@@ -19,7 +19,10 @@ function writeCookie(name: string, value: string) {
   document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
 }
 
-/** Parchea window.fetch para agregar el header x-branch a las llamadas /api. */
+/** Parchea window.fetch para identificar la sucursal en las llamadas /api:
+ *  - header x-branch (lo leen los endpoints)
+ *  - query ?branch=... en la URL (clave de caché única por sucursal, evita
+ *    que el CDN sirva la misma respuesta a ambas sucursales) */
 function patchFetch() {
   if (patched || typeof window === "undefined") return;
   patched = true;
@@ -33,6 +36,10 @@ function patchFetch() {
         );
         if (!headers.has("x-branch")) headers.set("x-branch", currentBranch);
         init = { ...init, headers };
+        // Agregar ?branch= a la URL (solo si es string y no lo trae ya)
+        if (typeof input === "string" && !/[?&]branch=/.test(input)) {
+          input = input + (input.includes("?") ? "&" : "?") + "branch=" + encodeURIComponent(currentBranch);
+        }
       }
     } catch {}
     return orig(input, init);
