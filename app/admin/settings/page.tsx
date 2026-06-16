@@ -25,6 +25,8 @@ export default function AdminSettingsPage() {
     promoDelDiaDetail: "",
     promoDelDiaPrice: 0,
     promoDelDiaImage: "",
+    promoDelDiaImageMobile: "",
+    promoDelDiaImageDesktop: "",
     address: "",
     hours: "",
     instagramUrl: "",

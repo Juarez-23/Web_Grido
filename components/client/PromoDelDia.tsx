@@ -17,9 +17,9 @@ export function PromoDelDia({ settings }: Props) {
     return null;
   }
 
-  // Imágenes de apoyo (solo visual, sin texto). Swap por breakpoint.
-  const IMG_MOBILE = "/promo_mundialista_mobile.png";
-  const IMG_DESKTOP = "/promo_mundialista_desktop.png";
+  // Imágenes de apoyo (solo visual). Editables desde el admin, con fallback estático.
+  const IMG_MOBILE = settings.promoDelDiaImageMobile || "/promo_mundialista_mobile.png";
+  const IMG_DESKTOP = settings.promoDelDiaImageDesktop || "/promo_mundialista_desktop.png";
 
   const PROMO = {
     id: "promo-del-dia",
