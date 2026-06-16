@@ -244,7 +244,7 @@ body {
 
 /* Promo del día — fade de la imagen: mobile 30%→45%, desktop 30%→35% */
 .promo-fade-img {
-  --promo-fade: 21%; /* mobile: banda más larga */
+  --promo-fade: 29%; /* mobile: fade hasta ~50% de la card (imagen más tapada) */
   -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 var(--promo-fade));
           mask-image: linear-gradient(to right, transparent 0%, #000 var(--promo-fade));
 }

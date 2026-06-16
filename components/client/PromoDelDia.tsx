@@ -44,8 +44,8 @@ export function PromoDelDia({ settings }: Props) {
         aria-label="Ver la promo del día"
         className="promo-dia-card relative w-full overflow-hidden rounded-3xl text-left active:scale-[0.985] transition-transform"
         style={{
-          background: "linear-gradient(125deg, #1747cc 0%, #0f349f 50%, #0a2578 100%)",
-          boxShadow: "0 16px 44px rgba(10,37,120,0.32), 0 4px 14px rgba(10,37,120,0.22)",
+          background: "linear-gradient(125deg, #1e57f5 0%, #1640d8 50%, #0f30ad 100%)",
+          boxShadow: "0 16px 44px rgba(15,48,173,0.34), 0 4px 14px rgba(15,48,173,0.24)",
         }}
       >
         <div className="relative min-h-[148px]">
