@@ -125,10 +125,11 @@ export default function AdminSettingsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(settings),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
       toast.success("Configuración guardada");
-    } catch {
-      toast.error("Error al guardar configuración");
+    } catch (err: any) {
+      toast.error(err.message || "Error al guardar configuración");
     } finally {
       setSaving(false);
     }

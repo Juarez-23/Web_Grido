@@ -136,19 +136,24 @@ export async function PUT(req: NextRequest) {
     if (body.mapsQuery !== undefined)
       updates.push({ key: "mapsQuery", value: body.mapsQuery });
 
-    // Upsert cada setting (por sucursal)
+    // Upsert cada setting (por sucursal) — se ignoran valores nulos
+    const safeUpdates = updates.filter((u) => u.value !== null && u.value !== undefined);
     await Promise.all(
-      updates.map((u) =>
+      safeUpdates.map((u) =>
         prisma.setting.upsert({
           where: { branchId_key: { branchId, key: u.key } },
-          update: { value: u.value },
-          create: { key: u.key, value: u.value, branchId },
+          update: { value: String(u.value) },
+          create: { key: u.key, value: String(u.value), branchId },
         })
       )
     );
 
     return NextResponse.json({ message: "Configuración actualizada" });
   } catch (error) {
-    return NextResponse.json({ error: "Error al actualizar configuración" }, { status: 500 });
+    console.error("PUT /api/settings error:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Error al actualizar configuración" },
+      { status: 500 }
+    );
   }
 }
