@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { generateWhatsAppMessage, generateWhatsAppUrl } from "@/lib/whatsapp";
 import { getAdminBranchId, resolveBranchId } from "@/lib/branch";
+import { deliveryActiveFromMap } from "@/lib/delivery";
 import type { CheckoutFormData, CartItem } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -77,7 +78,7 @@ export async function POST(req: NextRequest) {
     const settingsRows = await prisma.setting.findMany({
       where: {
         branchId,
-        key: { in: ["storeOpen", "deliveryEnabled", "minOrderAmount", "whatsappNumber", "transferAlias", "transferCbu", "transferHolder"] },
+        key: { in: ["storeOpen", "deliveryEnabled", "deliveryManualOn", "deliveryMode", "deliveryFrom", "deliveryTo", "minOrderAmount", "whatsappNumber", "transferAlias", "transferCbu", "transferHolder"] },
       },
     });
     const settings: Record<string, string> = {};
@@ -88,9 +89,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "La tienda está cerrada en este momento." }, { status: 503 });
     }
 
-    // Delivery desactivado: solo retiro
-    if (settings.deliveryEnabled === "false" && deliveryType === "DELIVERY") {
-      return NextResponse.json({ error: "El delivery no está disponible. Elegí retiro en el local." }, { status: 400 });
+    // Delivery desactivado (manual u horario): solo retiro
+    if (deliveryType === "DELIVERY" && !deliveryActiveFromMap(settings)) {
+      return NextResponse.json({ error: "El delivery no está disponible en este momento. Elegí retiro en el local." }, { status: 400 });
     }
 
     // Monto mínimo

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getPublicBranchId, getAdminBranchId } from "@/lib/branch";
+import { deliveryActiveFromMap } from "@/lib/delivery";
 import type { AppSettings } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -17,8 +18,17 @@ export async function GET(req: NextRequest) {
     const map: Record<string, string> = {};
     settings.forEach((s) => (map[s.key] = s.value));
 
+    const deliveryMode = map.deliveryMode === "SCHEDULE" ? "SCHEDULE" : "MANUAL";
+    const deliveryFrom = map.deliveryFrom || "10:00";
+    const deliveryTo = map.deliveryTo || "23:00";
+    const deliveryManualOn = (map.deliveryManualOn ?? map.deliveryEnabled) !== "false";
+
     const appSettings: AppSettings = {
-      deliveryEnabled: map.deliveryEnabled !== "false",
+      deliveryEnabled: deliveryActiveFromMap(map), // efectivo (manual u horario)
+      deliveryMode,
+      deliveryManualOn,
+      deliveryFrom,
+      deliveryTo,
       deliveryCost: parseFloat(map.deliveryCost || "1500"),
       minOrderAmount: parseFloat(map.minOrderAmount || "5000"),
       whatsappNumber: map.whatsappNumber || "5492604000000",
@@ -71,8 +81,14 @@ export async function PUT(req: NextRequest) {
 
     const updates: Array<{ key: string; value: string }> = [];
 
-    if (body.deliveryEnabled !== undefined)
-      updates.push({ key: "deliveryEnabled", value: String(body.deliveryEnabled) });
+    if (body.deliveryManualOn !== undefined)
+      updates.push({ key: "deliveryManualOn", value: String(body.deliveryManualOn) });
+    if (body.deliveryMode !== undefined)
+      updates.push({ key: "deliveryMode", value: body.deliveryMode === "SCHEDULE" ? "SCHEDULE" : "MANUAL" });
+    if (body.deliveryFrom !== undefined)
+      updates.push({ key: "deliveryFrom", value: body.deliveryFrom });
+    if (body.deliveryTo !== undefined)
+      updates.push({ key: "deliveryTo", value: body.deliveryTo });
     if (body.deliveryCost !== undefined)
       updates.push({ key: "deliveryCost", value: String(body.deliveryCost) });
     if (body.minOrderAmount !== undefined)

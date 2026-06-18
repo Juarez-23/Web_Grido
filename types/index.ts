@@ -124,8 +124,16 @@ export interface CheckoutFormData {
 
 // ─── SETTINGS ───────────────────────────────
 export interface AppSettings {
-  /** Si el delivery está habilitado. Si es false, el local solo hace take away */
+  /** Estado EFECTIVO del delivery (calculado: manual o por horario). Lo usan home/checkout. */
   deliveryEnabled: boolean;
+  /** Modo de control del delivery */
+  deliveryMode: "MANUAL" | "SCHEDULE";
+  /** Interruptor manual (cuando el modo es MANUAL) */
+  deliveryManualOn: boolean;
+  /** Hora de inicio del delivery (modo SCHEDULE), formato "HH:MM" */
+  deliveryFrom: string;
+  /** Hora de fin del delivery (modo SCHEDULE), formato "HH:MM" */
+  deliveryTo: string;
   deliveryCost: number;
   minOrderAmount: number;
   whatsappNumber: string;

@@ -7,6 +7,10 @@ import type { AppSettings } from "@/types";
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<AppSettings>({
     deliveryEnabled: true,
+    deliveryMode: "MANUAL",
+    deliveryManualOn: true,
+    deliveryFrom: "10:00",
+    deliveryTo: "23:00",
     deliveryCost: 1500,
     minOrderAmount: 5000,
     whatsappNumber: "5492604000000",
@@ -212,34 +216,84 @@ export default function AdminSettingsPage() {
 
         {/* Delivery */}
         <div className="bg-white rounded-2xl p-5 shadow-card">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="font-bold text-gray-900">Delivery</h2>
-              <p className="text-sm text-gray-500 mt-0.5">
-                {settings.deliveryEnabled ? "Habilitado — el cliente puede elegir envío" : "Desactivado — solo retiro (take away)"}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setSettings((s) => ({ ...s, deliveryEnabled: !s.deliveryEnabled }))}
-              aria-label="Habilitar delivery"
-              style={{
-                position: "relative", flexShrink: 0, width: 52, height: 30,
-                borderRadius: 999, border: "none", cursor: "pointer", padding: 0,
-                background: settings.deliveryEnabled ? "#22c55e" : "#d1d5db",
-                transition: "background 220ms cubic-bezier(0.25,1,0.5,1)",
-              }}
-            >
-              <span style={{
-                position: "absolute", top: 3, left: settings.deliveryEnabled ? 25 : 3,
-                width: 24, height: 24, background: "white", borderRadius: "50%",
-                boxShadow: "0 1px 4px rgba(0,0,0,0.22)",
-                transition: "left 220ms cubic-bezier(0.25,1,0.5,1)", display: "block",
-              }} />
-            </button>
+          <h2 className="font-bold text-gray-900 mb-1">Delivery</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Estado actual:{" "}
+            <strong className={settings.deliveryEnabled ? "text-green-600" : "text-red-500"}>
+              {settings.deliveryEnabled ? "Activo" : "Desactivado"}
+            </strong>
+          </p>
+
+          {/* Selector de modo */}
+          <div className="bg-gray-100 rounded-xl p-1 flex gap-1 mb-4">
+            {([
+              { v: "MANUAL", label: "Manual" },
+              { v: "SCHEDULE", label: "Por horario" },
+            ] as const).map((opt) => (
+              <button
+                key={opt.v}
+                type="button"
+                onClick={() => setSettings((s) => ({ ...s, deliveryMode: opt.v }))}
+                className="flex-1 py-2 rounded-lg text-sm font-bold transition-all"
+                style={{
+                  background: settings.deliveryMode === opt.v ? "#fff" : "transparent",
+                  color: settings.deliveryMode === opt.v ? "#0d40e8" : "#6b7280",
+                  boxShadow: settings.deliveryMode === opt.v ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+                }}
+              >
+                {opt.label}
+              </button>
+            ))}
           </div>
-          {settings.deliveryEnabled && (
-          <div className="grid grid-cols-2 gap-4">
+
+          {/* Modo MANUAL */}
+          {settings.deliveryMode === "MANUAL" && (
+            <div className="flex items-center justify-between py-1 mb-4">
+              <p className="text-sm font-medium text-gray-700">
+                {settings.deliveryManualOn ? "Delivery encendido" : "Delivery apagado (solo retiro)"}
+              </p>
+              <button
+                type="button"
+                onClick={() => setSettings((s) => ({ ...s, deliveryManualOn: !s.deliveryManualOn }))}
+                aria-label="Encender/apagar delivery"
+                style={{
+                  position: "relative", flexShrink: 0, width: 52, height: 30,
+                  borderRadius: 999, border: "none", cursor: "pointer", padding: 0,
+                  background: settings.deliveryManualOn ? "#22c55e" : "#d1d5db",
+                  transition: "background 220ms cubic-bezier(0.25,1,0.5,1)",
+                }}
+              >
+                <span style={{
+                  position: "absolute", top: 3, left: settings.deliveryManualOn ? 25 : 3,
+                  width: 24, height: 24, background: "white", borderRadius: "50%",
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.22)",
+                  transition: "left 220ms cubic-bezier(0.25,1,0.5,1)", display: "block",
+                }} />
+              </button>
+            </div>
+          )}
+
+          {/* Modo POR HORARIO */}
+          {settings.deliveryMode === "SCHEDULE" && (
+            <div className="mb-4">
+              <p className="text-sm text-gray-500 mb-2">
+                El delivery se activa y desactiva solo entre estos horarios (hora de Argentina).
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-600 mb-1 block">Desde</label>
+                  <input name="deliveryFrom" type="time" value={settings.deliveryFrom} onChange={handleChange} className="input-field" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600 mb-1 block">Hasta</label>
+                  <input name="deliveryTo" type="time" value={settings.deliveryTo} onChange={handleChange} className="input-field" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Costo y mínimo */}
+          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
             <div>
               <label className="text-sm font-medium text-gray-600 mb-1 block">Costo de envío (ARS)</label>
               <input name="deliveryCost" type="number" value={settings.deliveryCost} onChange={handleChange} className="input-field" placeholder="1500" />
@@ -249,7 +303,6 @@ export default function AdminSettingsPage() {
               <input name="minOrderAmount" type="number" value={settings.minOrderAmount} onChange={handleChange} className="input-field" placeholder="5000" />
             </div>
           </div>
-          )}
         </div>
 
         {/* Contacto / Sucursal */}
