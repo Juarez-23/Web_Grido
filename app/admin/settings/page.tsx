@@ -291,21 +291,21 @@ export default function AdminSettingsPage() {
               <p className="text-sm text-gray-500 mb-2">
                 El delivery se activa y desactiva solo entre estos horarios (hora de Argentina).
               </p>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="min-w-0">
                   <label className="text-sm font-medium text-gray-600 mb-1 block">Desde</label>
-                  <input name="deliveryFrom" type="time" value={settings.deliveryFrom} onChange={handleChange} className="input-field" />
+                  <input name="deliveryFrom" type="time" value={settings.deliveryFrom} onChange={handleChange} className="input-field w-full" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <label className="text-sm font-medium text-gray-600 mb-1 block">Hasta</label>
-                  <input name="deliveryTo" type="time" value={settings.deliveryTo} onChange={handleChange} className="input-field" />
+                  <input name="deliveryTo" type="time" value={settings.deliveryTo} onChange={handleChange} className="input-field w-full" />
                 </div>
               </div>
             </div>
           )}
 
           {/* Costo y mínimo */}
-          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-gray-100">
             <div>
               <label className="text-sm font-medium text-gray-600 mb-1 block">Costo de envío (ARS)</label>
               <input name="deliveryCost" type="number" value={settings.deliveryCost} onChange={handleChange} className="input-field" placeholder="1500" />
