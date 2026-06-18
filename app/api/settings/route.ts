@@ -136,9 +136,11 @@ export async function PUT(req: NextRequest) {
     if (body.mapsQuery !== undefined)
       updates.push({ key: "mapsQuery", value: body.mapsQuery });
 
-    // Upsert cada setting (por sucursal) — se ignoran valores nulos
+    // Upsert cada setting (por sucursal) — se ignoran valores nulos.
+    // En UNA transacción secuencial (no en paralelo) para no agotar el pool de
+    // conexiones de Supabase (límite bajo en serverless).
     const safeUpdates = updates.filter((u) => u.value !== null && u.value !== undefined);
-    await Promise.all(
+    await prisma.$transaction(
       safeUpdates.map((u) =>
         prisma.setting.upsert({
           where: { branchId_key: { branchId, key: u.key } },

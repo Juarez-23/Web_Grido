@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       updates.push({ key: "adminHash", value: hash });
     }
 
-    await Promise.all(
+    await prisma.$transaction(
       updates.map((u) =>
         prisma.setting.upsert({
           where: { branchId_key: { branchId, key: u.key } },
