@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import type { AppSettings } from "@/types";
+import { isWithinSchedule } from "@/lib/delivery";
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<AppSettings>({
@@ -218,12 +219,22 @@ export default function AdminSettingsPage() {
         {/* Delivery */}
         <div className="bg-white rounded-2xl p-5 shadow-card">
           <h2 className="font-bold text-gray-900 mb-1">Delivery</h2>
-          <p className="text-sm text-gray-500 mb-4">
-            Estado actual:{" "}
-            <strong className={settings.deliveryEnabled ? "text-green-600" : "text-red-500"}>
-              {settings.deliveryEnabled ? "Activo" : "Desactivado"}
-            </strong>
-          </p>
+          {(() => {
+            const activeNow = settings.deliveryMode === "SCHEDULE"
+              ? isWithinSchedule(settings.deliveryFrom, settings.deliveryTo)
+              : settings.deliveryManualOn;
+            return (
+              <p className="text-sm text-gray-500 mb-4">
+                Estado actual:{" "}
+                <strong className={activeNow ? "text-green-600" : "text-red-500"}>
+                  {activeNow ? "Activo" : "Desactivado"}
+                </strong>
+                {settings.deliveryMode === "SCHEDULE" && (
+                  <span className="text-gray-400"> · por horario {settings.deliveryFrom}–{settings.deliveryTo}</span>
+                )}
+              </p>
+            );
+          })()}
 
           {/* Selector de modo */}
           <div className="bg-gray-100 rounded-xl p-1 flex gap-1 mb-4">
