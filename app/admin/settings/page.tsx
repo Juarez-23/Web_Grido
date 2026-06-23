@@ -237,25 +237,25 @@ export default function AdminSettingsPage() {
           })()}
 
           {/* Selector de modo */}
-          <div className="bg-gray-100 rounded-xl p-1 flex gap-1 mb-4">
+          <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1 mb-4">
             {([
               { v: "MANUAL", label: "Manual" },
               { v: "SCHEDULE", label: "Por horario" },
-            ] as const).map((opt) => (
-              <button
-                key={opt.v}
-                type="button"
-                onClick={() => setSettings((s) => ({ ...s, deliveryMode: opt.v }))}
-                className="flex-1 py-2 rounded-lg text-sm font-bold transition-all"
-                style={{
-                  background: settings.deliveryMode === opt.v ? "#fff" : "transparent",
-                  color: settings.deliveryMode === opt.v ? "#0d40e8" : "#6b7280",
-                  boxShadow: settings.deliveryMode === opt.v ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
-                }}
-              >
-                {opt.label}
-              </button>
-            ))}
+            ] as const).map((opt) => {
+              const active = settings.deliveryMode === opt.v;
+              return (
+                <button
+                  key={opt.v}
+                  type="button"
+                  onClick={() => setSettings((s) => ({ ...s, deliveryMode: opt.v }))}
+                  className={`flex-1 h-9 rounded-lg text-sm font-bold flex items-center justify-center transition-colors ${
+                    active ? "bg-white text-grido-primary shadow-sm" : "text-gray-500"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
           </div>
 
           {/* Modo MANUAL */}
