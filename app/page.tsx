@@ -302,7 +302,7 @@ export default function HomePage() {
 
         {/* Contenido */}
         <div
-          className="hero-content relative h-full flex flex-col justify-center px-5 pb-8 max-w-xs md:max-w-[44%] md:px-8"
+          className="hero-content relative h-full flex flex-col justify-start md:justify-center pt-16 md:pt-0 px-5 pb-8 max-w-xs md:max-w-[44%] md:px-8"
         >
           {/* Badge — fijo arriba del bloque */}
           <div className="absolute top-3 left-5 md:left-8">
