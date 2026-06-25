@@ -130,10 +130,12 @@ export interface AppSettings {
   deliveryMode: "MANUAL" | "SCHEDULE";
   /** Interruptor manual (cuando el modo es MANUAL) */
   deliveryManualOn: boolean;
-  /** Hora de inicio del delivery (modo SCHEDULE), formato "HH:MM" */
+  /** Hora de inicio del delivery (modo SCHEDULE, legado un solo rango), formato "HH:MM" */
   deliveryFrom: string;
-  /** Hora de fin del delivery (modo SCHEDULE), formato "HH:MM" */
+  /** Hora de fin del delivery (modo SCHEDULE, legado un solo rango), formato "HH:MM" */
   deliveryTo: string;
+  /** Franjas horarias de delivery (modo SCHEDULE). JSON de [{start:"HH:MM",end:"HH:MM"}]. Reemplaza from/to cuando tiene al menos un elemento. */
+  deliverySchedule: string;
   deliveryCost: number;
   minOrderAmount: number;
   whatsappNumber: string;

@@ -39,11 +39,40 @@ export function isWithinSchedule(from: string, to: string, now = new Date()): bo
   return cur >= f || cur < t;
 }
 
+/**
+ * ¿El horario actual (Argentina) está dentro de alguna de las franjas configuradas?
+ * `scheduleJson` es un JSON string de `{start:string,end:string}[]`.
+ * Si está vacío o mal formado cae al rango legado from/to.
+ */
+export function isWithinAnySlot(
+  scheduleJson: string,
+  fallbackFrom: string,
+  fallbackTo: string,
+  now = new Date()
+): boolean {
+  let slots: { start: string; end: string }[] = [];
+  try {
+    const parsed = JSON.parse(scheduleJson || "[]");
+    if (Array.isArray(parsed)) slots = parsed;
+  } catch { /* ignore */ }
+
+  if (slots.length === 0) {
+    // legado: un solo rango
+    return isWithinSchedule(fallbackFrom, fallbackTo, now);
+  }
+
+  return slots.some((s) => isWithinSchedule(s.start, s.end, now));
+}
+
 /** Estado efectivo del delivery a partir del mapa de settings de una sucursal. */
 export function deliveryActiveFromMap(map: Record<string, string>): boolean {
   const mode = map.deliveryMode === "SCHEDULE" ? "SCHEDULE" : "MANUAL";
   if (mode === "SCHEDULE") {
-    return isWithinSchedule(map.deliveryFrom || "10:00", map.deliveryTo || "23:00");
+    return isWithinAnySlot(
+      map.deliverySchedule || "",
+      map.deliveryFrom || "10:00",
+      map.deliveryTo || "23:00"
+    );
   }
   // Manual — fallback a la clave vieja deliveryEnabled si aún no migró
   const manual = map.deliveryManualOn ?? map.deliveryEnabled;

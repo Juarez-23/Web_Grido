@@ -21,6 +21,7 @@ export async function GET(req: NextRequest) {
     const deliveryMode = map.deliveryMode === "SCHEDULE" ? "SCHEDULE" : "MANUAL";
     const deliveryFrom = map.deliveryFrom || "10:00";
     const deliveryTo = map.deliveryTo || "23:00";
+    const deliverySchedule = map.deliverySchedule || "";
     const deliveryManualOn = (map.deliveryManualOn ?? map.deliveryEnabled) !== "false";
 
     const appSettings: AppSettings = {
@@ -29,6 +30,7 @@ export async function GET(req: NextRequest) {
       deliveryManualOn,
       deliveryFrom,
       deliveryTo,
+      deliverySchedule,
       deliveryCost: parseFloat(map.deliveryCost || "1500"),
       minOrderAmount: parseFloat(map.minOrderAmount || "5000"),
       whatsappNumber: map.whatsappNumber || "5492604000000",
@@ -90,6 +92,8 @@ export async function PUT(req: NextRequest) {
       updates.push({ key: "deliveryFrom", value: body.deliveryFrom });
     if (body.deliveryTo !== undefined)
       updates.push({ key: "deliveryTo", value: body.deliveryTo });
+    if (body.deliverySchedule !== undefined)
+      updates.push({ key: "deliverySchedule", value: body.deliverySchedule });
     if (body.deliveryCost !== undefined)
       updates.push({ key: "deliveryCost", value: String(body.deliveryCost) });
     if (body.minOrderAmount !== undefined)
@@ -98,12 +102,16 @@ export async function PUT(req: NextRequest) {
       updates.push({ key: "whatsappNumber", value: body.whatsappNumber });
     if (body.whatsappDelivery !== undefined)
       updates.push({ key: "whatsappDelivery", value: body.whatsappDelivery });
-    if (body.transferAlias !== undefined)
-      updates.push({ key: "transferAlias", value: body.transferAlias });
-    if (body.transferCbu !== undefined)
-      updates.push({ key: "transferCbu", value: body.transferCbu });
-    if (body.transferHolder !== undefined)
-      updates.push({ key: "transferHolder", value: body.transferHolder });
+    // Datos bancarios — solo ADMIN puede modificarlos
+    const role = (session.user as any)?.role;
+    if (role === "ADMIN") {
+      if (body.transferAlias !== undefined)
+        updates.push({ key: "transferAlias", value: body.transferAlias });
+      if (body.transferCbu !== undefined)
+        updates.push({ key: "transferCbu", value: body.transferCbu });
+      if (body.transferHolder !== undefined)
+        updates.push({ key: "transferHolder", value: body.transferHolder });
+    }
     if (body.storeOpen !== undefined)
       updates.push({ key: "storeOpen", value: String(body.storeOpen) });
     if (body.storeClosedMessage !== undefined)

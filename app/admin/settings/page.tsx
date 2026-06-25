@@ -2,16 +2,23 @@
 
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
 import type { AppSettings } from "@/types";
-import { isWithinSchedule } from "@/lib/delivery";
+import { isWithinAnySlot } from "@/lib/delivery";
+
+type Slot = { start: string; end: string };
 
 export default function AdminSettingsPage() {
+  const { data: session } = useSession();
+  const isAdmin = (session?.user as any)?.role === "ADMIN";
+
   const [settings, setSettings] = useState<AppSettings>({
     deliveryEnabled: true,
     deliveryMode: "MANUAL",
     deliveryManualOn: true,
     deliveryFrom: "10:00",
     deliveryTo: "23:00",
+    deliverySchedule: "",
     deliveryCost: 1500,
     minOrderAmount: 5000,
     whatsappNumber: "5492604000000",
@@ -37,6 +44,13 @@ export default function AdminSettingsPage() {
     facebookUrl: "",
     mapsQuery: "",
   });
+
+  // Franjas horarias de delivery (modo SCHEDULE)
+  const [slots, setSlots] = useState<Slot[]>([
+    { start: "09:00", end: "13:00" },
+    { start: "17:00", end: "23:00" },
+  ]);
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [togglingStore, setTogglingStore] = useState(false);
@@ -82,7 +96,14 @@ export default function AdminSettingsPage() {
     fetch("/api/settings")
       .then((r) => r.json())
       .then((d) => {
-        if (d.data) setSettings(d.data);
+        if (d.data) {
+          setSettings(d.data);
+          // Parsear franjas horarias guardadas
+          try {
+            const parsed = JSON.parse(d.data.deliverySchedule || "[]");
+            if (Array.isArray(parsed) && parsed.length > 0) setSlots(parsed);
+          } catch { /* usar defaults */ }
+        }
         setLoading(false);
       });
   }, []);
@@ -122,10 +143,15 @@ export default function AdminSettingsPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
+      const payload = {
+        ...settings,
+        // Serializar franjas horarias al guardar
+        deliverySchedule: JSON.stringify(slots.filter((s) => s.start && s.end)),
+      };
       const res = await fetch("/api/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(settings),
+        body: JSON.stringify(payload),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
@@ -222,16 +248,18 @@ export default function AdminSettingsPage() {
           <h2 className="font-bold text-gray-900 mb-1">Delivery</h2>
           {(() => {
             const activeNow = settings.deliveryMode === "SCHEDULE"
-              ? isWithinSchedule(settings.deliveryFrom, settings.deliveryTo)
+              ? isWithinAnySlot(JSON.stringify(slots), settings.deliveryFrom, settings.deliveryTo)
               : settings.deliveryManualOn;
             return (
               <p className="text-sm text-gray-500 mb-4">
                 Estado actual:{" "}
                 <strong className={activeNow ? "text-green-600" : "text-red-500"}>
-                  {activeNow ? "Activo" : "Desactivado"}
+                  {activeNow ? "🟢 Activo" : "🔴 Desactivado"}
                 </strong>
-                {settings.deliveryMode === "SCHEDULE" && (
-                  <span className="text-gray-400"> · por horario {settings.deliveryFrom}–{settings.deliveryTo}</span>
+                {settings.deliveryMode === "SCHEDULE" && slots.length > 0 && (
+                  <span className="text-gray-400">
+                    {" "}· {slots.map((s) => `${s.start}–${s.end}`).join(", ")}
+                  </span>
                 )}
               </p>
             );
@@ -286,22 +314,63 @@ export default function AdminSettingsPage() {
             </div>
           )}
 
-          {/* Modo POR HORARIO */}
+          {/* Modo POR HORARIO — franjas múltiples */}
           {settings.deliveryMode === "SCHEDULE" && (
-            <div className="mb-4">
-              <p className="text-sm text-gray-500 mb-2">
-                El delivery se activa y desactiva solo entre estos horarios (hora de Argentina).
+            <div className="mb-4 space-y-3">
+              <p className="text-sm text-gray-500">
+                El delivery se activa y desactiva automáticamente (hora de Argentina). Podés agregar varias franjas, por ejemplo mediodía y noche.
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="min-w-0">
-                  <label className="text-sm font-medium text-gray-600 mb-1 block">Desde</label>
-                  <input name="deliveryFrom" type="time" value={settings.deliveryFrom} onChange={handleChange} className="input-field w-full" />
+
+              {slots.map((slot, i) => (
+                <div key={i} className="flex items-center gap-2 bg-gray-50 rounded-xl p-3">
+                  <span className="text-xs font-bold text-gray-400 w-5 text-center">{i + 1}</span>
+                  <div className="flex-1 grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-xs font-medium text-gray-500 mb-1 block">Desde</label>
+                      <input
+                        type="time"
+                        value={slot.start}
+                        onChange={(e) => setSlots((prev) => prev.map((s, j) => j === i ? { ...s, start: e.target.value } : s))}
+                        className="input-field w-full text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-500 mb-1 block">Hasta</label>
+                      <input
+                        type="time"
+                        value={slot.end}
+                        onChange={(e) => setSlots((prev) => prev.map((s, j) => j === i ? { ...s, end: e.target.value } : s))}
+                        className="input-field w-full text-sm"
+                      />
+                    </div>
+                  </div>
+                  {slots.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => setSlots((prev) => prev.filter((_, j) => j !== i))}
+                      className="w-8 h-8 flex items-center justify-center rounded-full bg-red-50 text-red-400 hover:bg-red-100 flex-shrink-0 transition-colors"
+                      aria-label="Eliminar franja"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                      </svg>
+                    </button>
+                  )}
                 </div>
-                <div className="min-w-0">
-                  <label className="text-sm font-medium text-gray-600 mb-1 block">Hasta</label>
-                  <input name="deliveryTo" type="time" value={settings.deliveryTo} onChange={handleChange} className="input-field w-full" />
-                </div>
-              </div>
+              ))}
+
+              {slots.length < 4 && (
+                <button
+                  type="button"
+                  onClick={() => setSlots((prev) => [...prev, { start: "09:00", end: "13:00" }])}
+                  className="w-full flex items-center justify-center gap-2 border-2 border-dashed border-gray-200 rounded-xl py-2.5 text-sm font-semibold text-gray-400 hover:border-grido-primary hover:text-grido-primary transition-colors"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                  Agregar franja horaria
+                </button>
+              )}
             </div>
           )}
 
@@ -367,25 +436,36 @@ export default function AdminSettingsPage() {
           </div>
         </div>
 
-        {/* Transferencia */}
-        <div className="bg-white rounded-2xl p-5 shadow-card">
-          <h2 className="font-bold text-gray-900 mb-4">Transferencia bancaria</h2>
-          <div className="space-y-3">
-            <div>
-              <label className="text-sm font-medium text-gray-600 mb-1 block">Titular de la cuenta</label>
-              <input name="transferHolder" value={settings.transferHolder} onChange={handleChange} className="input-field" placeholder="Juan Pérez" />
-              <p className="text-xs text-gray-400 mt-1">El nombre que verá el cliente para saber a quién transferir</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-600 mb-1 block">Alias</label>
-              <input name="transferAlias" value={settings.transferAlias} onChange={handleChange} className="input-field" placeholder="grido.sanrafael.mp" />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-600 mb-1 block">CBU (opcional)</label>
-              <input name="transferCbu" value={settings.transferCbu} onChange={handleChange} className="input-field" placeholder="0000000000000000000000" />
+        {/* Transferencia — solo visible para ADMIN */}
+        {isAdmin ? (
+          <div className="bg-white rounded-2xl p-5 shadow-card">
+            <h2 className="font-bold text-gray-900 mb-1">Transferencia bancaria</h2>
+            <p className="text-sm text-gray-500 mb-4">Solo visible para administradores</p>
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm font-medium text-gray-600 mb-1 block">Titular de la cuenta</label>
+                <input name="transferHolder" value={settings.transferHolder} onChange={handleChange} className="input-field" placeholder="Juan Pérez" />
+                <p className="text-xs text-gray-400 mt-1">El nombre que verá el cliente para saber a quién transferir</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600 mb-1 block">Alias</label>
+                <input name="transferAlias" value={settings.transferAlias} onChange={handleChange} className="input-field" placeholder="grido.sanrafael.mp" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600 mb-1 block">CBU (opcional)</label>
+                <input name="transferCbu" value={settings.transferCbu} onChange={handleChange} className="input-field" placeholder="0000000000000000000000" />
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-gray-50 rounded-2xl p-5 border border-dashed border-gray-200 flex items-center gap-3">
+            <span className="text-2xl">🔒</span>
+            <div>
+              <p className="font-semibold text-gray-600 text-sm">Datos bancarios restringidos</p>
+              <p className="text-xs text-gray-400 mt-0.5">Solo el administrador puede ver y modificar el alias y CBU</p>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="mt-6">
