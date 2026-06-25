@@ -2,15 +2,12 @@
 
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { useSession } from "next-auth/react";
 import type { AppSettings } from "@/types";
 import { isWithinAnySlot } from "@/lib/delivery";
 
 type Slot = { start: string; end: string };
 
 export default function AdminSettingsPage() {
-  const { data: session } = useSession();
-  const isAdmin = (session?.user as any)?.role === "ADMIN";
 
   const [settings, setSettings] = useState<AppSettings>({
     deliveryEnabled: true,
@@ -436,36 +433,30 @@ export default function AdminSettingsPage() {
           </div>
         </div>
 
-        {/* Transferencia — solo visible para ADMIN */}
-        {isAdmin ? (
-          <div className="bg-white rounded-2xl p-5 shadow-card">
-            <h2 className="font-bold text-gray-900 mb-1">Transferencia bancaria</h2>
-            <p className="text-sm text-gray-500 mb-4">Solo visible para administradores</p>
-            <div className="space-y-3">
-              <div>
-                <label className="text-sm font-medium text-gray-600 mb-1 block">Titular de la cuenta</label>
-                <input name="transferHolder" value={settings.transferHolder} onChange={handleChange} className="input-field" placeholder="Juan Pérez" />
-                <p className="text-xs text-gray-400 mt-1">El nombre que verá el cliente para saber a quién transferir</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-600 mb-1 block">Alias</label>
-                <input name="transferAlias" value={settings.transferAlias} onChange={handleChange} className="input-field" placeholder="grido.sanrafael.mp" />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-600 mb-1 block">CBU (opcional)</label>
-                <input name="transferCbu" value={settings.transferCbu} onChange={handleChange} className="input-field" placeholder="0000000000000000000000" />
-              </div>
-            </div>
+        {/* Transferencia — solo lectura, no modificable desde el panel */}
+        <div className="bg-white rounded-2xl p-5 shadow-card">
+          <div className="flex items-center gap-2 mb-1">
+            <h2 className="font-bold text-gray-900">Transferencia bancaria</h2>
+            <span className="text-xs bg-gray-100 text-gray-500 font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
+              🔒 Solo lectura
+            </span>
           </div>
-        ) : (
-          <div className="bg-gray-50 rounded-2xl p-5 border border-dashed border-gray-200 flex items-center gap-3">
-            <span className="text-2xl">🔒</span>
-            <div>
-              <p className="font-semibold text-gray-600 text-sm">Datos bancarios restringidos</p>
-              <p className="text-xs text-gray-400 mt-0.5">Solo el administrador puede ver y modificar el alias y CBU</p>
-            </div>
+          <p className="text-xs text-gray-400 mb-4">Para cambiar estos datos contactá al desarrollador del sistema</p>
+          <div className="space-y-3">
+            {[
+              { label: "Titular", value: settings.transferHolder },
+              { label: "Alias", value: settings.transferAlias },
+              { label: "CBU", value: settings.transferCbu },
+            ].map((item) => (
+              <div key={item.label} className="flex items-center justify-between py-2.5 px-3 bg-gray-50 rounded-xl">
+                <span className="text-sm font-medium text-gray-500">{item.label}</span>
+                <span className="text-sm font-bold text-gray-800 font-mono">
+                  {item.value || <span className="text-gray-300 font-sans font-normal">No configurado</span>}
+                </span>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
       </div>
 
       <div className="mt-6">

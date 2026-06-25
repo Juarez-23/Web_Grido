@@ -102,16 +102,8 @@ export async function PUT(req: NextRequest) {
       updates.push({ key: "whatsappNumber", value: body.whatsappNumber });
     if (body.whatsappDelivery !== undefined)
       updates.push({ key: "whatsappDelivery", value: body.whatsappDelivery });
-    // Datos bancarios — solo ADMIN puede modificarlos
-    const role = (session.user as any)?.role;
-    if (role === "ADMIN") {
-      if (body.transferAlias !== undefined)
-        updates.push({ key: "transferAlias", value: body.transferAlias });
-      if (body.transferCbu !== undefined)
-        updates.push({ key: "transferCbu", value: body.transferCbu });
-      if (body.transferHolder !== undefined)
-        updates.push({ key: "transferHolder", value: body.transferHolder });
-    }
+    // Datos bancarios (transferAlias, transferCbu, transferHolder) — bloqueados:
+    // no se modifican desde el panel de admin, sin importar el rol.
     if (body.storeOpen !== undefined)
       updates.push({ key: "storeOpen", value: String(body.storeOpen) });
     if (body.storeClosedMessage !== undefined)
