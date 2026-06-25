@@ -319,49 +319,38 @@ export default function AdminSettingsPage() {
               </p>
 
               {slots.map((slot, i) => (
-                <div key={i} className="bg-gray-50 rounded-xl overflow-hidden">
-                  {/* Encabezado de la franja */}
-                  <div className="flex items-center justify-between px-3 pt-2.5 pb-1">
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wide">
-                      Franja {i + 1}
-                    </span>
-                    {slots.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => setSlots((prev) => prev.filter((_, j) => j !== i))}
-                        className="text-xs font-semibold text-red-400 hover:text-red-600 flex items-center gap-1 transition-colors"
-                        aria-label="Eliminar franja"
-                      >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                          <path d="M18 6L6 18M6 6l12 12" />
-                        </svg>
-                        Eliminar
-                      </button>
-                    )}
-                  </div>
-                  {/* Inputs de hora en fila separada */}
-                  <div className="grid grid-cols-2 gap-2 px-3 pb-3">
-                    <div>
-                      <label className="text-xs font-medium text-gray-500 mb-1 block">Desde</label>
-                      <input
-                        type="time"
-                        value={slot.start}
-                        onChange={(e) => setSlots((prev) => prev.map((s, j) => j === i ? { ...s, start: e.target.value } : s))}
-                        className="input-field w-full text-sm tabular-nums"
-                        style={{ colorScheme: "light" }}
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs font-medium text-gray-500 mb-1 block">Hasta</label>
-                      <input
-                        type="time"
-                        value={slot.end}
-                        onChange={(e) => setSlots((prev) => prev.map((s, j) => j === i ? { ...s, end: e.target.value } : s))}
-                        className="input-field w-full text-sm tabular-nums"
-                        style={{ colorScheme: "light" }}
-                      />
-                    </div>
-                  </div>
+                <div key={i} className="flex items-center gap-2">
+                  {/* Desde */}
+                  <input
+                    type="time"
+                    value={slot.start}
+                    onChange={(e) => setSlots((prev) => prev.map((s, j) => j === i ? { ...s, start: e.target.value } : s))}
+                    className="flex-1 min-w-0 border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-800 tabular-nums bg-white focus:outline-none focus:ring-2 focus:ring-grido-primary/30 focus:border-grido-primary"
+                    style={{ colorScheme: "light" }}
+                  />
+                  {/* Separador */}
+                  <span className="text-gray-400 text-sm font-medium flex-shrink-0">→</span>
+                  {/* Hasta */}
+                  <input
+                    type="time"
+                    value={slot.end}
+                    onChange={(e) => setSlots((prev) => prev.map((s, j) => j === i ? { ...s, end: e.target.value } : s))}
+                    className="flex-1 min-w-0 border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-800 tabular-nums bg-white focus:outline-none focus:ring-2 focus:ring-grido-primary/30 focus:border-grido-primary"
+                    style={{ colorScheme: "light" }}
+                  />
+                  {/* Eliminar */}
+                  {slots.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => setSlots((prev) => prev.filter((_, j) => j !== i))}
+                      className="w-8 h-8 flex items-center justify-center rounded-full bg-red-50 text-red-400 hover:bg-red-100 flex-shrink-0 transition-colors"
+                      aria-label="Eliminar franja"
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                      </svg>
+                    </button>
+                  )}
                 </div>
               ))}
 
