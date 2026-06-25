@@ -124,6 +124,10 @@ export default function CheckoutPage() {
     if (form.deliveryType === "DELIVERY" && !form.address?.trim()) {
       toast.error("Ingresá la dirección de entrega"); return;
     }
+    if (form.deliveryType === "DELIVERY" && !locationUrl) {
+      toast.error("Necesitamos tu ubicación GPS para confirmar que estás dentro de la zona de delivery");
+      return;
+    }
     if (form.deliveryType === "DELIVERY" && zoneStatus === "outside") {
       toast.error("Tu ubicación está fuera de la zona de delivery"); return;
     }
@@ -175,9 +179,15 @@ export default function CheckoutPage() {
       const order = orderData.data;
       // El link de WhatsApp ya viene en la respuesta (sin segundo viaje a la DB)
       clearCart();
-      router.push(
-        `/pedido-confirmado?order=${order.id}&wa=${encodeURIComponent(orderData.waUrl || "")}&method=${form.paymentMethod}`
-      );
+      const params = new URLSearchParams({
+        order: order.id,
+        wa: orderData.waUrl || "",
+        method: form.paymentMethod,
+      });
+      if (orderData.waDeliveryUrl) {
+        params.set("waDelivery", orderData.waDeliveryUrl);
+      }
+      router.push(`/pedido-confirmado?${params.toString()}`);
     } catch (err) {
       console.error(err);
       toast.error("Error de conexión. Revisá tu internet e intentá de nuevo.");
@@ -344,7 +354,7 @@ export default function CheckoutPage() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => setLocationUrl(null)}
+                    onClick={() => { setLocationUrl(null); setZoneStatus("unknown"); setZoneDistance(null); }}
                     className="text-gray-400 hover:text-red-500 p-1"
                     aria-label="Quitar ubicación"
                   >
@@ -354,29 +364,39 @@ export default function CheckoutPage() {
                   </button>
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={handleGetLocation}
-                  disabled={gettingLocation}
-                  className="w-full flex items-center justify-center gap-2 border-2 border-grido-primary text-grido-primary font-semibold rounded-xl py-3 text-sm active:scale-95 transition-transform disabled:opacity-60"
-                >
-                  {gettingLocation ? (
-                    <>
-                      <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                      </svg>
-                      Obteniendo ubicación...
-                    </>
-                  ) : (
-                    <>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
-                      </svg>
-                      Usar mi ubicación actual
-                    </>
-                  )}
-                </button>
+                <div>
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <span className="text-sm font-medium text-gray-600">Ubicación GPS</span>
+                    <span className="text-red-500 text-sm font-bold">*</span>
+                    <span className="ml-auto text-xs text-red-500 font-semibold bg-red-50 px-2 py-0.5 rounded-full">Obligatorio</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleGetLocation}
+                    disabled={gettingLocation}
+                    className="w-full flex items-center justify-center gap-2 bg-grido-primary text-white font-semibold rounded-xl py-3.5 text-sm active:scale-95 transition-transform disabled:opacity-60 shadow-sm"
+                  >
+                    {gettingLocation ? (
+                      <>
+                        <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Obteniendo ubicación...
+                      </>
+                    ) : (
+                      <>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
+                        </svg>
+                        📍 Compartir mi ubicación actual
+                      </>
+                    )}
+                  </button>
+                  <p className="text-[11px] text-gray-400 text-center mt-2">
+                    Necesitamos tu ubicación para confirmar que estás dentro de nuestra zona de delivery
+                  </p>
+                </div>
               )}
               {/* Fuera de zona de cobertura */}
               {zoneStatus === "outside" && (
@@ -404,9 +424,6 @@ export default function CheckoutPage() {
                 </div>
               )}
 
-              <p className="text-[11px] text-gray-400 text-center">
-                Compartí tu ubicación para que el repartidor te encuentre más rápido 🛵
-              </p>
             </div>
           )}
         </section>
@@ -534,7 +551,12 @@ export default function CheckoutPage() {
 
           <button
             onClick={handleSubmit}
-            disabled={loading || (settings !== null && !settings?.storeOpen) || (form.deliveryType === "DELIVERY" && zoneStatus === "outside")}
+            disabled={
+              loading ||
+              (settings !== null && !settings?.storeOpen) ||
+              (form.deliveryType === "DELIVERY" && zoneStatus === "outside") ||
+              (form.deliveryType === "DELIVERY" && !locationUrl)
+            }
             className="w-full btn-primary h-14 text-base flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (

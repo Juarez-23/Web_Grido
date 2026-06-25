@@ -15,6 +15,7 @@ export default function AdminSettingsPage() {
     deliveryCost: 1500,
     minOrderAmount: 5000,
     whatsappNumber: "5492604000000",
+    whatsappDelivery: "",
     transferAlias: "",
     transferCbu: "",
     transferHolder: "",
@@ -350,9 +351,20 @@ export default function AdminSettingsPage() {
         {/* WhatsApp */}
         <div className="bg-white rounded-2xl p-5 shadow-card">
           <h2 className="font-bold text-gray-900 mb-4">WhatsApp</h2>
-          <label className="text-sm font-medium text-gray-600 mb-1 block">Número (con código de país, sin +)</label>
-          <input name="whatsappNumber" value={settings.whatsappNumber} onChange={handleChange} className="input-field" placeholder="5492604000000" />
-          <p className="text-xs text-gray-400 mt-1">Ejemplo: 5492604123456 (54=Argentina, 260=San Rafael)</p>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-gray-600 mb-1 block">📱 WhatsApp del local (principal)</label>
+              <input name="whatsappNumber" value={settings.whatsappNumber} onChange={handleChange} className="input-field" placeholder="5492604000000" />
+              <p className="text-xs text-gray-400 mt-1">Recibe todos los pedidos (delivery y retiro). Ej: 5492604123456</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-600 mb-1 block">🛵 WhatsApp Delivery (repartidor)</label>
+              <input name="whatsappDelivery" value={settings.whatsappDelivery ?? ""} onChange={handleChange} className="input-field" placeholder="5492604000001 (opcional)" />
+              <p className="text-xs text-gray-400 mt-1">
+                Si está configurado, cuando el cliente elige <strong>Delivery</strong> también se le envía el pedido a este número con la dirección y mapa. Dejá vacío para desactivar.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Transferencia */}

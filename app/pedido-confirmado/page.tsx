@@ -4,10 +4,20 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
+function WaIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+      <path d="M11.999 0C5.373 0 0 5.373 0 12c0 2.119.554 4.107 1.523 5.837L.057 23.804l6.085-1.596A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.626 0 11.999 0zm.001 21.818a9.814 9.814 0 01-5.007-1.372l-.359-.213-3.72.975.993-3.62-.234-.373A9.847 9.847 0 012.18 12c0-5.419 4.401-9.818 9.82-9.818 5.418 0 9.818 4.399 9.818 9.818 0 5.419-4.4 9.818-9.818 9.818z" />
+    </svg>
+  );
+}
+
 function PedidoConfirmadoContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("order");
   const waUrl = searchParams.get("wa");
+  const waDeliveryUrl = searchParams.get("waDelivery");
   const method = searchParams.get("method"); // EFECTIVO | TRANSFERENCIA
 
   const [whatsappOpened, setWhatsappOpened] = useState(false);
@@ -18,7 +28,7 @@ function PedidoConfirmadoContent() {
   // waUrl ya viene decodificado por useSearchParams (no decodificar de nuevo)
   const waLink = waUrl || null;
 
-  // Auto-abrir WhatsApp
+  // Auto-abrir WhatsApp principal
   useEffect(() => {
     if (waLink && !whatsappOpened) {
       setTimeout(() => {
@@ -27,6 +37,8 @@ function PedidoConfirmadoContent() {
       }, 900);
     }
   }, [waLink]);
+
+  const waDeliveryLink = waDeliveryUrl || null;
 
   return (
     <div className="min-h-dvh bg-gray-50 flex flex-col items-center justify-center px-4 py-10">
@@ -88,6 +100,7 @@ function PedidoConfirmadoContent() {
 
         {/* Botones */}
         <div className="space-y-3">
+          {/* WhatsApp principal — local */}
           {waLink && (
             <a
               href={waLink}
@@ -96,11 +109,22 @@ function PedidoConfirmadoContent() {
               className="w-full flex items-center justify-center gap-2.5 text-white font-bold rounded-2xl py-4 text-base active:scale-95 transition-transform shadow-md"
               style={{ backgroundColor: "#25D366" }}
             >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
-                <path d="M11.999 0C5.373 0 0 5.373 0 12c0 2.119.554 4.107 1.523 5.837L.057 23.804l6.085-1.596A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.626 0 11.999 0zm.001 21.818a9.814 9.814 0 01-5.007-1.372l-.359-.213-3.72.975.993-3.62-.234-.373A9.847 9.847 0 012.18 12c0-5.419 4.401-9.818 9.82-9.818 5.418 0 9.818 4.399 9.818 9.818 0 5.419-4.4 9.818-9.818 9.818z" />
-              </svg>
-              {isTransfer ? "Enviar pedido + comprobante" : "Enviar pedido por WhatsApp"}
+              <WaIcon />
+              {isTransfer ? "Enviar pedido + comprobante al local" : "Enviar pedido al local"}
+            </a>
+          )}
+
+          {/* WhatsApp Delivery — repartidor (solo si es delivery y hay número configurado) */}
+          {waDeliveryLink && (
+            <a
+              href={waDeliveryLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-center gap-2.5 text-white font-bold rounded-2xl py-4 text-base active:scale-95 transition-transform shadow-md"
+              style={{ backgroundColor: "#128C7E" }}
+            >
+              <WaIcon />
+              Avisar al repartidor 🛵
             </a>
           )}
 

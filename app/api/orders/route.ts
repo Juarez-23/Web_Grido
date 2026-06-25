@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { generateWhatsAppMessage, generateWhatsAppUrl } from "@/lib/whatsapp";
+import { generateWhatsAppMessage, generateWhatsAppUrl, generateDeliveryMessage } from "@/lib/whatsapp";
 import { getAdminBranchId, resolveBranchId } from "@/lib/branch";
 import { deliveryActiveFromMap } from "@/lib/delivery";
 import type { CheckoutFormData, CartItem } from "@/types";
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
     const settingsRows = await prisma.setting.findMany({
       where: {
         branchId,
-        key: { in: ["storeOpen", "deliveryEnabled", "deliveryManualOn", "deliveryMode", "deliveryFrom", "deliveryTo", "minOrderAmount", "whatsappNumber", "transferAlias", "transferCbu", "transferHolder"] },
+        key: { in: ["storeOpen", "deliveryEnabled", "deliveryManualOn", "deliveryMode", "deliveryFrom", "deliveryTo", "minOrderAmount", "whatsappNumber", "whatsappDelivery", "transferAlias", "transferCbu", "transferHolder"] },
       },
     });
     const settings: Record<string, string> = {};
@@ -185,7 +185,23 @@ export async function POST(req: NextRequest) {
     const whatsappNumber = settings.whatsappNumber || process.env.WHATSAPP_NUMBER || "5492604000000";
     const waUrl = generateWhatsAppUrl(whatsappNumber, message);
 
-    return NextResponse.json({ data: order, waUrl }, { status: 201 });
+    // WhatsApp Delivery: solo se genera si el pedido es Delivery y hay número configurado
+    let waDeliveryUrl: string | null = null;
+    const deliveryNumber = settings.whatsappDelivery?.trim();
+    if (deliveryType === "DELIVERY" && deliveryNumber) {
+      const deliveryMsg = generateDeliveryMessage(
+        order.orderNumber,
+        formData,
+        cartItems,
+        order.subtotal,
+        order.deliveryCost,
+        order.total,
+        branch?.name
+      );
+      waDeliveryUrl = generateWhatsAppUrl(deliveryNumber, deliveryMsg);
+    }
+
+    return NextResponse.json({ data: order, waUrl, waDeliveryUrl }, { status: 201 });
   } catch (error) {
     console.error("POST /api/orders error:", error);
     return NextResponse.json({ error: "Error al crear pedido" }, { status: 500 });

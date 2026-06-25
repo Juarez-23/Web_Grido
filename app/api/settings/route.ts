@@ -32,6 +32,7 @@ export async function GET(req: NextRequest) {
       deliveryCost: parseFloat(map.deliveryCost || "1500"),
       minOrderAmount: parseFloat(map.minOrderAmount || "5000"),
       whatsappNumber: map.whatsappNumber || "5492604000000",
+      whatsappDelivery: map.whatsappDelivery || "",
       transferAlias: map.transferAlias || "",
       transferCbu: map.transferCbu || "",
       transferHolder: map.transferHolder || "",
@@ -95,6 +96,8 @@ export async function PUT(req: NextRequest) {
       updates.push({ key: "minOrderAmount", value: String(body.minOrderAmount) });
     if (body.whatsappNumber !== undefined)
       updates.push({ key: "whatsappNumber", value: body.whatsappNumber });
+    if (body.whatsappDelivery !== undefined)
+      updates.push({ key: "whatsappDelivery", value: body.whatsappDelivery });
     if (body.transferAlias !== undefined)
       updates.push({ key: "transferAlias", value: body.transferAlias });
     if (body.transferCbu !== undefined)

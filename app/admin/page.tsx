@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Link from "next/link";
 import { DashboardPending } from "@/components/admin/DashboardPending";
+import { DashboardStats } from "@/components/admin/DashboardStats";
 import type { OrderStatus } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -55,12 +56,6 @@ export default async function AdminDashboard() {
   const branchId = (session?.user as any)?.branchId ?? null;
   const d = await getData(branchId);
 
-  const stats = [
-    { label: "Pedidos hoy", value: d.todayCount },
-    { label: "Ventas hoy", value: money(d.todayRevenue) },
-    { label: "Ventas del mes", value: money(d.monthTotal) },
-  ];
-
   return (
     <div className="p-4 md:p-8 max-w-3xl mx-auto">
       {/* Saludo */}
@@ -71,15 +66,15 @@ export default async function AdminDashboard() {
         </p>
       </div>
 
-      {/* 3 números clave */}
-      <div className="grid grid-cols-3 gap-px bg-gray-100 rounded-2xl overflow-hidden mb-8 shadow-card">
-        {stats.map((s) => (
-          <div key={s.label} className="bg-white p-5 text-center">
-            <p className="text-xl md:text-2xl font-black text-gray-900 leading-none">{s.value}</p>
-            <p className="text-gray-400 text-xs mt-2">{s.label}</p>
-          </div>
-        ))}
-      </div>
+      {/* 3 números clave — se actualizan en tiempo real cada 30s */}
+      <DashboardStats
+        initial={{
+          todayCount: d.todayCount,
+          todayRevenue: d.todayRevenue,
+          monthTotal: d.monthTotal,
+          activeCount: d.activeCount,
+        }}
+      />
 
       {/* Pedidos pendientes */}
       <div className="flex items-center justify-between mb-3">

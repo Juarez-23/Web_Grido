@@ -137,6 +137,8 @@ export interface AppSettings {
   deliveryCost: number;
   minOrderAmount: number;
   whatsappNumber: string;
+  /** Número de WhatsApp exclusivo para el repartidor (delivery). Opcional. */
+  whatsappDelivery: string;
   transferAlias: string;
   transferCbu: string;
   /** Nombre del titular de la cuenta (para transferencias) */
